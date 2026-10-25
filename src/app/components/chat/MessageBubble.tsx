@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '../../lib/cn'
+import { LogoMark } from '../ui/LogoMark'
 
 export type MessageRole = 'user' | 'assistant' | 'system'
 
@@ -38,7 +39,7 @@ export function MessageBubble({
     return (
       <div className={cn('flex flex-col gap-1.5', className)}>
         <div className="flex items-center gap-2" aria-hidden="true">
-          <LokMark />
+          <LogoMark size="sm" />
           <span className="text-2xs font-medium text-fg-tertiary">LokAI</span>
         </div>
         <div className="min-w-0 text-fg-primary">{children}</div>
@@ -68,26 +69,5 @@ export function MessageBubble({
         </button>
       )}
     </div>
-  )
-}
-
-/** small flame-in-navy mark for assistant turns */
-export function LokMark({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-standout',
-        className,
-      )}
-      aria-hidden="true"
-    >
-      <svg viewBox="0 0 24 24" className="size-3" fill="none">
-        <path
-          d="M12 5c-.9 2.6-3.4 3.4-3.4 6.3a3.4 3.4 0 0 0 6.8 0C15.4 8.4 12.9 7.6 12 5z"
-          fill="var(--c-spark)"
-          stroke="none"
-        />
-      </svg>
-    </span>
   )
 }

@@ -12,7 +12,7 @@ export function Card({ raised = false, paper = false, className, ...rest }: Card
   return (
     <div
       className={cn(
-        'rounded-2xl border p-4',
+        'rounded-3xl border p-4',
         paper ? 'paper border-warning-line/60' : 'bg-card border-line-default',
         raised && !paper && 'shadow-default',
         className,

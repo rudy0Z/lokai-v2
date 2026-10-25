@@ -67,6 +67,181 @@ body {
   line-height: 2.15;
 }
 
+/* ============================================================================
+   VoiceOrb — THE signature element (DESIGN.md). The only gradients in the
+   product. Sage layers over the ivory ground; core disc in standout ink.
+   ============================================================================ */
+.voice-orb {
+  --orb-outer: oklch(76% 0.055 140 / 0.34);
+  --orb-mid: oklch(62% 0.075 150 / 0.55);
+  --orb-core: var(--c-standout);
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.voice-orb--lg {
+  width: 200px;
+  height: 200px;
+}
+.voice-orb--md {
+  width: 128px;
+  height: 128px;
+}
+[data-theme="dark"] .voice-orb {
+  --orb-outer: oklch(58% 0.06 150 / 0.28);
+  --orb-mid: oklch(45% 0.07 155 / 0.5);
+}
+.orb-layer {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+.orb-outer {
+  inset: 0;
+  background: radial-gradient(
+    58% 58% at 42% 38%,
+    var(--orb-outer),
+    transparent 72%
+  );
+}
+.orb-mid {
+  inset: 14%;
+  background: radial-gradient(
+    60% 60% at 45% 40%,
+    var(--orb-mid),
+    transparent 74%
+  );
+}
+.orb-core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44%;
+  height: 44%;
+  border-radius: 9999px;
+  background: var(--orb-core);
+  box-shadow: 0 8px 24px rgb(20 34 26 / 0.28);
+}
+
+/* idle: a slow breathe */
+.voice-orb--idle .orb-mid {
+  animation: orb-breathe 3.6s var(--ease-out-soft, ease-out) infinite;
+}
+.voice-orb--idle .orb-outer {
+  animation: orb-breathe 3.6s var(--ease-out-soft, ease-out) infinite 0.4s;
+}
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+/* listening: quicker pulse + expanding rings */
+.voice-orb--listening .orb-mid {
+  animation: orb-pulse 1.15s ease-in-out infinite;
+}
+.voice-orb--listening .orb-outer {
+  animation: orb-pulse 1.15s ease-in-out infinite 0.18s;
+}
+@keyframes orb-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+.orb-ring {
+  position: absolute;
+  inset: 18%;
+  border-radius: 9999px;
+  border: 1.5px solid var(--orb-mid);
+  animation: orb-ring 1.8s ease-out infinite;
+  pointer-events: none;
+}
+.orb-ring--b {
+  animation-delay: 0.9s;
+}
+@keyframes orb-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+/* thinking: a held, slightly contracted state (beats carry the motion) */
+.voice-orb--thinking .orb-mid {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-orb .orb-layer,
+  .voice-orb .orb-ring {
+    animation: none !important;
+  }
+}
+
+/* ============================================================================
+   Listening waveform — deterministic bar dance, green ink. Reduced motion
+   holds a static mid-wave.
+   ============================================================================ */
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 28px;
+}
+.wave-bar {
+  width: 3px;
+  border-radius: 999px;
+  background: var(--c-brand-solid);
+  height: 30%;
+  animation: wave-dance 1.05s ease-in-out infinite;
+}
+.wave-bar:nth-child(4n + 1) {
+  animation-delay: 0.12s;
+}
+.wave-bar:nth-child(4n + 2) {
+  animation-delay: 0.28s;
+  height: 62%;
+}
+.wave-bar:nth-child(4n + 3) {
+  animation-delay: 0.05s;
+  height: 88%;
+}
+.wave-bar:nth-child(4n) {
+  animation-delay: 0.36s;
+  height: 46%;
+}
+@keyframes wave-dance {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wave-bar {
+    animation: none !important;
+    height: 55%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -69,6 +69,16 @@ export const LEGAL_CONTENT: LegalEntry[] = [
     lastChecked: '2026-10-25',
     notes: 'Prototype shows a clearly-marked placeholder contact until real data is added.',
   },
+  {
+    id: 'mmc-property-tax',
+    claim:
+      'Municipal corporations issue annual property-tax demands under their governing municipal act; the demand notice states the amount, the period, and the payment deadline.',
+    source: 'Mumbai Municipal Corporation Act, 1888',
+    sectionRef: 'S. 149 [VERIFY — property-tax demand provision]',
+    verified: false,
+    lastChecked: '2026-10-26',
+    notes: 'Cited by the notice-interpretation scenario. Section number is a placeholder pending verification.',
+  },
 ]
 
 export function legalById(id: string): LegalEntry | undefined {

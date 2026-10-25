@@ -44,7 +44,7 @@ export default function GalleryPage() {
   )
 
   return (
-    <AppShell topBarExtra={<Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>{tr('back')}</Button>}>
+    <AppShell showTabs={false} topBarExtra={<Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>{tr('back')}</Button>}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <header className="flex flex-col gap-1">
           <h1 className="text-lg font-semibold text-fg-primary" lang="en">Component gallery</h1>

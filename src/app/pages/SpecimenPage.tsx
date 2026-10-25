@@ -95,6 +95,7 @@ export default function SpecimenPage() {
   const { tr, lang } = useApp()
   return (
     <AppShell
+      showTabs={false}
       topBarExtra={
         <Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>
           {tr('back')}

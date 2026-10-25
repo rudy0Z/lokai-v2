@@ -37,6 +37,18 @@ export default function DevLauncherPage() {
           ))}
 
           <Card className="mt-3">
+            <CardTitle>Flows</CardTitle>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              <Button variant="secondary" size="sm" onClick={() => navigate('/voice')}>
+                Simulated voice capture
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => navigate('/notice')}>
+                Notice interpreter
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="mt-3">
             <CardTitle>Foundations</CardTitle>
             <div className="mt-2.5 flex flex-wrap gap-2">
               <Button variant="secondary" size="sm" onClick={() => navigate('/specimen')}>

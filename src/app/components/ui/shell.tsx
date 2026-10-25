@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
-import { LokMark } from '../chat/MessageBubble'
+import { BrandLockup } from './LogoMark'
+import { TabBar, type TabId } from './TabBar'
 import { IconMoon, IconSun } from './icons'
 
 export function ThemeToggle({ className }: { className?: string }) {
@@ -30,12 +31,12 @@ export function LanguageSelect({ className }: { className?: string }) {
         value={lang}
         onChange={(e) => setLang(e.target.value as typeof lang)}
         aria-label={tr('langLabel')}
-        className="min-h-9 cursor-pointer rounded-lg border border-line-default bg-container px-2 py-1 text-2xs font-medium text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
+        className="min-h-9 cursor-pointer rounded-full border border-line-default bg-container px-2.5 py-1 text-2xs font-medium text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
       >
-        <option value="en">English</option>
-        <option value="hi">हिन्दी</option>
-        <option value="mr">मराठी</option>
-        <option value="ta">தமிழ்</option>
+        <option value="en">EN</option>
+        <option value="hi">हिं</option>
+        <option value="mr">मरा</option>
+        <option value="ta">தமி</option>
         <option value="ur">اردو</option>
       </select>
     </label>
@@ -43,34 +44,38 @@ export function LanguageSelect({ className }: { className?: string }) {
 }
 
 export interface AppShellProps {
+  activeTab?: TabId
+  showTabs?: boolean
   topBarExtra?: ReactNode
   children: ReactNode
   footer?: ReactNode
+  /** full-bleed main (no horizontal padding) — flows manage their own */
+  bare?: boolean
 }
 
 /**
  * The 390px framed prototype shell: full-bleed on small screens, centered
- * quiet frame on desktop (A3 viewport rule).
+ * quiet frame on desktop. Top bar = brand + language + theme; bottom =
+ * composer/footer and, on app surfaces, the tab bar.
  */
-export function AppShell({ topBarExtra, children, footer }: AppShellProps) {
+export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, children, footer }: AppShellProps) {
   const { tr } = useApp()
   return (
-    <div className="flex min-h-dvh justify-center bg-page">
-      <div className="flex min-h-dvh w-full max-w-[390px] flex-col bg-shell sm:my-6 sm:min-h-0 sm:h-[min(844px,calc(100dvh-3rem))] sm:rounded-3xl sm:border sm:border-line-default sm:shadow-xl overflow-hidden">
-        <header className="flex items-center gap-2 border-b border-line-subtle bg-shell px-3 py-2">
-          <LokMark />
-          <div className="me-auto min-w-0">
-            <p className="text-sm font-semibold leading-tight text-fg-primary">LokAI</p>
-            <p className="truncate text-2xs leading-tight text-fg-tertiary">{tr('roleLine')}</p>
+    <div className="flex h-dvh justify-center overflow-hidden bg-page">
+      <div className="flex h-dvh w-full max-w-[390px] flex-col bg-shell sm:my-6 sm:h-[min(844px,calc(100dvh-3rem))] sm:rounded-3xl sm:border sm:border-line-default sm:shadow-xl overflow-hidden">
+        <header className="flex items-center gap-2 border-b border-line-subtle bg-shell px-3 py-2.5">
+          <BrandLockup tagline={tr('roleLine')} />
+          <div className="ms-auto flex items-center gap-1.5">
+            {topBarExtra}
+            <LanguageSelect />
+            <ThemeToggle />
           </div>
-          {topBarExtra}
-          <LanguageSelect />
-          <ThemeToggle />
         </header>
         <main className="flex min-h-0 flex-1 flex-col">{children}</main>
         {footer && (
-          <footer className="border-t border-line-subtle bg-shell px-3 py-2.5">{footer}</footer>
+          <div className="border-t border-line-subtle bg-shell px-3 py-2.5">{footer}</div>
         )}
+        {showTabs && <TabBar active={activeTab} />}
       </div>
     </div>
   )

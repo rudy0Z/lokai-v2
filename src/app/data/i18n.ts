@@ -88,6 +88,49 @@ export interface UiStrings {
   ans1to2: Pack
   ans2plus: Pack
   ansNotSure: Pack
+  tabHome: Pack
+  tabHistory: Pack
+  tabSaved: Pack
+  tabProfile: Pack
+  navLabel: Pack
+  speakCta: Pack
+  langHint: Pack
+  addNotice: Pack
+  addNoticeSub: Pack
+  typeInstead: Pack
+  typeInsteadSub: Pack
+  listening: Pack
+  speakNaturally: Pack
+  tapToStop: Pack
+  heardTitle: Pack
+  heardSub: Pack
+  detectedLang: Pack
+  addDetails: Pack
+  addFilePhoto: Pack
+  addLocation: Pack
+  specifyDate: Pack
+  sendToLokai: Pack
+  simulatedVoiceNote: Pack
+  noticeMeaning: Pack
+  keyPoints: Pack
+  whatNext: Pack
+  sourcesLabel: Pack
+  viewAll: Pack
+  readOriginal: Pack
+  historyTitle: Pack
+  savedTitle: Pack
+  emptyHistory: Pack
+  emptySaved: Pack
+  privacyTitle: Pack
+  privacyBody: Pack
+  whatStored: Pack
+  storedBody: Pack
+  deleteAll: Pack
+  deleteAllConfirm: Pack
+  deleteYes: Pack
+  deleteNo: Pack
+  profileNote: Pack
+  autoDetect: Pack
 }
 
 export const UI: UiStrings = {
@@ -189,6 +232,49 @@ export const UI: UiStrings = {
   ans1to2: { en: '1 to 2 years ago', hi: '1–2 साल पहले', mr: '1–2 वर्षांपूर्वी', ta: '1–2 ஆண்டுகளுக்கு முன்', ur: '1–2 سال پہلے' },
   ans2plus: { en: 'More than 2 years ago', hi: '2 साल से पहले', mr: '2 वर्षांहून अधिक पूर्वी', ta: '2 ஆண்டுகளுக்கு முன்', ur: '2 سال سے پہلے' },
   ansNotSure: { en: 'Not sure', hi: 'याद नहीं', mr: 'आठवत नाही', ta: 'நினைவில்லை', ur: 'یاد نہیں' },
+  tabHome: { en: 'Home', hi: 'होम', mr: 'होम', ta: 'முகப்பு', ur: 'ہوم' },
+  tabHistory: { en: 'History', hi: 'इतिहास', mr: 'इतिहास', ta: 'வரலாறு', ur: 'تاریخ' },
+  tabSaved: { en: 'Saved', hi: 'सेव किए', mr: 'सेव्ह केले', ta: 'சேமித்தவை', ur: 'محفوظ' },
+  tabProfile: { en: 'Profile', hi: 'प्रोफ़ाइल', mr: 'प्रोफाइल', ta: 'சுயவிவரம்', ur: 'پروفائل' },
+  navLabel: { en: 'Main navigation', hi: 'मुख्य नेविगेशन', mr: 'मुख्य नेव्हिगेशन', ta: 'முதன்மை வழிசெலுத்தல்', ur: 'مینی نیویگیشن' },
+  speakCta: { en: 'Tap to speak', hi: 'बोलने के लिए दबाएँ', mr: 'बोलण्यासाठी दाबा', ta: 'பேச தட்டவும்', ur: 'بولنے کے لیے دبائیں' },
+  langHint: { en: 'Hindi, English or any Indian language', hi: 'हिन्दी, अंग्रेज़ी या कोई भी भारतीय भाषा', mr: 'हिंदी, इंग्रजी किंवा कोणतीही भारतीय भाषा', ta: 'இந்தி, ஆங்கிலம் அல்லது எந்த இந்திய மொழி', ur: 'ہندی، انگریزی یا کوئی بھی ہندوستانی زبان' },
+  addNotice: { en: 'Add a notice', hi: 'नोटिस जोड़ें', mr: 'जाहीरनामा जोडा', ta: 'அறிவிப்பைச் சேர்க்க', ur: 'نوٹس لگائیں' },
+  addNoticeSub: { en: 'Upload or take a photo', hi: 'अपलोड करें या फ़ोटो लें', mr: 'अपलोड करा किंवा फोटो घ्या', ta: 'பதிவேற்றவும் அல்லது புகைப்படம்', ur: 'اپلوڈ کریں یا تصویر لیں' },
+  typeInstead: { en: 'Type instead', hi: 'टाइप करें', mr: 'टाइप करा', ta: 'தட்டச்சு செய்யவும்', ur: 'ٹائپ کریں' },
+  typeInsteadSub: { en: 'Open text chat', hi: 'टेक्स्ट चैट खोलें', mr: 'टेक्स्ट चॅट उघडा', ta: 'உரை அரட்டையைத் திற', ur: 'ٹیکسٹ چیٹ کھولیں' },
+  listening: { en: 'Listening…', hi: 'सुन रहा हूँ…', mr: 'ऐकत आहे…', ta: 'கேட்கிறேன்…', ur: 'سن رہا ہوں…' },
+  speakNaturally: { en: 'You can speak naturally in Hindi, English or any Indian language.', hi: 'आप हिन्दी, अंग्रेज़ी या किसी भी भारतीय भाषा में सहज रूप से बोल सकते हैं।', mr: 'तुम्ही हिंदी, इंग्रजी किंवा कोणत्याही भारतीय भाषेत नैसर्गिकरित्या बोलू शकता.', ta: 'இந்தி, ஆங்கிலம் அல்லது எந்த இந்திய மொழியிலும் இயல்பாகப் பேசலாம்.', ur: 'آپ ہندی، انگریزی یا کسی بھی ہندوستانی زبان میں قدرتی انداز میں بول سکتے ہیں۔' },
+  tapToStop: { en: 'Tap to stop', hi: 'रोकने के लिए दबाएँ', mr: 'थांबवण्यासाठी दाबा', ta: 'நிறுத்த தட்டவும்', ur: 'روکنے کے لیے دبائیں' },
+  heardTitle: { en: 'Here’s what I heard', hi: 'मैंने यह सुना', mr: 'मी असे ऐकले', ta: 'இதைக் கேட்டேன்', ur: 'میں نے یہ سنا' },
+  heardSub: { en: 'You can edit this before sending.', hi: 'भेजने से पहले आप इसे संपादित कर सकते हैं।', mr: 'पाठवण्यापूर्वी तुम्ही इट संपादित करू शकता.', ta: 'அனுப்புவதற்கு முன் இதைத் திருத்தலாம்.', ur: 'بھیجنے سے پہلے آپ اسے ترمیم کر سکتے ہیں۔' },
+  detectedLang: { en: 'Detected language', hi: 'पहचानी गई भाषा', mr: 'ओळखलेली भाषा', ta: 'கண்டறிந்த மொழி', ur: 'شناخت شدہ زبان' },
+  addDetails: { en: 'Add more details (optional)', hi: 'और विवरण जोड़ें (वैकल्पिक)', mr: 'अधिक तपशील जोडा (ऐच्छिक)', ta: 'கூடுதல் விவரங்கள் (விருப்பம்)', ur: 'مزید تفصیلات (اختیاری)' },
+  addFilePhoto: { en: 'Add a file / photo', hi: 'फ़ाइल / फ़ोटो जोड़ें', mr: 'फाइल / फोटो जोडा', ta: 'கோப்பு / புகைப்படம்', ur: 'فائل / تصویر لگائیں' },
+  addLocation: { en: 'Add location', hi: 'स्थान जोड़ें', mr: 'स्थान जोडा', ta: 'இடத்தைச் சேர்க்க', ur: 'مقام لگائیں' },
+  specifyDate: { en: 'Specify date', hi: 'तारीख़ बताएँ', mr: 'तारीख सांगा', ta: 'தேதியைக் குறி', ur: 'تاریخ متعین کریں' },
+  sendToLokai: { en: 'Send to LokAI', hi: 'LokAI को भेजें', mr: 'LokAI ला पाठवा', ta: 'LokAI-க்கு அனுப்பு', ur: 'LokAI کو بھیجیں' },
+  simulatedVoiceNote: { en: 'Voice is simulated in this prototype — nothing is recorded.', hi: 'इस प्रोटोटाइप में आवाज़ अनुकरित है — कुछ भी रिकॉर्ड नहीं होता।', mr: 'या प्रोटोटाइपमध्ये आवाज नक्कली आहे — काहीही रेकॉर्ड होत नाही.', ta: 'இந்த மாதிரியில் குரல் உருவகம் — எதுவும் பதிவு செய்யப்படவில்லை.', ur: 'اس پروٹوٹائپ میں آواز نقل ہے — کچھ بھی ریکارڈ نہیں ہوتا۔' },
+  noticeMeaning: { en: 'Here’s what this means', hi: 'इसका मतलब यह है', mr: 'याचा अर्थ असा', ta: 'இதன் பொருள் இதுவாகும்', ur: 'اس کا مطلب یہ ہے' },
+  keyPoints: { en: 'Key points from your notice', hi: 'आपके नोटिस के मुख्य बिंदु', mr: 'तुमच्या जाहीरनाम्यातील मुद्दे', ta: 'உங்கள் அறிவிப்பின் முக்கிய குறிப்புகள்', ur: 'آپ کے نوٹس کے اہم نکات' },
+  whatNext: { en: 'What you can do next', hi: 'आप आगे क्या कर सकते हैं', mr: 'पुढे तुम्ही काय करू शकता', ta: 'அடுத்து நீங்கள் என்ன செய்யலாம்', ur: 'آگے آپ کیا کر سکتے ہیں' },
+  sourcesLabel: { en: 'Sources', hi: 'स्रोत', mr: 'स्रोत', ta: 'மூலங்கள்', ur: 'ذرائع' },
+  viewAll: { en: 'View all', hi: 'सभी देखें', mr: 'सर्व पहा', ta: 'அனைத்தையும் காண்க', ur: 'سب دیکھیں' },
+  readOriginal: { en: 'Read the original notice', hi: 'मूल नोटिस पढ़ें', mr: 'मूळ जाहीरनामा वाचा', ta: 'மூல அறிவிப்பைப் படி', ur: 'اصل نوٹس پڑھیں' },
+  historyTitle: { en: 'History', hi: 'इतिहास', mr: 'इतिहास', ta: 'வரலாறு', ur: 'تاریخ' },
+  savedTitle: { en: 'Saved', hi: 'सेव किए', mr: 'सेव्ह केले', ta: 'சேமித்தவை', ur: 'محفوظ' },
+  emptyHistory: { en: 'Conversations you start will appear here.', hi: 'आपकी शुरू की गई बातचीत यहाँ दिखेगी।', mr: 'तुम्ही सुरू केलेली संभाषणे इथे दिसतील.', ta: 'நீங்கள் தொடங்கும் உரையாடல்கள் இங்கே தோன்றும்.', ur: 'آپ کی شروع کی گفتگو یہاں نظر آئے گی۔' },
+  emptySaved: { en: 'Save a finding or a draft and it will be here.', hi: 'कोई निष्कर्ष या ड्राफ़्ट सेव करें, वह यहाँ आएगा।', mr: 'एखादा निष्कर्ष किंवा मसुदा सेव्ह करा, तो इथे येईल.', ta: 'ஒரு கண்டுபிடிப்பையோ வரைவையோ சேமித்தால் இங்கே வரும்.', ur: 'کوئی نتیجہ یا مسودہ محفوظ کریں، وہ یہاں آئے گا۔' },
+  privacyTitle: { en: 'Privacy', hi: 'गोपनीयता', mr: 'गोपनीयता', ta: 'தனியுரிமை', ur: 'رازداری' },
+  privacyBody: { en: 'Legal conversations are sensitive. This prototype stores everything only on this device — nothing is sent anywhere.', hi: 'कानूनी बातचीत संवेदनशील होती है। यह प्रोटोटाइप सब कुछ केवल इसी डिवाइस पर रखता है — कुछ भी कहीं नहीं भेजा जाता।', mr: 'कायदेशीर संभाषणे संवेदनशील असतात. हे प्रोटोटाइप सर्व काही फक्त याच उपकरणावर ठेवते — काहीही कोठेतरी पाठवले जात नाही.', ta: 'சட்ட உரையாடல்கள் மிக முக்கியமானவை. இந்த மாதிரி எல்லாவற்றையும் இந்தச் சாதனத்தில் மட்டுமே வைக்கிறது — எதுவும் எங்கும் அனுப்பப்படுவதில்லை.', ur: 'قانونی گفتگو حساس ہوتی ہے۔ یہ پروٹوٹائپ سب کچھ صرف اسی ڈیوائس پر رکھتا ہے — کچھ بھی کہیں نہیں بھیجا جاتا۔' },
+  whatStored: { en: 'What is stored', hi: 'क्या संग्रहीत है', mr: 'काय साठवले आहे', ta: 'என்ன சேமிக்கப்பட்டுள்ளது', ur: 'کیا محفوظ ہے' },
+  storedBody: { en: 'Your conversations, uploaded documents (mock) and saved drafts — on this device only, until you delete them.', hi: 'आपकी बातचीत, अपलोड किए दस्तावेज़ (नमूना) और सेव किए ड्राफ़्ट — केवल इसी डिवाइस पर, जब तक आप न मिटाएँ।', mr: 'तुमची संभाषणे, अपलोड केलेले दस्तऐवज (नमुना) आणि सेव्ह केलेले मसुदे — फक्त याच उपकरणावर, जोपर्यंत तुम्ही डिलीट करत नाही.', ta: 'உங்கள் உரையாடல்கள், பதிவேற்றிய ஆவணங்கள் (போலி) மற்றும் சேமித்த வரைவுகள் — இந்தச் சாதனத்தில் மட்டுமே, நீங்கள் நீக்கும் வரை.', ur: 'آپ کی گفتگو، اپلوڈ شدہ دستاویزات (نمونہ) اور محفوظ مسودے — صرف اسی ڈیوائس پر، جب تک آپ حذف نہ کریں۔' },
+  deleteAll: { en: 'Delete everything', hi: 'सब कुछ मिटाएँ', mr: 'सर्व काही डिलीट करा', ta: 'எல்லாவற்றையும் நீக்கு', ur: 'سب کچھ حذف کریں' },
+  deleteAllConfirm: { en: 'Delete every conversation, document and saved draft on this device? This cannot be undone.', hi: 'इस डिवाइस पर हर बातचीत, दस्तावेज़ और सेव किया ड्राफ़्ट मिटाएँ? यह वापस नहीं आ सकता।', mr: 'या उपकरणावरील प्रत्येक संभाषण, दस्तऐवज आणि सेव्ह केलेला मसुदा डिलीट करायचा? हे परत येणार नाही.', ta: 'இந்தச் சாதனத்தில் உள்ள எல்லா உரையாடல்களையும் ஆவணங்களையும் சேமித்த வரைவுகளையும் நீக்கவா? இதை மீட்டல் முடியாது.', ur: 'اس ڈیوائس پر ہر گفتگو، دستاویز اور محفوظ مسودہ حذف کریں؟ یہ واپس نہیں آ سکتا۔' },
+  deleteYes: { en: 'Yes, delete everything', hi: 'हाँ, सब मिटाएँ', mr: 'हो, सर्व डिलीट करा', ta: 'ஆம், எல்லாவற்றையும் நீக்கு', ur: 'ہاں، سب حذف کریں' },
+  deleteNo: { en: 'Keep everything', hi: 'सब रखें', mr: 'सर्व ठेवा', ta: 'எல்லாம் வைத்திரு', ur: 'سب رکھیں' },
+  profileNote: { en: 'Prototype — this profile is illustrative only.', hi: 'प्रोटोटाइप — यह प्रोफ़ाइल केवल उदाहरण है।', mr: 'प्रोटोटाइप — ही प्रोफाइल केवल उदाहरण आहे.', ta: 'மாதிரி — இந்த சுயவிவரம் எடுத்துக்காட்டு மட்டுமே.', ur: 'پروٹوٹائپ — یہ پروفائل صرف مثال ہے۔' },
+  autoDetect: { en: 'Auto-detected', hi: 'स्वतः पहचाना', mr: 'स्वयं-ओळख', ta: 'தானாகக் கண்டறிதல்', ur: 'خود بخود شناخت' },
 }
 
 export type UiKey = keyof UiStrings

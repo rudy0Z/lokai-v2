@@ -23,6 +23,8 @@ import { ActionLadder } from '../components/cards/ActionLadder'
 import { CautionCard } from '../components/cards/CautionCard'
 import { DemandNoticeReview } from '../components/cards/DemandNoticeReview'
 import { StopScreen } from '../components/stop/StopScreen'
+import { VoiceOrb } from '../components/voice/VoiceOrb'
+import { IconCamera, IconKeyboard } from '../components/ui/icons'
 
 type ItemKind = 'user' | 'assistant' | 'chips' | 'finding' | 'ladder' | 'caution' | 'error' | 'system'
 
@@ -81,12 +83,21 @@ export default function ChatPage() {
 
   /* ---- flows ---- */
 
-  const startConsumerFlow = (fail = false) => {
+  const startConsumerFlow = (fail = false, userText?: string) => {
     run(
       'explain',
       () => {
+        // the scripted restatement belongs to the HomeKart demo journey;
+        // anything else gets an honest echo of the user's own words
+        const isMixerScenario = /HomeKart|mixer/i.test(userText ?? '')
+        const restatement = isMixerScenario
+          ? JOURNEY_STRINGS.restatement![lang]
+          : `“${(userText ?? '').trim()}”`
         push(
-          { kind: 'assistant', text: `${JOURNEY_STRINGS.reassurance![lang]}\n\n${tr('restatePrefix')} ${JOURNEY_STRINGS.restatement![lang]}` },
+          {
+            kind: 'assistant',
+            text: `${JOURNEY_STRINGS.reassurance![lang]}\n\n${tr('restatePrefix')} ${restatement}`,
+          },
           { kind: 'chips', text: 'qWhen' },
         )
       },
@@ -130,7 +141,7 @@ export default function ChatPage() {
       })
       return
     }
-    startConsumerFlow(fail)
+    startConsumerFlow(fail, text)
   }
 
   const handleAnswer = (answer: AnswerId) => {
@@ -185,6 +196,29 @@ export default function ChatPage() {
     setNoticeOpen(false)
     setFindingData(FINDING)
   }
+
+  /* ---- handoff from the simulated voice flow (review & send).
+     StrictMode-safe: the storage item is consumed only when the timer
+     actually fires, so the discarded first effect run doesn't eat it. ---- */
+  useEffect(() => {
+    let pending: string | null = null
+    try {
+      pending = window.sessionStorage.getItem('lokai.pendingTranscript')
+    } catch {
+      /* ignore */
+    }
+    if (!pending || !pending.trim()) return
+    const t = window.setTimeout(() => {
+      try {
+        window.sessionStorage.removeItem('lokai.pendingTranscript')
+      } catch {
+        /* ignore */
+      }
+      handleSend(pending!.trim(), [])
+    }, 450)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   /* ---- offline (seeded or real) ---- */
   useEffect(() => {
@@ -278,28 +312,55 @@ export default function ChatPage() {
           )}
           <Thread scrollKey={`${items.length}-${busy}-${stageLabel ?? ''}`}>
             {empty && (
-              <div className="flex flex-col items-center gap-4 px-2 pb-8 pt-10 text-center">
-                <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-standout">
-                  <svg viewBox="0 0 24 24" className="size-6" fill="none" aria-hidden="true">
-                    <path
-                      d="M12 5c-.9 2.6-3.4 3.4-3.4 6.3a3.4 3.4 0 0 0 6.8 0C15.4 8.4 12.9 7.6 12 5z"
-                      fill="var(--c-spark)"
-                      stroke="none"
-                    />
-                  </svg>
-                </span>
+              <div className="flex flex-col items-center gap-5 px-4 pb-8 pt-8 text-center">
                 <div>
-                  <h1 className="text-lg font-semibold text-fg-primary">{tr('greeting')}</h1>
-                  <p className="mt-1.5 max-w-[300px] text-sm text-fg-secondary">{tr('greetingSub')}</p>
+                  <h1 className="font-serif text-[1.7rem] font-semibold leading-tight text-fg-primary">
+                    {tr('greeting')}
+                  </h1>
+                  <p className="mx-auto mt-2 max-w-[310px] text-sm leading-relaxed text-fg-secondary">
+                    {tr('greetingSub')}
+                  </p>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/voice')}
+                  aria-label={tr('speakCta')}
+                  className="rounded-full outline-offset-8"
+                >
+                  <VoiceOrb state="idle" size="lg" />
+                </button>
+                <div className="-mt-1">
+                  <p className="text-sm font-semibold text-fg-primary">{tr('speakCta')}</p>
+                  <p className="mt-0.5 text-2xs text-fg-tertiary">{tr('langHint')}</p>
+                </div>
+
+                <div className="grid w-full max-w-[330px] grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/notice')}
+                    className="flex min-h-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line-default bg-card px-3 py-4 transition-colors hover:bg-component-hover"
+                  >
+                    <IconCamera className="size-5 text-brand-fg" />
+                    <span className="text-sm font-medium text-fg-primary">{tr('addNotice')}</span>
+                    <span className="text-2xs text-fg-tertiary">{tr('addNoticeSub')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus()}
+                    className="flex min-h-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line-default bg-card px-3 py-4 transition-colors hover:bg-component-hover"
+                  >
+                    <IconKeyboard className="size-5 text-brand-fg" />
+                    <span className="text-sm font-medium text-fg-primary">{tr('typeInstead')}</span>
+                    <span className="text-2xs text-fg-tertiary">{tr('typeInsteadSub')}</span>
+                  </button>
+                </div>
+
                 <div className="flex flex-wrap justify-center gap-2">
                   <Chip onClick={() => handleSend(SCENARIO_SEEDS[0]!.userMessage, [])}>{tr('chipDefective')}</Chip>
+                  <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
                   <Chip onClick={() => handleSend('I received an official notice about property tax', [])}>
                     {tr('chipNotice')}
-                  </Chip>
-                  <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
-                  <Chip onClick={() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus()}>
-                    {tr('chipOther')}
                   </Chip>
                 </div>
                 <p className="text-2xs text-fg-tertiary">{tr('protoTag')}</p>

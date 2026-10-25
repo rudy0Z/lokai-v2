@@ -116,3 +116,63 @@ export const IconWifiOff = makeIcon(
   </>,
   'wifi-off',
 )
+export const IconHome = makeIcon(
+  <path d="M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2v-8z" />,
+  'home',
+)
+export const IconClock = makeIcon(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </>,
+  'clock',
+)
+export const IconBookmark = makeIcon(<path d="M7 4h10v17l-5-4-5 4V4z" />, 'bookmark')
+export const IconUser = makeIcon(
+  <>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M5 21a7 7 0 0 1 14 0" />
+  </>,
+  'user',
+)
+export const IconMic = makeIcon(
+  <>
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M5 11a7 7 0 0 0 14 0" />
+    <path d="M12 18v3" />
+  </>,
+  'mic',
+)
+export const IconKeyboard = makeIcon(
+  <>
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10" />
+  </>,
+  'keyboard',
+)
+export const IconCamera = makeIcon(
+  <>
+    <path d="M4 8h3l2-3h6l2 3h3v11H4V8z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </>,
+  'camera',
+)
+export const IconStop = makeIcon(<rect x="7" y="7" width="10" height="10" rx="1.5" />, 'stop')
+export const IconExternal = makeIcon(
+  <>
+    <path d="M14 4h6v6" />
+    <path d="M20 4L11 13" />
+    <path d="M19 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5" />
+  </>,
+  'external',
+)
+export const IconScales = makeIcon(
+  <>
+    <path d="M12 4v15" />
+    <path d="M8 19.5h8" />
+    <path d="M4 7.5h16" />
+    <path d="M4 7.5L1.7 12.7a2.4 2.4 0 0 0 4.6 0L4 7.5z" />
+    <path d="M20 7.5l2.3 5.2a2.4 2.4 0 0 1-4.6 0L20 7.5z" />
+  </>,
+  'scales',
+)
