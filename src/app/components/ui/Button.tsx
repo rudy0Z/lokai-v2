@@ -15,13 +15,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClass: Record<Variant, string> = {
   primary:
-    'bg-brand-solid text-on-brand-solid hover:bg-brand-solid-hover active:bg-brand-solid-active shadow-default',
+    'bg-brand-solid text-on-brand-solid shadow-default enabled:hover:bg-brand-solid-hover enabled:active:bg-brand-solid-active',
   secondary:
-    'bg-component text-fg-primary border border-line-default hover:bg-component-hover active:bg-component-active',
-  ghost: 'bg-transparent text-fg-secondary hover:bg-hover-veil active:bg-component',
-  danger: 'bg-danger-solid text-on-danger-solid hover:bg-danger-solid-hover',
+    'bg-component text-fg-primary enabled:hover:bg-component-hover enabled:active:bg-component-active',
+  ghost: 'bg-transparent text-fg-secondary enabled:hover:bg-hover-veil',
+  danger: 'bg-danger-solid text-on-danger-solid enabled:hover:bg-danger-solid-hover',
   inverted:
-    'bg-fg-on-inverted text-standout hover:bg-fg-standout-secondary',
+    'bg-fg-on-inverted text-standout',
 }
 
 const sizeClass: Record<Size, string> = {
@@ -47,7 +47,7 @@ export function Button({
       type="button"
       disabled={disabled || loading}
       className={cn(
-        'inline-flex items-center justify-center font-medium transition-colors duration-150 select-none',
+        'pressable inline-flex items-center justify-center font-medium transition-colors duration-150 select-none',
         variantClass[variant],
         sizeClass[size],
         block && 'w-full',

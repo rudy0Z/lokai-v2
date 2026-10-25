@@ -88,7 +88,10 @@ const mustContain = [
   ['src/app/pages/SpecimenPage.tsx', 'SpecimenPage', 'type specimen route'],
   ['src/app/pages/GalleryPage.tsx', 'GalleryPage', 'component gallery route'],
   ['src/app/data/languages.ts', "'ur'", 'Urdu config'],
-  ['src/app/data/languages.ts', "direction: 'rtl'", 'RTL direction flag'],
+  ['src/app/data/languages.ts', "'rtl'", 'RTL direction flag'],
+  ['src/app/data/languages.ts', "'olchiki'", 'Santali Ol Chiki script'],
+  ['src/app/data/languages.ts', "'meetei'", 'Manipuri Meetei Mayek script'],
+  ['src/app/data/i18n-drafts.ts', 'UI_DRAFTS', 'draft language packs'],
   ['src/app/data/scope-rules.ts', 'hard-stop', 'hard-stop tier'],
   ['src/app/data/scope-rules.ts', 'downgrade', 'downgrade law'],
   ['src/app/components/trust/ReasoningPill.tsx', 'simulatedTag', 'simulated tag wiring'],
@@ -101,14 +104,16 @@ for (const [file, needle, label] of mustContain) {
   else ok(`presence: ${label}`)
 }
 
-/* languages: 5 codes incl ur with rtl */
+/* languages: every scheduled language present via the factory */
 {
   const text = readFileSync(join(ROOT, 'src/app/data/languages.ts'), 'utf8')
-  for (const code of ['en', 'hi', 'mr', 'ta', 'ur']) {
-    if (!new RegExp(`${code}:\\s*\\{`).test(text)) fail(`languages.ts missing ${code}`)
+  const codes = ['en', 'as', 'bn', 'brx', 'doi', 'gom', 'gu', 'hi', 'kn', 'ks', 'mai', 'ml', 'mni', 'mr', 'ne', 'or', 'pa', 'sa', 'sat', 'sd', 'ta', 'te', 'ur']
+  for (const code of codes) {
+    if (!new RegExp(`L\\('${code}'`).test(text)) fail(`languages.ts missing ${code}`)
   }
+  if (codes.length !== 23) fail('expected 23 languages')
 }
-ok('presence: en/hi/mr/ta/ur language configs')
+ok('presence: all 22 scheduled Indian languages + English')
 
 /* legal content: every entry unverified + [VERIFY] visible */
 {

@@ -68,10 +68,10 @@ export const SCENARIO_SEEDS: ScenarioSeed[] = [
   },
 ]
 
-/** Localized conversational beats (short strings; card bodies stay en). */
+/** Localized conversational beats (prepared languages; fallback to English elsewhere). */
 export const JOURNEY_STRINGS: Record<
   string,
-  Record<LangCode, string>
+  Partial<Record<LangCode, string>>
 > = {
   reassurance: {
     en: 'That sounds frustrating, and it is a common situation — there are free steps you can take. Let me make sure I have this right before anything else.',

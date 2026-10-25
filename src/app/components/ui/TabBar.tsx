@@ -12,32 +12,39 @@ const TABS = [
 
 export type TabId = (typeof TABS)[number]['id']
 
-/** Bottom tab bar — the only global navigation (DESIGN.md). */
+/**
+ * Floating glass tab bar (apple-design material §12) — no boxed strip;
+ * content scrolls beneath the translucent pill.
+ */
 export function TabBar({ active }: { active: TabId }) {
   const { tr } = useApp()
   return (
     <nav
       aria-label={tr('navLabel')}
-      className="flex items-stretch justify-around border-t border-line-subtle bg-shell px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[calc(0.875rem+env(safe-area-inset-bottom))]"
     >
-      {TABS.map(({ id, path, icon: Icon, labelKey }) => {
-        const isActive = id === active
-        return (
-          <button
-            key={id}
-            type="button"
-            aria-current={isActive ? 'page' : undefined}
-            onClick={() => navigate(path)}
-            className={cn(
-              'flex min-h-11 min-w-16 flex-col items-center justify-center gap-0.5 rounded-xl px-2 transition-colors',
-              isActive ? 'text-brand-fg' : 'text-fg-tertiary hover:text-fg-secondary',
-            )}
-          >
-            <Icon className="size-5" strokeWidth={isActive ? 2 : 1.75} />
-            <span className={cn('text-2xs', isActive && 'font-semibold')}>{tr(labelKey)}</span>
-          </button>
-        )
-      })}
+      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-white/30 bg-shell/70 p-1.5 shadow-large backdrop-blur-2xl">
+        {TABS.map(({ id, path, icon: Icon, labelKey }) => {
+          const isActive = id === active
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-current={isActive ? 'page' : undefined}
+              onClick={() => navigate(path)}
+              className={cn(
+                'pressable flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-full px-3 transition-colors duration-150',
+                isActive
+                  ? 'bg-brand-solid text-on-brand-solid'
+                  : 'text-fg-tertiary',
+              )}
+            >
+              <Icon className="size-5" strokeWidth={isActive ? 2 : 1.75} />
+              <span className={cn('text-2xs', isActive ? 'font-semibold' : 'font-medium')}>{tr(labelKey)}</span>
+            </button>
+          )
+        })}
+      </div>
     </nav>
   )
 }

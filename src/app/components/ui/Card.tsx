@@ -12,9 +12,9 @@ export function Card({ raised = false, paper = false, className, ...rest }: Card
   return (
     <div
       className={cn(
-        'rounded-3xl border p-4',
-        paper ? 'paper border-warning-line/60' : 'bg-card border-line-default',
-        raised && !paper && 'shadow-default',
+        'rounded-[22px] p-4',
+        paper ? 'paper rounded-[18px] border border-warning-line/50' : 'bg-card',
+        raised && !paper && 'shadow-large',
         className,
       )}
       {...rest}

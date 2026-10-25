@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { LANGUAGES, type LangCode } from '../data/languages'
+import { ALL_LANGS, LANGUAGES, type LangCode } from '../data/languages'
 import { UI, type UiKey } from '../data/i18n'
+import { UI_DRAFTS } from '../data/i18n-drafts'
 
 type Theme = 'light' | 'dark'
 
@@ -28,7 +29,7 @@ function readStored<T extends string>(key: string, fallback: T, valid: readonly 
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => readStored('lokai.theme', 'light', ['light', 'dark'] as const))
-  const [lang, setLangState] = useState<LangCode>(() => readStored('lokai.lang', 'en', ['en', 'hi', 'mr', 'ta', 'ur'] as const))
+  const [lang, setLangState] = useState<LangCode>(() => readStored('lokai.lang', 'en', ALL_LANGS))
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -68,7 +69,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleTheme,
       lang,
       setLang,
-      tr: (key: UiKey) => UI[key][lang],
+      /** fallback law: full pack -> draft pack -> English, never a blank */
+      tr: (key: UiKey) => UI[key]?.[lang] ?? UI_DRAFTS[key]?.[lang] ?? UI[key]?.en ?? '',
       direction: LANGUAGES[lang].direction,
     }),
     [theme, toggleTheme, lang, setLang],

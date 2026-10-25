@@ -25,6 +25,7 @@ import { DemandNoticeReview } from '../components/cards/DemandNoticeReview'
 import { StopScreen } from '../components/stop/StopScreen'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
 import { IconCamera, IconKeyboard } from '../components/ui/icons'
+import { useSpans } from '../lib/useSpans'
 
 type ItemKind = 'user' | 'assistant' | 'chips' | 'finding' | 'ladder' | 'caution' | 'error' | 'system'
 
@@ -43,6 +44,7 @@ export default function ChatPage() {
   const { tr, lang } = useApp()
   const { params } = useHashRoute()
   const seedId = params.get('s')
+  const spans = useSpans()
 
   const [items, setItems] = useState<ChatItem[]>([])
   const [busy, setBusy] = useState(false)
@@ -87,16 +89,16 @@ export default function ChatPage() {
     run(
       'explain',
       () => {
-        // the scripted restatement belongs to the HomeKart demo journey;
-        // anything else gets an honest echo of the user's own words
-        const isMixerScenario = /HomeKart|mixer/i.test(userText ?? '')
-        const restatement = isMixerScenario
-          ? JOURNEY_STRINGS.restatement![lang]
+        // the scripted restatement belongs to the exact HomeKart demo seed;
+        // anything else gets an honest echo of the user's own words (P0-2)
+        const isExactMixerSeed = userText === SCENARIO_SEEDS[0]!.userMessage
+        const restatement = isExactMixerSeed
+          ? JOURNEY_STRINGS.restatement![lang] ?? JOURNEY_STRINGS.restatement!.en
           : `“${(userText ?? '').trim()}”`
         push(
           {
             kind: 'assistant',
-            text: `${JOURNEY_STRINGS.reassurance![lang]}\n\n${tr('restatePrefix')} ${restatement}`,
+            text: `${JOURNEY_STRINGS.reassurance![lang] ?? JOURNEY_STRINGS.reassurance!.en}\n\n${tr('restatePrefix')} ${restatement}`,
           },
           { kind: 'chips', text: 'qWhen' },
         )
@@ -262,6 +264,28 @@ export default function ChatPage() {
 
   const empty = items.length === 0 && !stopDecision && !noticeOpen
 
+  /* Duo spanning: the latest generative card docks in the right pane */
+  const focusItem = spans
+    ? [...items].reverse().find((i) => i.kind === 'finding' || i.kind === 'caution' || i.kind === 'ladder')
+    : undefined
+  const focusPane = !focusItem ? null : (
+    <aside
+      aria-label="Focus"
+      className="scroll-calm min-w-0 flex-1 overflow-y-auto pe-[max(1rem,env(safe-area-inset-right))] ps-1 pt-3"
+    >
+      {focusItem.kind === 'finding' && (
+        <MessageBubble role="assistant">
+          <FindingCard data={findingData} stale={focusItem.stale} onUpdate={setFindingData} />
+        </MessageBubble>
+      )}
+      {focusItem.kind === 'caution' && <CautionCard />}
+      {focusItem.kind === 'ladder' && (
+        <ActionLadder mode={focusItem.variant ?? 'full'} onOpenNotice={() => setNoticeOpen(true)} />
+      )}
+    </aside>
+  )
+  const spanRow = spans ? 'flex min-h-0 flex-1 flex-row gap-2' : 'flex min-h-0 flex-1 flex-col'
+
   const chipsForQuestion = (
     <QuickReplies
       options={[
@@ -310,14 +334,26 @@ export default function ChatPage() {
               <Banner tone="offline">{tr('offlineBanner')}</Banner>
             </div>
           )}
-          <Thread scrollKey={`${items.length}-${busy}-${stageLabel ?? ''}`}>
+          <div className={spanRow}>
+            <Thread
+              scrollKey={`${items.length}-${busy}-${stageLabel ?? ''}`}
+              autoScroll={items.length > 0}
+              className={spans ? 'min-w-0 flex-1 ps-[max(1rem,env(safe-area-inset-left))]' : undefined}
+            >
+            {(() => {
+              const focus = spans
+                ? [...items].reverse().find((i) => i.kind === 'finding' || i.kind === 'caution' || i.kind === 'ladder')
+                : undefined
+              const threadItems = focus ? items.filter((i) => i.id !== focus.id) : items
+              return (
+                <>
             {empty && (
-              <div className="flex flex-col items-center gap-5 px-4 pb-8 pt-8 text-center">
+              <div className="flex flex-col items-center gap-6 px-5 pb-10 pt-14 text-center">
                 <div>
-                  <h1 className="font-serif text-[1.7rem] font-semibold leading-tight text-fg-primary">
+                  <h1 className="font-serif text-[2.1rem] font-semibold leading-[1.12] tracking-[-0.02em] text-fg-primary">
                     {tr('greeting')}
                   </h1>
-                  <p className="mx-auto mt-2 max-w-[310px] text-sm leading-relaxed text-fg-secondary">
+                  <p className="mx-auto mt-3 max-w-[320px] text-[0.95rem] leading-relaxed text-fg-secondary">
                     {tr('greetingSub')}
                   </p>
                 </div>
@@ -326,32 +362,32 @@ export default function ChatPage() {
                   type="button"
                   onClick={() => navigate('/voice')}
                   aria-label={tr('speakCta')}
-                  className="rounded-full outline-offset-8"
+                  className="pressable rounded-full outline-offset-8"
                 >
                   <VoiceOrb state="idle" size="lg" />
                 </button>
-                <div className="-mt-1">
-                  <p className="text-sm font-semibold text-fg-primary">{tr('speakCta')}</p>
-                  <p className="mt-0.5 text-2xs text-fg-tertiary">{tr('langHint')}</p>
+                <div className="-mt-2">
+                  <p className="text-base font-semibold text-fg-primary">{tr('speakCta')}</p>
+                  <p className="mt-1 text-sm text-fg-tertiary">{tr('langHint')}</p>
                 </div>
 
-                <div className="grid w-full max-w-[330px] grid-cols-2 gap-2.5">
+                <div className="grid w-full max-w-[350px] grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => navigate('/notice')}
-                    className="flex min-h-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line-default bg-card px-3 py-4 transition-colors hover:bg-component-hover"
+                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-[22px] bg-card px-3 py-5 transition-colors"
                   >
-                    <IconCamera className="size-5 text-brand-fg" />
-                    <span className="text-sm font-medium text-fg-primary">{tr('addNotice')}</span>
+                    <IconCamera className="size-6 text-brand-fg" />
+                    <span className="text-base font-medium text-fg-primary">{tr('addNotice')}</span>
                     <span className="text-2xs text-fg-tertiary">{tr('addNoticeSub')}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus()}
-                    className="flex min-h-24 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line-default bg-card px-3 py-4 transition-colors hover:bg-component-hover"
+                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-[22px] bg-card px-3 py-5 transition-colors"
                   >
-                    <IconKeyboard className="size-5 text-brand-fg" />
-                    <span className="text-sm font-medium text-fg-primary">{tr('typeInstead')}</span>
+                    <IconKeyboard className="size-6 text-brand-fg" />
+                    <span className="text-base font-medium text-fg-primary">{tr('typeInstead')}</span>
                     <span className="text-2xs text-fg-tertiary">{tr('typeInsteadSub')}</span>
                   </button>
                 </div>
@@ -370,7 +406,7 @@ export default function ChatPage() {
               </div>
             )}
 
-            {items.map((item) => {
+            {threadItems.map((item) => {
               switch (item.kind) {
                 case 'user':
                   return (
@@ -456,7 +492,12 @@ export default function ChatPage() {
             })}
 
             {busy && <TypingIndicator stageLabel={stageLabel} />}
+                </>
+              )
+            })()}
           </Thread>
+          {spans && focusPane}
+          </div>
         </>
       )}
     </AppShell>

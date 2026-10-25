@@ -25,7 +25,7 @@ export default function DevLauncherPage() {
               key={s.id}
               type="button"
               onClick={() => navigate(`/?s=${s.id}`)}
-              className="rounded-2xl border border-line-default bg-card p-4 text-start transition-colors hover:bg-component-hover"
+              className="bg-card rounded-[22px] p-4 text-start transition-colors hover:bg-component-hover"
             >
               <div className="flex items-center gap-2">
                 <CardTitle>{s.label}</CardTitle>

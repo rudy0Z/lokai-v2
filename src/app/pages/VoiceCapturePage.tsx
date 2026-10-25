@@ -22,7 +22,7 @@ export default function VoiceCapturePage() {
   const { tr, lang } = useApp()
   const [phase, setPhase] = useState<CaptureState>('listening')
   const [seconds, setSeconds] = useState(0)
-  const [transcript, setTranscript] = useState(VOICE_SAMPLES[lang])
+  const [transcript, setTranscript] = useState(VOICE_SAMPLES[lang] ?? VOICE_SAMPLES.en!)
   const [detected, setDetected] = useState<LangCode | 'auto'>(lang)
   const secondsRef = useRef(0)
 
@@ -64,13 +64,13 @@ export default function VoiceCapturePage() {
             <button type="button" onClick={stop} aria-label={tr('tapToStop')} className="rounded-full outline-offset-8">
               <VoiceOrb state="listening" size="lg" />
             </button>
-            <div className="w-full max-w-[300px] rounded-2xl border border-line-default bg-card p-4">
+            <div className="w-full max-w-[300px] bg-card rounded-[22px] p-4">
               <div className="waveform" aria-hidden="true">
                 {Array.from({ length: 28 }, (_, i) => (
                   <span key={i} className="wave-bar" />
                 ))}
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-fg-secondary">{VOICE_SAMPLES[lang]}</p>
+              <p className="mt-3 text-sm leading-relaxed text-fg-secondary">{VOICE_SAMPLES[lang] ?? VOICE_SAMPLES.en!}</p>
             </div>
             <p className="max-w-[280px] text-center text-2xs text-fg-tertiary">{tr('speakNaturally')}</p>
           </div>
@@ -96,7 +96,7 @@ export default function VoiceCapturePage() {
             <p className="mt-1 text-2xs text-fg-tertiary">{tr('heardSub')}</p>
           </div>
 
-          <div className="relative rounded-2xl border border-line-default bg-card p-4">
+          <div className="relative bg-card rounded-[22px] p-4">
             <textarea
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}

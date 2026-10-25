@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { LanguageSelect, ThemeToggle } from '../components/ui/shell'
 import { LogoMark } from '../components/ui/LogoMark'
-import { LANG_ORDER, LANGUAGES } from '../data/languages'
+import { ALL_LANGS, LANGUAGES } from '../data/languages'
 
 export default function ProfilePage() {
   const { tr, lang, setLang } = useApp()
@@ -22,26 +22,35 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <section className="flex flex-col gap-2 rounded-2xl border border-line-default bg-card p-4">
+          <section className="flex flex-col gap-2 rounded-[22px] bg-card p-4">
             <h2 className="text-sm font-semibold text-fg-primary">{tr('langLabel')}</h2>
+            <p className="text-2xs text-fg-tertiary">{tr('profileLangsNote')}</p>
             <div className="flex flex-wrap gap-2">
-              {LANG_ORDER.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-pressed={lang === c}
-                  onClick={() => setLang(c)}
-                  className={
-                    'min-h-11 rounded-full border px-4 text-sm font-medium transition-colors ' +
-                    (lang === c
-                      ? 'border-brand-line bg-brand-subtle text-on-brand-subtle'
-                      : 'border-line-default bg-container text-fg-primary hover:bg-component-hover')
-                  }
-                >
-                  {LANGUAGES[c].native}
-                </button>
-              ))}
+              {ALL_LANGS.map((c) => {
+                const cfg = LANGUAGES[c]
+                const active = lang === c
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setLang(c)}
+                    className={
+                      'pressable min-h-11 rounded-full px-4 text-sm font-medium transition-colors ' +
+                      (active
+                        ? 'bg-brand-solid text-on-brand-solid'
+                        : 'bg-container text-fg-primary')
+                    }
+                  >
+                    {cfg.native}
+                    {cfg.coverage !== 'full' && (
+                      <span className={active ? 'ms-1.5 opacity-70' : 'ms-1.5 text-fg-tertiary'}>·</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
+            <p className="text-2xs text-fg-tertiary">{tr('profileCoverageNote')}</p>
             <div className="flex items-center gap-3 pt-1">
               <span className="text-2xs text-fg-tertiary">{tr('themeLabel')}</span>
               <ThemeToggle />
@@ -49,7 +58,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-2.5 rounded-2xl border border-line-default bg-card p-4">
+          <section className="flex flex-col gap-2.5 bg-card rounded-[22px] p-4">
             <h2 className="text-sm font-semibold text-fg-primary">{tr('privacyTitle')}</h2>
             <p className="text-sm leading-relaxed text-fg-secondary">{tr('privacyBody')}</p>
             <div className="rounded-xl bg-sunken px-3.5 py-3">

@@ -111,8 +111,8 @@ export const NOTICE_FIELDS: NoticeField[] = [
   },
 ]
 
-/** What the notice means — per UI language (AI-drafted, unreviewed). */
-export const NOTICE_SUMMARY: Record<LangCode, string> = {
+/** What the notice means — per UI language (AI-drafted, unreviewed). Prepared languages only; others fall back to English. */
+export const NOTICE_SUMMARY: Partial<Record<LangCode, string>> = {
   en: 'This is a property-tax demand from your municipal corporation. It asks for ₹18,540 for the year April 2026 to March 2027, to be paid by 31 December 2026. After that date, late-payment interest applies. It also names a local office for objections.',
   hi: 'यह आपके नगर निगम की ओर से मालमत्ता कर की माँग है। यह 1 अप्रैल 2026 से 31 मार्च 2027 के लिए ₹18,540 माँगती है, जो 31 दिसंबर 2026 तक जमा करना है। उसके बाद विलंब ब्याज लगेगा। आपत्ति के लिए स्थानीय कार्यालय भी लिखा है।',
   mr: 'ही तुमच्या महानगरपालिकेकडून मालमत्ता कराची मागणी आहे. १ एप्रिल २०२६ ते ३१ मार्च २०२७ या कालावधीसाठी ₹१८,५४० मागितले आहे; ३१ डिसेंबर २०२६ पर्यंत भरावे. नंतर उशीरीचे व्याज लागेल. तक्रारीसाठी स्थानिक कार्यालय दिले आहे.',

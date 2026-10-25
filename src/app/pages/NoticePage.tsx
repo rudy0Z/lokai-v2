@@ -84,9 +84,9 @@ export default function NoticePage() {
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
           {/* what this means */}
-          <section className="rounded-2xl border border-line-default bg-card p-4">
+          <section className="bg-card rounded-[22px] p-4">
             <h1 className="font-serif text-xl font-semibold leading-snug text-fg-primary">{tr('noticeMeaning')}</h1>
-            <p className="mt-2 text-sm leading-relaxed text-fg-primary">{NOTICE_SUMMARY[lang]}</p>
+            <p className="mt-2 text-sm leading-relaxed text-fg-primary">{NOTICE_SUMMARY[lang] ?? NOTICE_SUMMARY.en!}</p>
             <p className="mt-2 text-2xs text-fg-tertiary" lang="en">
               {NOTICE_DOC.authority} · {NOTICE_DOC.sourceLangLabel}
             </p>
@@ -98,7 +98,7 @@ export default function NoticePage() {
             <ol className="flex flex-col gap-2">
               {NOTICE_FIELDS.map((field, i) => (
                 <li key={field.id}>
-                  <div className="rounded-2xl border border-line-default bg-card">
+                  <div className="bg-card rounded-[22px]">
                     <button
                       type="button"
                       aria-expanded={openField?.id === field.id}

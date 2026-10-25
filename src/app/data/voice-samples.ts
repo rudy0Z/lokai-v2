@@ -5,7 +5,8 @@ import type { LangCode } from './languages'
  * reviewed — the whole voice surface carries the "Simulated in prototype"
  * tag. The mic is never accessed; these stand in for a transcript.
  */
-export const VOICE_SAMPLES: Record<LangCode, string> = {
+/** Simulated voice-capture samples (prepared languages; others fall back to English). */
+export const VOICE_SAMPLES: Partial<Record<LangCode, string>> = {
   en: 'I got a legal notice about a property dispute. I want to understand what it says and what I should do.',
   hi: 'मुझे संपत्ति विवाद के बारे में एक कानूनी नोटिस मिला है। मैं समझना चाहता हूँ कि इसमें क्या लिखा है और मुझे क्या करना चाहिए।',
   mr: 'मला मालमत्ता वादाबाबत एक कायदेशीर जाहीरनामा आला आहे. यात काय लिहिले आहे आणि मी काय करावे हे समजून घ्यायचे आहे.',

@@ -13,10 +13,10 @@ export function Chip({ selected = false, leadingIcon, className, children, ...re
       type="button"
       aria-pressed={selected}
       className={cn(
-        'inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-150',
+        'pressable inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors duration-150',
         selected
-          ? 'border-brand-line bg-brand-subtle text-on-brand-subtle'
-          : 'border-line-default bg-component text-fg-primary hover:bg-component-hover active:bg-component-active',
+          ? 'bg-brand-solid text-on-brand-solid'
+          : 'bg-container text-fg-primary',
         className,
       )}
       {...rest}

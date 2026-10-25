@@ -32,7 +32,7 @@ export default function HistoryPage() {
               key={h.id}
               type="button"
               onClick={() => navigate(h.tier === 'notice' ? '/notice' : '/')}
-              className="flex items-center gap-3 rounded-2xl border border-line-default bg-card p-4 text-start transition-colors hover:bg-component-hover"
+              className="flex items-center gap-3 bg-card rounded-[22px] p-4 text-start transition-colors hover:bg-component-hover"
             >
               <IconDoc className="size-5 shrink-0 text-fg-tertiary" />
               <span className="min-w-0 flex-1">

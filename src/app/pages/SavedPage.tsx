@@ -24,7 +24,7 @@ export default function SavedPage() {
           <h1 className="font-serif text-xl font-semibold text-fg-primary">{tr('savedTitle')}</h1>
           {SAVED.length === 0 && <p className="text-sm text-fg-tertiary">{tr('emptySaved')}</p>}
           {SAVED.map((s) => (
-            <div key={s.id} className="rounded-2xl border border-line-default bg-card p-4">
+            <div key={s.id} className="bg-card rounded-[22px] p-4">
               <div className="flex items-center gap-2">
                 <IconBookmark className="size-4 text-brand-fg" />
                 <Badge tone="neutral" variant="outline" lang="en">{s.kind}</Badge>

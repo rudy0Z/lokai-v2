@@ -1,11 +1,13 @@
 import type { LangCode } from './languages'
 
 /**
- * UI chrome strings. Translations for hi/mr/ta/ur are AI-drafted placeholders
- * (reviewedByNativeSpeaker: false — see languages.ts). Legal claims never
- * live here; they live only in legal-content.ts behind the [VERIFY] policy.
+ * UI chrome strings. Translations for non-English languages are AI-drafted
+ * placeholders (reviewedByNativeSpeaker: false — see languages.ts). Packs
+ * are PARTIAL: any missing language falls back through i18n-drafts.ts and
+ * then to English in tr() — visible fallback, never a blank. Legal claims
+ * never live here; they live only in legal-content.ts behind [VERIFY].
  */
-type Pack = Record<LangCode, string>
+type Pack = Partial<Record<LangCode, string>>
 
 export interface UiStrings {
   roleLine: Pack
@@ -131,6 +133,8 @@ export interface UiStrings {
   deleteNo: Pack
   profileNote: Pack
   autoDetect: Pack
+  profileLangsNote: Pack
+  profileCoverageNote: Pack
 }
 
 export const UI: UiStrings = {
@@ -275,10 +279,24 @@ export const UI: UiStrings = {
   deleteNo: { en: 'Keep everything', hi: 'सब रखें', mr: 'सर्व ठेवा', ta: 'எல்லாம் வைத்திரு', ur: 'سب رکھیں' },
   profileNote: { en: 'Prototype — this profile is illustrative only.', hi: 'प्रोटोटाइप — यह प्रोफ़ाइल केवल उदाहरण है।', mr: 'प्रोटोटाइप — ही प्रोफाइल केवल उदाहरण आहे.', ta: 'மாதிரி — இந்த சுயவிவரம் எடுத்துக்காட்டு மட்டுமே.', ur: 'پروٹوٹائپ — یہ پروفائل صرف مثال ہے۔' },
   autoDetect: { en: 'Auto-detected', hi: 'स्वतः पहचाना', mr: 'स्वयं-ओळख', ta: 'தானாகக் கண்டறிதல்', ur: 'خود بخود شناخت' },
+  profileLangsNote: {
+    en: 'All 22 scheduled Indian languages are selectable. Core screens render in your language; the rest falls back to English rather than showing a wrong sentence.',
+    hi: 'अनुसूचित सभी 22 भारतीय भाषाएँ चुनी जा सकती हैं। मुख्य स्क्रीन आपकी भाषा में आती हैं; बाकी ग़लत वाक्य दिखाने की बजाय अंग्रेज़ी में दिखता है।',
+    mr: 'अनुसूचित सर्व २२ भारतीय भाषा निवडता येतात. मुख्य स्क्रीन तुमच्या भाषेत येतात; उर्वरित चुकीचे वाक्य दाखवण्याऐवजी इंग्रजीत दिसते.',
+    ta: 'அட்டவணைப்படுத்தப்பட்ட அனைத்து 22 இந்திய மொழிகளும் தேர்வு செய்யப்படலாம். முக்கியத் திரைகள் உங்கள் மொழியில் வரும்; மீதி தவறான வாக்கியத்தைக் காட்டுவதற்குப் பதிலாக ஆங்கிலத்தில் வரும்.',
+    ur: ' شیڈولڈ تمام 22 ہندوستانی زبانیں منتخب ہو سکتی ہیں۔ اہم اسکرینیں آپ کی زبان میں آتی ہیں؛ باقی غلط جملہ دکھانے کے بجائے انگریزی میں آتا ہے۔',
+  },
+  profileCoverageNote: {
+    en: 'Dots mark languages still in draft (AI-drafted, not yet human-reviewed). Legal content stays in English until verified.',
+    hi: 'बिंदु उन भाषाओं को दर्शाते हैं जो अभी ड्राफ़्ट में हैं (AI-निर्मित, मानव-समीक्षित नहीं)। कानूनी सामग्री जाँचे जाने तक अंग्रेज़ी में रहती है।',
+    mr: 'बिंदू अशा भाषा दर्शवतात ज्या अजून मसुदा अवस्थेत आहेत (AI-निर्मित, मानव-तपासलेल्या नाहीत). कायदेशीर मजकूर तपासेपर्यंत इंग्रजीतच राहतो.',
+    ta: 'புள்ளிகள் இன்னும் வரைவு நிலையில் உள்ள மொழிகளைக் குறிக்கின்றன (AI-உருவாக்கம், மனித-ஆய்வு இல்லை). சட்ட உள்ளடக்கம் சரிபார்க்கப்படும் வரை ஆங்கிலத்திலேயே இருக்கும்.',
+    ur: 'نقطے ان زبانوں کو ظاہر کرتے ہیں جو ابھی مسودے میں ہیں (AI-ساخته، انسانی جانچے نہیں)۔ قانونی مواد جانچے جانے تک انگریزی میں رہتا ہے۔',
+  },
 }
 
 export type UiKey = keyof UiStrings
 
 export function t(lang: LangCode, key: UiKey): string {
-  return UI[key][lang]
+  return UI[key]?.[lang] ?? UI[key]?.en ?? ''
 }

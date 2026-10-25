@@ -78,8 +78,8 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
 
       <div
         className={cn(
-          'rounded-3xl border bg-container p-2 transition-colors',
-          offline ? 'border-line-default opacity-60' : 'border-line-default focus-within:border-brand-line',
+          'rounded-[26px] bg-sunken transition-shadow duration-200',
+          offline ? 'opacity-60' : 'focus-within:shadow-[0_0_0_1.5px_var(--c-brand-line)]',
         )}
       >
         {attachments.length > 0 && (
@@ -104,13 +104,13 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
           </div>
         )}
 
-        <div className="flex items-end gap-1.5">
+        <div className="flex items-end gap-1 p-1.5">
           <button
             type="button"
             aria-label={tr('composerAttach')}
             disabled={disabled || offline}
             onClick={() => setTrayOpen((v) => !v)}
-            className="mb-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-primary disabled:opacity-40"
+            className="pressable mb-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-primary disabled:opacity-40"
           >
             <IconPaperclip className="size-5" />
           </button>
@@ -129,7 +129,7 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
             disabled={disabled || offline}
             placeholder={offline ? tr('offlineBanner') : tr('composerPlaceholder')}
             aria-label={tr('composerPlaceholder')}
-            className="max-h-[140px] flex-1 resize-none bg-transparent py-2.5 text-sm text-fg-primary placeholder:text-fg-tertiary focus:outline-none"
+            className="max-h-[140px] min-h-11 flex-1 resize-none bg-transparent py-2.5 text-base text-fg-primary placeholder:text-fg-tertiary focus:outline-none"
           />
 
           <button
@@ -138,10 +138,10 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
             disabled={disabled || offline || text.trim() === ''}
             onClick={submit}
             className={cn(
-              'mb-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-colors',
+              'pressable mb-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full transition-colors',
               text.trim() === '' || disabled || offline
-                ? 'bg-sunken text-fg-disabled'
-                : 'bg-brand-solid text-on-brand-solid hover:bg-brand-solid-hover shadow-default',
+                ? 'bg-container text-fg-disabled'
+                : 'bg-brand-solid text-on-brand-solid shadow-default',
             )}
           >
             <IconSend className="size-5" />
