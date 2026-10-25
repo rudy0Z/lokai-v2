@@ -1,0 +1,118 @@
+import type { SVGProps } from 'react'
+
+/**
+ * Bespoke stroke-icon set (24px grid, 1.75 stroke, round joins).
+ * The project's ONLY icon tier — no icon libraries in v2.
+ */
+function makeIcon(paths: ReactNode_, name: string) {
+  const C = (props: SVGProps<SVGSVGElement>) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      data-icon={name}
+      {...props}
+    >
+      {paths}
+    </svg>
+  )
+  C.displayName = name
+  return C
+}
+
+// paths are static children; JSX typed loosely below via ReactNode alias
+type ReactNode_ = SVGProps<SVGSVGElement>['children']
+
+export const IconChevronDown = makeIcon(<path d="M6 9l6 6 6-6" />, 'chevron-down')
+export const IconChevronRight = makeIcon(<path d="M9 6l6 6-6 6" />, 'chevron-right')
+export const IconCheck = makeIcon(<path d="M5 13l4 4L19 7" />, 'check')
+export const IconInfo = makeIcon(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8h.01M12 11v5" />
+  </>,
+  'info',
+)
+export const IconAlert = makeIcon(
+  <>
+    <path d="M12 3l9.5 17H2.5L12 3z" />
+    <path d="M12 10v4M12 17h.01" />
+  </>,
+  'alert',
+)
+export const IconX = makeIcon(<path d="M6 6l12 12M18 6L6 18" />, 'x')
+export const IconCopy = makeIcon(
+  <>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+  </>,
+  'copy',
+)
+export const IconPencil = makeIcon(<path d="M4 20l4-1L20 7l-3-3L5 16l-1 4z" />, 'pencil')
+export const IconRefresh = makeIcon(
+  <>
+    <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+    <path d="M21 3v6h-6" />
+  </>,
+  'refresh',
+)
+export const IconTrash = makeIcon(
+  <>
+    <path d="M4 7h16M9 7V5h6v2" />
+    <path d="M6 7l1 13h10l1-13" />
+  </>,
+  'trash',
+)
+export const IconPlus = makeIcon(<path d="M12 5v14M5 12h14" />, 'plus')
+export const IconSend = makeIcon(<path d="M12 19V5M6 11l6-6 6 6" />, 'send')
+export const IconPaperclip = makeIcon(
+  <path d="M21 12.5l-8.5 8.5a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8" />,
+  'paperclip',
+)
+export const IconPhone = makeIcon(
+  <path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />,
+  'phone',
+)
+export const IconShield = makeIcon(
+  <>
+    <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
+    <path d="M9 12l2 2 4-4" />
+  </>,
+  'shield',
+)
+export const IconArrowLeft = makeIcon(<path d="M19 12H5M11 6l-6 6 6 6" />, 'arrow-left')
+export const IconSun = makeIcon(
+  <>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </>,
+  'sun',
+)
+export const IconMoon = makeIcon(<path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9z" />, 'moon')
+export const IconGlobe = makeIcon(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z" />
+  </>,
+  'globe',
+)
+export const IconDoc = makeIcon(
+  <>
+    <path d="M7 3h7l5 5v13H7z" />
+    <path d="M14 3v5h5" />
+  </>,
+  'doc',
+)
+export const IconWifiOff = makeIcon(
+  <>
+    <path d="M2 2l20 20" />
+    <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+    <path d="M5 12.5a10 10 0 0 1 3-2M16.5 11a10 10 0 0 1 2.5 1.5" />
+    <path d="M12 20h.01" />
+  </>,
+  'wifi-off',
+)

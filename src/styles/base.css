@@ -1,0 +1,78 @@
+/* Base layer — only place besides tokens.css allowed to hold raw values. */
+
+* {
+  border-color: var(--c-line-default);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-page);
+  color: var(--c-fg-primary);
+  font-family: var(--stk-sans);
+  font-size: 0.9375rem; /* 15px body at 16px root; scales with data-script */
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Latin-only display niceties are opt-in per element (.latin-track);
+   NEVER applied to non-Latin text (A4b rule 4). */
+.latin-track {
+  letter-spacing: 0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--c-brand-subtle);
+  color: var(--c-on-brand-subtle);
+}
+
+/* Thin, calm scrollbars inside the app frame */
+.scroll-calm {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-strong) transparent;
+}
+.scroll-calm::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-calm::-webkit-scrollbar-thumb {
+  background: var(--c-line-strong);
+  border-radius: 999px;
+}
+
+/* Document stationery register — functional paper for generated documents
+   and receipts ONLY (A4). Ruled lines are part of the paper metaphor. */
+.paper {
+  background: var(--c-paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgb(70 60 40 / 0.055) 27px,
+    rgb(70 60 40 / 0.055) 28px
+  );
+  color: oklch(24% 0.02 80);
+}
+
+/* Urdu / Nastaliq needs generous leading everywhere it appears */
+:lang(ur) {
+  line-height: 2.15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
