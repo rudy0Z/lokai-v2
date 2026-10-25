@@ -13,15 +13,16 @@ const TABS = [
 export type TabId = (typeof TABS)[number]['id']
 
 /**
- * Floating glass tab bar (apple-design material §12) — no boxed strip;
- * content scrolls beneath the translucent pill.
+ * Floating glass tab bar (apple-design material §12) — anchored inside the
+ * device frame (absolute, not fixed), so it stays within the prototype
+ * presentation on desktop and full-bleed on phones.
  */
 export function TabBar({ active }: { active: TabId }) {
   const { tr } = useApp()
   return (
     <nav
       aria-label={tr('navLabel')}
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[calc(0.875rem+env(safe-area-inset-bottom))]"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center pb-[calc(0.875rem+env(safe-area-inset-bottom))]"
     >
       <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-white/30 bg-shell/70 p-1.5 shadow-large backdrop-blur-2xl">
         {TABS.map(({ id, path, icon: Icon, labelKey }) => {

@@ -53,34 +53,44 @@ export interface AppShellProps {
 }
 
 /**
- * Full-bleed app surface — no frame, no box (2026 reference standard).
- * Chrome floats as translucent material (apple-design §12); content runs
- * edge to edge beneath it. dvh + safe-area aware.
+ * Mobile-prototype presentation: full-bleed on real phones, centered device
+ * frame on desktop (this IS a mobile prototype — the frame stays), and
+ * full-width across both segments when an iPhone Duo spans. Chrome floats
+ * as translucent material (apple-design §12) inside the frame.
  */
 export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, children, footer }: AppShellProps) {
   const { tr } = useApp()
   return (
-    <div className="flex h-dvh flex-col bg-shell">
-      <header className="pointer-events-none sticky top-0 z-30 flex items-center gap-2 bg-gradient-to-b from-shell via-shell/90 to-transparent px-4 pb-4 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <div className="pointer-events-auto flex items-center gap-2.5">
-          <LogoMark />
-          <span className="font-serif text-lg font-semibold tracking-[-0.01em] text-fg-primary">LokAI</span>
-        </div>
-        <div className="pointer-events-auto ms-auto flex items-center gap-0.5">
-          {topBarExtra}
-          <LanguageSelect />
-          <ThemeToggle />
-        </div>
-      </header>
+    <div className="flex h-dvh justify-center bg-page sm:items-center sm:py-6">
+      <div
+        className={
+          'relative flex h-dvh w-full flex-col overflow-hidden bg-shell ' +
+          'sm:h-[min(844px,calc(100dvh-3rem))] sm:w-[390px] sm:rounded-[2.25rem] sm:border sm:border-line-strong/70 sm:shadow-xl ' +
+          '[@media(horizontal-viewport-segments:2)]:!h-dvh [@media(horizontal-viewport-segments:2)]:!w-full ' +
+          '[@media(horizontal-viewport-segments:2)]:!rounded-none [@media(horizontal-viewport-segments:2)]:!border-0'
+        }
+      >
+        <header className="pointer-events-none z-30 flex items-center gap-2 bg-gradient-to-b from-shell via-shell/90 to-transparent px-4 pb-4 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+          <div className="pointer-events-auto flex items-center gap-2.5">
+            <LogoMark />
+            <span className="font-serif text-lg font-semibold tracking-[-0.01em] text-fg-primary">LokAI</span>
+          </div>
+          <div className="pointer-events-auto ms-auto flex items-center gap-0.5">
+            {topBarExtra}
+            <LanguageSelect />
+            <ThemeToggle />
+          </div>
+        </header>
 
-      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
 
-      {footer && (
-        <div className="relative z-20 px-4 pb-[calc(6.25rem+env(safe-area-inset-bottom))]">{footer}</div>
-      )}
-      {showTabs && <TabBar active={activeTab} />}
-      {!footer && showTabs && <div aria-hidden="true" className="h-[6.25rem] shrink-0" />}
-      <p className="sr-only">{tr('roleLine')}</p>
+        {footer && (
+          <div className="relative z-20 px-4 pb-[calc(6.25rem+env(safe-area-inset-bottom))]">{footer}</div>
+        )}
+        {showTabs && <TabBar active={activeTab} />}
+        {!footer && showTabs && <div aria-hidden="true" className="h-[6.25rem] shrink-0" />}
+        <p className="sr-only">{tr('roleLine')}</p>
+      </div>
     </div>
   )
 }

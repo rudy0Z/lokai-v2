@@ -9,9 +9,9 @@ rebuilt to the 2026 register. See `DESIGN.md` for the language of record. Eviden
 
 | Owner's finding | Root cause | Fix shipped |
 |---|---|---|
-| "What is this box/container at the bottom?" | The 390px frame rendered the app inside a bordered, shadowed container — an exhibit, not an app | **Frame deleted.** Full-bleed edge-to-edge surface; safe-area aware; `interactive-widget=resizes-content` |
-| Composer looked boxed | Opaque bordered bar | **Borderless composer** on a sunken tonal field, 26px radius, brand ring on focus only |
-| Tab bar looked bolted on | Solid strip with border | **Floating glass pill** — `backdrop-blur`, content scrolls beneath (Apple material) |
+| "What is this box/container at the bottom?" | The composer and tab bar rendered as opaque bordered boxes | **Borderless composer** on a sunken tonal field; **floating glass tab bar** (backdrop-blur) — while the **desktop device frame stays** (this is a mobile prototype; it presents as a phone on desktop, full-bleed on real phones, full-width on a spanned Duo) |
+| Composer looked boxed | Opaque bordered bar | Borderless composer, 26px radius, brand ring on focus only |
+| Tab bar looked bolted on | Solid strip with border | Floating glass pill anchored inside the frame; content scrolls beneath |
 | Small, cramped, 2020 | 15px body, small display, borders everywhere | 16px base (also the iOS zoom floor), 2.1rem serif display with tight tracking, borderless tonal cards/chips |
 | Static, lifeless | No press feedback | **Press physics**: 0.96 scale on touch-down (150ms), hover gated behind `(hover:hover)`, springs elsewhere |
 | Orb too dim | Faint halo, small | 244px, layered sage gradients, inner-light core; brightened in dark mode |
