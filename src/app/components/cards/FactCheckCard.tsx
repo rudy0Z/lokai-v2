@@ -38,7 +38,7 @@ export function FactCheckCard({
       <div className="flex flex-col gap-1">
         {facts.map((f) => (
           <div key={f.key} className="flex min-h-11 items-center gap-2 rounded-xl px-1">
-            <span className="w-24 shrink-0 text-2xs text-fg-tertiary" lang="en">
+            <span className="w-24 shrink-0 text-2xs text-fg-tertiary">
               {f.label}
             </span>
             {editing === f.key ? (
@@ -53,7 +53,7 @@ export function FactCheckCard({
               />
             ) : (
               <>
-                <span className="min-w-0 flex-1 text-sm font-medium text-fg-primary" lang="en">
+                <span className="min-w-0 flex-1 text-sm font-medium text-fg-primary">
                   {values[f.key]}
                 </span>
                 <button

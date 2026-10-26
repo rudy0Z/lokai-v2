@@ -9,7 +9,9 @@ interface AppContextValue {
   theme: Theme
   toggleTheme: () => void
   lang: LangCode
-  setLang: (l: LangCode) => void
+  /** persist=false for transient changes (replay immersion) that must not
+      outlive the session or survive a reload */
+  setLang: (l: LangCode, persist?: boolean) => void
   /** localized UI chrome string */
   tr: (key: UiKey) => string
   direction: 'ltr' | 'rtl'
@@ -54,8 +56,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const setLang = useCallback((l: LangCode) => {
+  const setLang = useCallback((l: LangCode, persist = true) => {
     setLangState(l)
+    if (!persist) return
     try {
       window.localStorage.setItem('lokai.lang', l)
     } catch {

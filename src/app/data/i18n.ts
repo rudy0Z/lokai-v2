@@ -159,6 +159,7 @@ export interface UiStrings {
   replayPlay: Pack
   replayPause: Pack
   replayRestart: Pack
+  replayFinished: Pack
 }
 
 export const UI: UiStrings = {
@@ -383,6 +384,13 @@ export const UI: UiStrings = {
   replayPlay: { en: 'Play', hi: 'चलाएँ', mr: 'चालवा', ta: 'இயக்கு', ur: 'چلائیں' },
   replayPause: { en: 'Pause', hi: 'रोकें', mr: 'थांबवा', ta: 'இடைநிறுத்து', ur: 'روکیں' },
   replayRestart: { en: 'Restart', hi: 'फिर से', mr: 'पुन्हा सुरू', ta: 'மீண்டும் தொடங்கு', ur: 'دوبارہ شروع' },
+  replayFinished: {
+    en: 'Replay finished — restart to watch again.',
+    hi: 'रीप्ले पूरा हुआ — दोबारा देखने के लिए फिर से चलाएँ।',
+    mr: 'रीप्ले पूर्ण — पुन्हा पाहण्यासाठी पुन्हा सुरू करा.',
+    ta: 'மறுஇயக்கம் முடிந்தது — மீண்டும் பார்க்க மீண்டும் தொடங்குங்கள்.',
+    ur: 'ریپلے مکمل — دوبارہ دیکھنے کے لیے دوبارہ چلائیں۔',
+  },
 }
 
 export type UiKey = keyof UiStrings

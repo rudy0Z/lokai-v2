@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../lib/app-context'
 import { navigate } from '../lib/router'
 import { REPLAY_SCRIPTS, replayById, type ReplayScript } from '../data/replays'
+import { paperDocById } from '../data/documents'
 import { FINDING } from '../data/refund-journey'
+import { NOTICE_FIELDS, NOTICE_NEXT_STEPS } from '../data/notice-interpretation'
+import { LANGUAGES } from '../data/languages'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -13,17 +16,30 @@ import { MessageBubble } from '../components/chat/MessageBubble'
 import { StreamText } from '../components/chat/StreamText'
 import { FindingCard } from '../components/cards/FindingCard'
 import { ActionLadder } from '../components/cards/ActionLadder'
-import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
+import { CautionCard } from '../components/cards/CautionCard'
+import { FactCheckCard } from '../components/cards/FactCheckCard'
 import { HandoverCard } from '../components/cards/HandoverCard'
 import { ProtectiveCard } from '../components/stop/ProtectiveCard'
+import { DocumentPaper } from '../components/documents/DocumentPaper'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
-import { IconPlay } from '../components/ui/icons'
+import { IconDoc, IconPlay } from '../components/ui/icons'
 
 /**
  * Replay mode: a prepared conversation plays itself with simulated HUMAN
- * actions — typing into the composer, tapping a reply chip, the voice beat.
- * The viewer just watches (play/pause/restart/speed). Nothing is live.
+ * actions — thinking pauses, char-by-char typing with punctuation and
+ * hesitation beats, tapping a reply chip, the voice beat, sending a document.
+ * The viewer watches (play/pause/restart/speed). Nothing is live.
  */
+
+type ReplayCardKind =
+  | 'factcheck'
+  | 'finding'
+  | 'ladder'
+  | 'caution'
+  | 'protective'
+  | 'handover'
+  | 'noticecard'
+  | 'noticeSummary'
 
 type ReplayItem =
   | { id: number; kind: 'user'; text: string }
@@ -31,15 +47,8 @@ type ReplayItem =
   | { id: number; kind: 'system'; text: string }
   | { id: number; kind: 'chips'; question: string; options: string[]; select: number; tapped: boolean }
   | { id: number; kind: 'voice'; seconds: number; transcript: string; revealed: boolean }
-  | { id: number; kind: 'card'; card: 'factcheck' | 'finding' | 'ladder' | 'protective' | 'handover'; why?: string }
-
-const FACT_ITEMS: FactItem[] = [
-  { key: 'item', label: 'Item', value: 'Mixer grinder' },
-  { key: 'seller', label: 'Seller', value: 'HomeKart' },
-  { key: 'issue', label: 'Issue', value: 'Arrived cracked' },
-  { key: 'ask', label: 'Refused', value: 'Refund and replacement' },
-  { key: 'when', label: 'Bought', value: '1 to 2 years ago' },
-]
+  | { id: number; kind: 'document'; docId: string }
+  | { id: number; kind: 'card'; card: ReplayCardKind; why?: string; mode?: 'full' | 'free' }
 
 const sleep = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
 
@@ -48,12 +57,28 @@ const streamMs = (text: string) => text.split(/\s+/).length * 45 + 600
 /** Omit that distributes over the union (plain Omit collapses it). */
 type DistOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
+/**
+ * Human typing pacing (deterministic): a base beat per character, extra time
+ * after punctuation and spaces, and a hesitation beat every 9th character —
+ * the rhythm of someone typing on a phone in their second script.
+ */
+function charDelay(text: string, i: number): number {
+  let d = 42
+  const prev = text[i - 1]
+  if (prev && /[,.;:!?।]/.test(prev)) d += 110
+  else if (prev === ' ') d += 26
+  if (i > 0 && i % 9 === 0) d += 170
+  return d
+}
+
 export default function ReplayPage({ id }: { id?: string }) {
   const script = replayById(id)
   if (!id) return <ReplayPicker />
   if (!script) return <ReplayPicker missing />
   return <ReplayPlayer key={script.id} script={script} />
 }
+
+const outcomeTone = { proceed: 'brand', notice: 'neutral', caution: 'warning', stop: 'danger' } as const
 
 function ReplayPicker({ missing = false }: { missing?: boolean }) {
   const { tr } = useApp()
@@ -73,11 +98,21 @@ function ReplayPicker({ missing = false }: { missing?: boolean }) {
               onClick={() => navigate(`/replay/${s.id}`)}
               className="pressable bg-card rounded-[22px] p-4 text-start"
             >
-              <div className="flex items-center gap-2">
-                <Badge tone="brand" variant="outline">{s.mode === 'voice' ? tr('listen') : tr('typeInstead')}</Badge>
-                <span className="text-sm font-semibold text-fg-primary" lang="en">{s.label}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge tone={outcomeTone[s.outcome]} variant="outline">
+                  {s.outcome === 'proceed'
+                    ? tr('tierProceed')
+                    : s.outcome === 'notice'
+                      ? tr('chipNotice')
+                      : s.outcome === 'caution'
+                        ? tr('tierCaution')
+                        : tr('tierHardStop')}
+                </Badge>
+                <span className="text-2xs font-semibold text-fg-tertiary">{LANGUAGES[s.lang].native}</span>
+                <span className="text-2xs text-fg-tertiary">· {s.mode === 'voice' ? tr('listen') : tr('typeInstead')}</span>
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-fg-secondary" lang="en">{s.blurb}</p>
+              <p className="mt-2 font-serif text-base font-semibold text-fg-primary">{s.label}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-fg-secondary" lang="en">{s.blurb}</p>
               <span className="mt-3 inline-flex items-center gap-1.5 text-2xs font-semibold text-brand-fg">
                 <IconPlay className="size-3.5" /> {tr('replayPlay')}
               </span>
@@ -89,8 +124,8 @@ function ReplayPicker({ missing = false }: { missing?: boolean }) {
   )
 }
 
-function ReplayPlayer({ script }: { script: ReplayScript }) {
-  const { tr } = useApp()
+export function ReplayPlayer({ script }: { script: ReplayScript }) {
+  const { tr, lang: appLang, setLang } = useApp()
   const [items, setItems] = useState<ReplayItem[]>([])
   const [typing, setTyping] = useState('')
   const [playing, setPlaying] = useState(true)
@@ -103,6 +138,17 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
   const stepRef = useRef(0)
   const speedRef = useRef(1)
   speedRef.current = speed
+
+  /* Full immersion: the replay plays as that user would see it — chrome,
+     cards and reassurance all in the script's language. Transient, not
+     persisted: a reload mid-replay never rewrites the viewer's own setting,
+     and leaving restores it. */
+  const restoreLangRef = useRef(appLang)
+  useEffect(() => {
+    setLang(script.lang, false)
+    return () => setLang(restoreLangRef.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [script.lang])
 
   const nextId = () => ++idRef.current
   const push = (item: DistOmit<ReplayItem, 'id'>) => {
@@ -124,16 +170,23 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
         const step = steps[stepRef.current]!
         const s = speedRef.current
         switch (step.kind) {
+          case 'think':
+          case 'pause': {
+            await sleep(step.ms / s)
+            break
+          }
           case 'typing': {
-            for (let i = 1; i <= step.text.length; i++) {
+            for (let i = 0; i < step.text.length; i++) {
               if (!alive()) return
-              setTyping(step.text.slice(0, i))
-              await sleep(26 / s)
+              await sleep(charDelay(step.text, i) / s)
+              if (!alive()) return
+              setTyping(step.text.slice(0, i + 1))
             }
             if (!alive()) return
+            await sleep(420 / s)
             push({ kind: 'user', text: step.text })
             setTyping('')
-            await sleep(420 / s)
+            await sleep(500 / s)
             break
           }
           case 'assistant': {
@@ -142,13 +195,13 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
             await sleep((step.stream ? streamMs(step.text) : 320) / s)
             if (!alive()) return
             if (step.stream) patch(itemId, { stream: false })
-            await sleep(260 / s)
+            await sleep(320 / s)
             break
           }
           case 'system': {
             if (!alive()) return
             push({ kind: 'system', text: step.text })
-            await sleep(500 / s)
+            await sleep(600 / s)
             break
           }
           case 'chips': {
@@ -160,14 +213,14 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
               select: step.select,
               tapped: false,
             })
-            await sleep(800 / s)
+            await sleep(900 / s)
             if (!alive()) return
             patch(itemId, { tapped: true })
-            await sleep(520 / s)
+            await sleep(560 / s)
             if (!alive()) return
             push({ kind: 'user', text: step.options[step.select]! })
             setItems((prev) => prev.filter((i) => i.id !== itemId))
-            await sleep(340 / s)
+            await sleep(400 / s)
             break
           }
           case 'voice': {
@@ -181,20 +234,22 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
             await sleep((step.seconds * 1000 + 700) / s)
             if (!alive()) return
             patch(itemId, { revealed: true })
-            await sleep(1300 / s)
+            await sleep(1400 / s)
             if (!alive()) return
             push({ kind: 'user', text: step.transcript })
-            await sleep(420 / s)
+            await sleep(500 / s)
+            break
+          }
+          case 'document': {
+            if (!alive()) return
+            push({ kind: 'document', docId: step.doc })
+            await sleep(1200 / s)
             break
           }
           case 'card': {
             if (!alive()) return
-            push({ kind: 'card', card: step.card, why: step.why })
-            await sleep((step.card === 'factcheck' ? 1500 : 900) / s)
-            break
-          }
-          case 'pause': {
-            await sleep(step.ms / s)
+            push({ kind: 'card', card: step.card, why: step.why, mode: 'mode' in step ? step.mode : undefined })
+            await sleep((step.card === 'factcheck' ? 1700 : 900) / s)
             break
           }
         }
@@ -219,7 +274,6 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
     setItems([])
     setTyping('')
     setFinished(false)
-    setSpeed(1)
     setPlaying(true)
     setRunToken((t) => t + 1)
   }
@@ -232,6 +286,7 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
       topBarExtra={
         <div className="flex items-center gap-2">
           <Badge tone="brand" variant="outline">{tr('replayBadge')}</Badge>
+          <span className="text-2xs font-semibold text-fg-tertiary">{LANGUAGES[script.lang].native}</span>
           <Button variant="ghost" size="sm" onClick={() => navigate('/replay')}>
             {tr('back')}
           </Button>
@@ -240,13 +295,13 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
       footer={
         <div className="rounded-[26px] bg-sunken px-4 py-3">
           {typing ? (
-            <p className="min-h-6 truncate text-base text-fg-primary" lang="en" aria-label="Simulated typing">
+            <p className="min-h-6 truncate text-base text-fg-primary" aria-label="Simulated typing">
               {typing}
               <span className="stream-caret" aria-hidden="true" />
             </p>
           ) : (
             <p className="min-h-6 text-base text-fg-tertiary">
-              {finished ? 'Replay finished.' : tr('replayHint')}
+              {finished ? tr('replayFinished') : tr('replayHint')}
             </p>
           )}
         </div>
@@ -269,7 +324,7 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setSpeed((v) => (v === 1 ? 1.5 : 1))}
+            onClick={() => setSpeed((v) => (v === 1 ? 1.5 : v === 1.5 ? 2 : 1))}
             aria-pressed={speed !== 1}
           >
             {speed}×
@@ -284,9 +339,7 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
 
         <Thread scrollKey={`${items.length}-${typing.length}-${playing}`} autoScroll>
           <div className="flex flex-col gap-1 px-3.5 pb-6 pt-3">
-            <p className="mb-1 font-serif text-lg font-semibold text-fg-primary" lang="en">
-              {script.label}
-            </p>
+            <p className="mb-1 font-serif text-lg font-semibold text-fg-primary">{script.label}</p>
             <p className="mb-2 text-sm leading-relaxed text-fg-secondary" lang="en">
               {script.blurb}
             </p>
@@ -323,10 +376,10 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
                 case 'chips':
                   return (
                     <div key={item.id} className="flex flex-col gap-2.5 ps-7">
-                      <p className="text-sm font-medium text-fg-primary" lang="en">{item.question}</p>
+                      <p className="text-sm font-medium text-fg-primary">{item.question}</p>
                       <div className="flex flex-wrap gap-2">
                         {item.options.map((o, idx) => (
-                          <Chip key={o} selected={item.tapped && idx === item.select} lang="en">
+                          <Chip key={o} selected={item.tapped && idx === item.select}>
                             {o}
                           </Chip>
                         ))}
@@ -350,18 +403,40 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
                           ))}
                         </div>
                         {item.revealed && (
-                          <p className="font-serif text-sm leading-relaxed text-fg-primary" lang="en">
+                          <p className="font-serif text-sm leading-relaxed text-fg-primary">
                             “{item.transcript}”
                           </p>
                         )}
                       </Card>
                     </MessageBubble>
                   )
+                case 'document': {
+                  const doc = paperDocById(item.docId)
+                  if (!doc) return null
+                  return (
+                    <div key={item.id} className="flex flex-col items-end gap-2">
+                      <MessageBubble role="user">
+                        <span className="inline-flex items-center gap-1.5">
+                          <IconDoc className="size-3.5 shrink-0" />
+                          {doc.fileName}
+                        </span>
+                      </MessageBubble>
+                      <div className="w-full">
+                        <DocumentPaper doc={doc} />
+                      </div>
+                    </div>
+                  )
+                }
                 case 'card':
                   if (item.card === 'factcheck')
                     return (
                       <MessageBubble key={item.id} role="assistant">
-                        <FactCheckCard facts={FACT_ITEMS} onConfirm={() => { /* simulated tap: the script continues */ }} />
+                        <FactCheckCard
+                          facts={script.facts ?? []}
+                          onConfirm={() => {
+                            /* simulated tap: the script continues */
+                          }}
+                        />
                       </MessageBubble>
                     )
                   if (item.card === 'finding')
@@ -373,8 +448,34 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
                   if (item.card === 'ladder')
                     return (
                       <div key={item.id} className="ps-7">
-                        <ActionLadder mode="full" onOpenNotice={() => navigate('/notice')} />
+                        <ActionLadder mode={item.mode ?? 'full'} onOpenNotice={() => navigate('/notice')} />
                       </div>
+                    )
+                  if (item.card === 'caution')
+                    return (
+                      <MessageBubble key={item.id} role="assistant">
+                        <CautionCard />
+                      </MessageBubble>
+                    )
+                  if (item.card === 'noticecard')
+                    return (
+                      <MessageBubble key={item.id} role="assistant">
+                        <Card className="flex flex-col gap-2.5">
+                          <h3 className="font-serif text-lg font-semibold text-fg-primary">
+                            {tr('noticeCardTitle')}
+                          </h3>
+                          <p className="text-sm leading-relaxed text-fg-secondary">{tr('noticeCardBody')}</p>
+                          <Button variant="primary" size="sm" className="self-start" onClick={() => navigate('/notice')}>
+                            {tr('noticeCardOpen')}
+                          </Button>
+                        </Card>
+                      </MessageBubble>
+                    )
+                  if (item.card === 'noticeSummary')
+                    return (
+                      <MessageBubble key={item.id} role="assistant">
+                        <NoticeSummaryCard />
+                      </MessageBubble>
                     )
                   if (item.card === 'protective')
                     return (
@@ -386,11 +487,11 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
                         />
                       </MessageBubble>
                     )
-                    return (
-                      <div key={item.id} className="ps-7">
-                        <HandoverCard tierLabel={tr('tierHardStop')} why={item.why ?? ''} />
-                      </div>
-                    )
+                  return (
+                    <div key={item.id} className="ps-7">
+                      <HandoverCard tierLabel={tr('tierHardStop')} why={item.why ?? ''} />
+                    </div>
+                  )
                 default:
                   return null
               }
@@ -399,5 +500,47 @@ function ReplayPlayer({ script }: { script: ReplayScript }) {
         </Thread>
       </div>
     </AppShell>
+  )
+}
+
+/** Static reading of the interpreter's key points (the editable live version lives on the notice page). */
+function NoticeSummaryCard() {
+  const { tr } = useApp()
+  return (
+    <Card className="flex flex-col gap-3">
+      <h3 className="font-serif text-lg font-semibold text-fg-primary">{tr('keyPoints')}</h3>
+      <ol className="flex flex-col gap-2">
+        {NOTICE_FIELDS.map((field, i) => (
+          <li key={field.id}>
+            <div className="flex items-center gap-3 rounded-xl bg-sunken px-3 py-2.5">
+              <span
+                className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle font-mono text-2xs font-semibold text-on-brand-subtle"
+                aria-hidden="true"
+              >
+                {i + 1}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-2xs text-fg-tertiary" lang="en">{field.label}</span>
+                <span className="block text-sm font-medium text-fg-primary" lang="en">{field.value}</span>
+              </span>
+              {field.confidence !== 'clear' && (
+                <Badge tone="warning" variant="subtle">{tr('confLikely')}</Badge>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div className="flex flex-col gap-1.5">
+        <p className="text-2xs font-semibold text-fg-secondary">{tr('whatNext')}</p>
+        {NOTICE_NEXT_STEPS.map((step) => (
+          <div key={step.id} className="rounded-xl border border-line-default px-3.5 py-2.5 text-sm text-fg-primary" lang="en">
+            {step.label}
+          </div>
+        ))}
+      </div>
+      <Button variant="primary" size="sm" className="self-start" onClick={() => navigate('/notice')}>
+        {tr('noticeCardOpen')}
+      </Button>
+    </Card>
   )
 }
