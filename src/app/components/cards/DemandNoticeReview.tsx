@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
-import { cn } from '../../lib/cn'
 import { copyText } from '../../lib/format'
 import { NOTICE_FIELDS } from '../../data/refund-journey'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
 import { Checkbox } from '../ui/Checkbox'
-import { Field, Input, Textarea } from '../ui/Field'
+import { Field, Textarea } from '../ui/Field'
 import { IconArrowLeft, IconCopy } from '../ui/icons'
 
 /**
@@ -80,15 +79,16 @@ export function DemandNoticeReview({ onBack }: { onBack: () => void }) {
           dates, amounts and the order number letter by letter.
         </Banner>
 
-        <div className="paper flex flex-col gap-4 rounded-2xl p-5" lang="en">
+        <div className="paper flex flex-col gap-4 rounded-[18px] p-5" lang="en">
           {NOTICE_FIELDS.filter((f) => f.key !== 'body').map((f) => (
             <Field key={f.key} label={f.label}>
               {(id) => (
-                <Input
+                <Textarea
                   id={id}
+                  rows={2}
                   value={values[f.key] ?? ''}
                   onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                  className={cn('bg-transparent border-x-0 border-t-0 border-warning-line/40 rounded-none px-0 font-serif')}
+                  className="resize-none rounded-none border-x-0 border-t-0 border-warning-line/40 bg-transparent px-0 font-serif"
                 />
               )}
             </Field>

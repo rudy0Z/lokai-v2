@@ -30,6 +30,7 @@ import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
 import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
 import { HandoverCard } from '../components/cards/HandoverCard'
+import { Card } from '../components/ui/Card'
 
 type ItemKind =
   | 'user'
@@ -42,6 +43,7 @@ type ItemKind =
   | 'system'
   | 'factcheck'
   | 'handover'
+  | 'noticecard'
 
 interface ChatItem {
   id: number
@@ -52,6 +54,8 @@ interface ChatItem {
   role?: 'answer'
   /** assistant text still revealing (caret streaming) */
   stream?: boolean
+  /** a consumed question row (collapsed once answered) */
+  done?: boolean
 }
 
 type AnswerId = '30' | '1to2' | '2plus' | 'notsure'
@@ -73,6 +77,7 @@ export default function ChatPage() {
   const [findingData, setFindingData] = useState<FindingCardData>(FINDING)
   const [factItems, setFactItems] = useState<FactItem[]>([])
   const [lastStop, setLastStop] = useState<ScopeDecision | null>(null)
+  const [composerOpen, setComposerOpen] = useState(false)
 
   const idRef = useRef(0)
   const seededRef = useRef<string | null>(null)
@@ -148,7 +153,27 @@ export default function ChatPage() {
 
   const handleSend = (text: string, _atts: string[], fail = false) => {
     push({ kind: 'user', text })
-    const decision = classifyMatter(text)
+
+    // safety first: strong hard-stop signals never route to the notice reader
+    const strongStop = /evict|throw (?:us|me|him|her) out|threat|police|\bfir\b|धमकी|बेदखल|पुलिस|پولیس/i.test(text)
+    // notice-intent: a received legal/official/tax notice → the interpreter
+    // (explain-only), NOT the consumer script and NOT a fake "coming later" (Trap 2)
+    const noticeIntent =
+      /\b(?:legal|official|court|tax|municipal|property[- ]tax|govt|government)\s+notice\b/i.test(text) ||
+      /\bnotice\s+(?:about|regarding|from|came|received)\b/i.test(text) ||
+      /received a notice/i.test(text) ||
+      /(कानूनी|सरकारी|कोर्ट|अदालत|टैक्स|नगर निगम|संपत्ति)[\s-]*नोटिस/i.test(text) ||
+      /नोटिस (?:आया|मिला|आया है)/i.test(text) ||
+      /(कायदेशीर|शासकीय|महापालिका|मालमत्ता)[\s-]*जाहीरनामा/i.test(text) ||
+      /जाहीरनामा (?:आल|मिळाल)/i.test(text) ||
+      /(சட்ட|அரசு|வரி|மாநகர|சொத்து)[\s-]*அறிவிப்பு/i.test(text) ||
+      /(قانونی|سرکاری|ٹیکس|بلدیہ|جائیداد)[\s-]*نوٹس/i.test(text)
+    if (!strongStop && noticeIntent) {
+      push({ kind: 'noticecard' })
+      return
+    }
+
+    const decision = classifyMatter(text, lang)
 
     if (decision.tier === 'hard-stop') {
       setStopPending(true)
@@ -162,22 +187,14 @@ export default function ChatPage() {
       startCautionFlow()
       return
     }
-    // notice-chip special: scanner arrives in a later phase — stay honest
-    if (/official notice|सरकारी नोटिस|शासकीय जाहीरनामा|அரசு அறிவிப்பு|سرکاری نوٹس/i.test(text)) {
-      run('disclose', () => {
-        push({
-          kind: 'assistant',
-          text: 'The notice reader is coming in a later phase of this prototype. For now, tell me in your own words what the notice says — who sent it, any amount, any deadline — and I will help you think it through.',
-        })
-      })
-      return
-    }
     startConsumerFlow(fail, text)
   }
 
   const handleAnswer = (answer: AnswerId) => {
     const label =
       answer === '30' ? tr('ans30') : answer === '1to2' ? tr('ans1to2') : answer === '2plus' ? tr('ans2plus') : tr('ansNotSure')
+    // collapse the answered question chips — the thread reads as a conversation (Trap 3)
+    setItems((prev) => prev.map((i) => (i.kind === 'chips' ? { ...i, done: true } : i)))
     push({ kind: 'user', text: label, role: 'answer' })
 
     if (answer === '30' || answer === '1to2') {
@@ -224,7 +241,7 @@ export default function ChatPage() {
 
   const tellMore = () => {
     setStopDecision(null)
-    const decision = reRouteAsCaution()
+    const decision = reRouteAsCaution(lang)
     push({ kind: 'system', text: tr('tierCaution') })
     run('caution', () => {
       push(
@@ -348,14 +365,18 @@ export default function ChatPage() {
         </Button>
       }
       footer={
-        <Composer
-          onSend={handleSend}
-          disabled={busy}
-          offline={offline}
-          attachments={attachments}
-          onAttach={(name) => setAttachments((a) => [...a, name])}
-          onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
-        />
+        // Trap-3A fix: no chat composer on the voice-first empty state, on the
+        // stop screen, or on the notice flows — one input model per screen
+        empty && !composerOpen ? undefined : noticeOpen || stopDecision || stopPending ? undefined : (
+          <Composer
+            onSend={handleSend}
+            disabled={busy}
+            offline={offline}
+            attachments={attachments}
+            onAttach={(name) => setAttachments((a) => [...a, name])}
+            onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
+          />
+        )
       }
     >
       {noticeOpen ? (
@@ -431,7 +452,13 @@ export default function ChatPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus()}
+                    onClick={() => {
+                      setComposerOpen(true)
+                      window.setTimeout(
+                        () => document.querySelector<HTMLTextAreaElement>('textarea')?.focus(),
+                        60,
+                      )
+                    }}
                     className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-[22px] bg-card px-3 py-5 transition-colors"
                   >
                     <IconKeyboard className="size-6 text-brand-fg" />
@@ -461,6 +488,7 @@ export default function ChatPage() {
                     <MessageBubble
                       key={item.id}
                       role="user"
+                      isAnswer={item.role === 'answer'}
                       stale={item.stale}
                       onStaleAction={item.role === 'answer' ? () => reopenQuestion(item.id) : undefined}
                       staleActionLabel={tr('update')}
@@ -512,11 +540,28 @@ export default function ChatPage() {
                     </MessageBubble>
                   )
                 case 'chips':
+                  if (item.done) return null
                   return (
                     <div key={item.id} className="flex flex-col gap-2.5 ps-7">
                       <p className="text-sm font-medium text-fg-primary">{tr('qWhen')}</p>
                       {chipsForQuestion}
                     </div>
+                  )
+                case 'noticecard':
+                  return (
+                    <MessageBubble key={item.id} role="assistant">
+                      <Card className="flex flex-col gap-2.5">
+                        <h3 className="font-serif text-lg font-semibold text-fg-primary">
+                          {tr('noticeCardTitle')}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-fg-secondary">
+                          {tr('noticeCardBody')}
+                        </p>
+                        <Button variant="primary" size="sm" className="self-start" onClick={() => navigate('/notice')}>
+                          {tr('noticeCardOpen')}
+                        </Button>
+                      </Card>
+                    </MessageBubble>
                   )
                 case 'finding':
                   return (

@@ -59,13 +59,17 @@ function DlsaPanel({ inverted }: { inverted: boolean }) {
             </select>
           </label>
           <div className="min-w-0 flex-1">
-            <Field label={tr('dlsaDistrict')}>
+            <Field label={tr('dlsaDistrict')} inverted>
               {(id) => (
                 <Input
                   id={id}
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className={inverted ? 'border-line-inverted bg-transparent text-fg-on-inverted' : ''}
+                  className={
+                    inverted
+                      ? 'border-line-inverted bg-transparent text-fg-on-inverted placeholder:text-fg-standout-secondary/60'
+                      : ''
+                  }
                 />
               )}
             </Field>
@@ -112,7 +116,7 @@ function DlsaPanel({ inverted }: { inverted: boolean }) {
             </div>
           </dl>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
-            <VerificationBadge verified={legal?.verified ?? false} />
+            <VerificationBadge inverted verified={legal?.verified ?? false} />
             <span className="text-2xs opacity-80">{tr('dlsaPlaceholderNote')}</span>
           </div>
         </Card>

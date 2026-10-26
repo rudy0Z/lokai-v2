@@ -11,6 +11,8 @@ export interface MessageBubbleProps {
   stale?: boolean
   onStaleAction?: () => void
   staleActionLabel?: string
+  /** this user bubble is a chosen answer (Update affordance lives here) */
+  isAnswer?: boolean
   /** quiet action row under assistant text (copy etc.) */
   actions?: ReactNode
   className?: string
@@ -27,6 +29,7 @@ export function MessageBubble({
   stale = false,
   onStaleAction,
   staleActionLabel,
+  isAnswer = false,
   actions,
   className,
 }: MessageBubbleProps) {
@@ -63,11 +66,11 @@ export function MessageBubble({
       >
         {children}
       </div>
-      {stale && onStaleAction && (
+      {onStaleAction && (stale || isAnswer) && (
         <button
           type="button"
           onClick={onStaleAction}
-          className="mt-1 min-h-9 rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
+          className="pressable mt-1 inline-flex min-h-9 items-center gap-1.5 rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
         >
           {staleActionLabel}
         </button>

@@ -145,6 +145,10 @@ export interface UiStrings {
   handoverWhat: Pack
   exhibitsLabel: Pack
   stagesLabel: Pack
+  noticeCardTitle: Pack
+  noticeCardBody: Pack
+  noticeCardOpen: Pack
+  listen: Pack
 }
 
 export const UI: UiStrings = {
@@ -319,6 +323,28 @@ export const UI: UiStrings = {
   handoverWhat: { en: 'What to bring', hi: 'क्या साथ लें', mr: 'काय घेऊन जावे', ta: 'என்ன எடுத்துச் செல்லவும்', ur: 'کیا ساتھ لیں' },
   exhibitsLabel: { en: 'Exhibits', hi: 'साक्ष्य', mr: 'पुरावे', ta: 'ஆதாரங்கள்', ur: 'ثبوتات' },
   stagesLabel: { en: 'Progress', hi: 'प्रगति', mr: 'प्रगती', ta: 'முன்னேற்றம்', ur: 'پیش رفت' },
+  noticeCardTitle: {
+    en: 'I can read that notice with you',
+    hi: 'मैं वह नोटिस आपके साथ पढ़ सकता हूँ',
+    mr: 'ते जाहीरनामा मी तुमच्यासोबत वाचू शकतो',
+    ta: 'அந்த அறிவிப்பை உங்களுடன் படிக்கிறேன்',
+    ur: 'میں وہ نوٹس آپ کے ساتھ پڑھ سکتا ہوں',
+  },
+  noticeCardBody: {
+    en: 'The notice interpreter explains what it says, line by line, in your language. It does not tell you whether to dispute it — that is a human decision.',
+    hi: 'नोटिस व्याख्याकार बताता है कि उसमें क्या लिखा है, पंक्ति-दर-पंक्ति, आपकी भाषा में। वह यह नहीं बताता कि विवाद करें या नहीं — यह मानवीय निर्णय है।',
+    mr: 'जाहीरनामा वाचक सांगतो की त्यात काय लिहिले आहे, ओळीनुसार, तुमच्या भाषेत. वाद करायचा की नाही हे तो सांगत नाही — तो मानवी निर्णय आहे.',
+    ta: 'அறிவிப்பு விளக்கி என்ன எழுதியுள்ளது என்பதை வரிவாரியாக, உங்கள் மொழியில் சொல்லும். தகராறு செய்யவேண்டுமா என்று அது சொல்லாது — அது மனிதரின் முடிவு.',
+    ur: 'نوٹس مفسر بتاتا ہے کہ اس میں کیا لکھا ہے، سطر بہ سطر، آپ کی زبان میں۔ وہ یہ نہیں بتاتا کہ تنازع کریں یا نہیں — وہ انسانی فیصلہ ہے۔',
+  },
+  noticeCardOpen: {
+    en: 'Open the notice interpreter',
+    hi: 'नोटिस व्याख्याकार खोलें',
+    mr: 'जाहीरनामा वाचक उघडा',
+    ta: 'அறிவிப்பு விளக்கியைத் திற',
+    ur: 'نوٹس مفسر کھولیں',
+  },
+  listen: { en: 'Listen', hi: 'सुनें', mr: 'ऐका', ta: 'கேளுங்கள்', ur: 'سنیں' },
 }
 
 export type UiKey = keyof UiStrings

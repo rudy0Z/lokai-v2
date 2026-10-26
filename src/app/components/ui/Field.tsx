@@ -4,14 +4,19 @@ import { cn } from '../../lib/cn'
 export interface FieldProps {
   label: ReactNode
   hint?: ReactNode
+  /** dark-ink label on inverted (standout) surfaces — Trap-3B fix */
+  inverted?: boolean
   children: (id: string) => ReactNode
 }
 
-export function Field({ label, hint, children }: FieldProps) {
+export function Field({ label, hint, inverted = false, children }: FieldProps) {
   const id = useId()
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-2xs font-medium text-fg-secondary">
+      <label
+        htmlFor={id}
+        className={cn('text-2xs font-medium', inverted ? 'text-fg-standout-secondary' : 'text-fg-secondary')}
+      >
         {label}
       </label>
       {children(id)}

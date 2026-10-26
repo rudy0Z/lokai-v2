@@ -17,6 +17,7 @@ import { ConfidenceIndicator } from '../components/trust/ConfidenceIndicator'
 import { VerificationBadge } from '../components/trust/VerificationBadge'
 import { ReasoningPill } from '../components/trust/ReasoningPill'
 import { ScanDocument } from '../components/notice/ScanDocument'
+import { SpeakPill } from '../components/trust/SpeakPill'
 import { IconDoc, IconExternal } from '../components/ui/icons'
 import { runBeats } from '../lib/engine'
 
@@ -75,7 +76,10 @@ export default function NoticePage() {
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
           {/* what this means */}
           <section className="bg-card rounded-[22px] p-4">
-            <h1 className="font-serif text-xl font-semibold leading-snug text-fg-primary">{tr('noticeMeaning')}</h1>
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="font-serif text-xl font-semibold leading-snug text-fg-primary">{tr('noticeMeaning')}</h1>
+              <SpeakPill text={NOTICE_SUMMARY[lang] ?? NOTICE_SUMMARY.en!} className="shrink-0" />
+            </div>
             <p className="mt-2 text-sm leading-relaxed text-fg-primary">{NOTICE_SUMMARY[lang] ?? NOTICE_SUMMARY.en!}</p>
             <p className="mt-2 text-2xs text-fg-tertiary" lang="en">
               {NOTICE_DOC.authority} · {NOTICE_DOC.sourceLangLabel}

@@ -10,6 +10,7 @@ import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIn
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { ReasoningPill } from '../trust/ReasoningPill'
 import { LegalText } from '../trust/LegalText'
+import { SpeakPill } from '../trust/SpeakPill'
 import { CardActions } from './CardActions'
 
 export interface FindingCardData {
@@ -120,6 +121,9 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
       )}
 
       <ConfidenceIndicator level={draft.confidence} />
+      <div className="flex flex-wrap items-center gap-2">
+        <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
+      </div>
       <ReasoningPill steps={draft.reasoningSteps} />
 
       <CardActions

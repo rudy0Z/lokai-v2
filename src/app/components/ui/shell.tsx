@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { LANG_OPTIONS } from '../../data/languages'
+import { navigate } from '../../lib/router'
 import { LogoMark } from './LogoMark'
 import { TabBar, type TabId } from './TabBar'
 import { IconMoon, IconSun } from './icons'
@@ -44,6 +45,42 @@ export function LanguageSelect({ className }: { className?: string }) {
   )
 }
 
+/**
+ * Desktop reviewer tour — a quiet floating card in the margin OUTSIDE the
+ * device frame (lg+): the six moments that matter, ~60 seconds.
+ */
+function ReviewerTour({ onUrdu }: { onUrdu: () => void }) {
+  const stops: { n: string; label: string; go: () => void }[] = [
+    { n: '01', label: 'Voice intake → review', go: () => navigate('/voice') },
+    { n: '02', label: 'Golden refund journey', go: () => navigate('/?s=refund-golden') },
+    { n: '03', label: 'Marathi notice reader', go: () => navigate('/notice') },
+    { n: '04', label: 'Safety hard-stop', go: () => navigate('/?s=stop-eviction') },
+    { n: '05', label: 'Urdu RTL', go: onUrdu },
+    { n: '06', label: 'Type specimen', go: () => navigate('/specimen') },
+  ]
+  return (
+    <aside className="pointer-events-none fixed start-8 top-1/2 z-30 hidden -translate-y-1/2 lg:block">
+      <div className="pointer-events-auto flex w-64 flex-col gap-1.5 rounded-3xl border border-line-subtle bg-shell/85 p-4 shadow-xl backdrop-blur-xl">
+        <p className="font-serif text-sm font-semibold text-fg-primary">Reviewing the prototype?</p>
+        <p className="mb-1.5 text-2xs leading-relaxed text-fg-tertiary">
+          Six moments, about a minute. The phone is live — everything runs on mock data.
+        </p>
+        {stops.map((s) => (
+          <button
+            key={s.n}
+            type="button"
+            onClick={s.go}
+            className="pressable flex min-h-9 items-center gap-2.5 rounded-xl px-2 text-start text-2xs font-medium text-fg-secondary transition-colors hover:bg-hover-veil"
+          >
+            <span className="font-mono text-2xs text-brand-fg">{s.n}</span>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </aside>
+  )
+}
+
 export interface AppShellProps {
   activeTab?: TabId
   showTabs?: boolean
@@ -59,9 +96,10 @@ export interface AppShellProps {
  * as translucent material (apple-design §12) inside the frame.
  */
 export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, children, footer }: AppShellProps) {
-  const { tr } = useApp()
+  const { tr, setLang } = useApp()
   return (
     <div className="flex h-dvh justify-center bg-page sm:items-center sm:py-6">
+      <ReviewerTour onUrdu={() => { setLang('ur'); navigate('/') }} />
       <div
         className={
           'relative flex h-dvh w-full flex-col overflow-hidden bg-shell ' +
