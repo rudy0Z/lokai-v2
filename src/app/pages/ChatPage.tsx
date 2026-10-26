@@ -24,10 +24,24 @@ import { CautionCard } from '../components/cards/CautionCard'
 import { DemandNoticeReview } from '../components/cards/DemandNoticeReview'
 import { StopScreen } from '../components/stop/StopScreen'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
-import { IconCamera, IconKeyboard } from '../components/ui/icons'
+import { IconCamera, IconKeyboard, IconCopy } from '../components/ui/icons'
 import { useSpans } from '../lib/useSpans'
+import { StreamText } from '../components/chat/StreamText'
+import { copyText } from '../lib/format'
+import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
+import { HandoverCard } from '../components/cards/HandoverCard'
 
-type ItemKind = 'user' | 'assistant' | 'chips' | 'finding' | 'ladder' | 'caution' | 'error' | 'system'
+type ItemKind =
+  | 'user'
+  | 'assistant'
+  | 'chips'
+  | 'finding'
+  | 'ladder'
+  | 'caution'
+  | 'error'
+  | 'system'
+  | 'factcheck'
+  | 'handover'
 
 interface ChatItem {
   id: number
@@ -36,6 +50,8 @@ interface ChatItem {
   variant?: 'full' | 'free'
   stale?: boolean
   role?: 'answer'
+  /** assistant text still revealing (caret streaming) */
+  stream?: boolean
 }
 
 type AnswerId = '30' | '1to2' | '2plus' | 'notsure'
@@ -55,20 +71,32 @@ export default function ChatPage() {
   const [stopPending, setStopPending] = useState(false)
   const [noticeOpen, setNoticeOpen] = useState(false)
   const [findingData, setFindingData] = useState<FindingCardData>(FINDING)
+  const [factItems, setFactItems] = useState<FactItem[]>([])
+  const [lastStop, setLastStop] = useState<ScopeDecision | null>(null)
 
   const idRef = useRef(0)
   const seededRef = useRef<string | null>(null)
   const retryRef = useRef<(() => void) | null>(null)
+  const cancelRef = useRef(false)
 
   const nextId = () => ++idRef.current
   const push = (...newItems: Omit<ChatItem, 'id'>[]) =>
     setItems((prev) => [...prev, ...newItems.map((i) => ({ ...i, id: nextId() }))])
 
+  /** skip the remaining narrated beats — resolve straight to the answer */
+  const skipBeats = () => {
+    cancelRef.current = true
+  }
+
   /** deterministic staged beats -> then(); failure injectable for the error state */
   const run = useCallback((beatClass: BeatClass, then: () => void, fail = false) => {
     setBusy(true)
+    cancelRef.current = false
     retryRef.current = () => run(beatClass, then, false)
-    runBeats(beatClass, (label) => setStageLabel(label), { failAfterFirstBeat: fail })
+    runBeats(beatClass, (label) => setStageLabel(label), {
+      failAfterFirstBeat: fail,
+      isCancelled: () => cancelRef.current,
+    })
       .then(() => {
         if (!fail) then()
       })
@@ -98,6 +126,7 @@ export default function ChatPage() {
         push(
           {
             kind: 'assistant',
+            stream: true,
             text: `${JOURNEY_STRINGS.reassurance![lang] ?? JOURNEY_STRINGS.reassurance!.en}\n\n${tr('restatePrefix')} ${restatement}`,
           },
           { kind: 'chips', text: 'qWhen' },
@@ -152,8 +181,16 @@ export default function ChatPage() {
     push({ kind: 'user', text: label, role: 'answer' })
 
     if (answer === '30' || answer === '1to2') {
+      setFactItems([
+        { key: 'item', label: 'Item', value: 'Mixer grinder' },
+        { key: 'seller', label: 'Seller', value: 'HomeKart' },
+        { key: 'issue', label: 'Issue', value: 'Arrived cracked' },
+        { key: 'ask', label: 'Refused', value: 'Refund and replacement' },
+        { key: 'when', label: 'Bought', value: label },
+      ])
+      // the verification gate: nothing generative until facts are signed (A2.7)
       run('explain', () => {
-        push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
+        push({ kind: 'factcheck' })
       })
     } else {
       run('caution', () => {
@@ -161,6 +198,12 @@ export default function ChatPage() {
       })
     }
   }
+
+  const confirmFacts = useCallback(() => {
+    run('progress', () => {
+      push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
+    })
+  }, [run])
 
   /** user changes an earlier answer: downstream cards go stale, question re-opens */
   const reopenQuestion = (userId: number) => {
@@ -322,6 +365,11 @@ export default function ChatPage() {
           decision={stopDecision}
           pending={stopPending}
           onBack={() => {
+            // returning from a stop leaves the handover packet in the thread
+            if (stopDecision) {
+              setLastStop(stopDecision)
+              push({ kind: 'system', text: tr('tierHardStop') }, { kind: 'handover' })
+            }
             setStopDecision(null)
             setStopPending(false)
           }}
@@ -422,8 +470,39 @@ export default function ChatPage() {
                   )
                 case 'assistant':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
-                      <p className="whitespace-pre-line text-sm leading-relaxed">{item.text}</p>
+                    <MessageBubble
+                      key={item.id}
+                      role="assistant"
+                      actions={
+                        item.stream ? undefined : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            leadingIcon={<IconCopy className="size-3.5" />}
+                            onClick={async () => {
+                              const ok = await copyText(item.text ?? '')
+                              if (ok) toast.success(tr('copied'))
+                            }}
+                          >
+                            {tr('copy')}
+                          </Button>
+                        )
+                      }
+                    >
+                      {item.stream ? (
+                        <p className="whitespace-pre-line text-sm leading-relaxed">
+                          <StreamText
+                            text={item.text ?? ''}
+                            onDone={() =>
+                              setItems((prev) =>
+                                prev.map((i) => (i.id === item.id ? { ...i, stream: false } : i)),
+                              )
+                            }
+                          />
+                        </p>
+                      ) : (
+                        <p className="whitespace-pre-line text-sm leading-relaxed">{item.text}</p>
+                      )}
                     </MessageBubble>
                   )
                 case 'system':
@@ -470,6 +549,21 @@ export default function ChatPage() {
                       />
                     </MessageBubble>
                   )
+                case 'factcheck':
+                  return (
+                    <MessageBubble key={item.id} role="assistant">
+                      <FactCheckCard facts={factItems} onConfirm={confirmFacts} />
+                    </MessageBubble>
+                  )
+                case 'handover':
+                  return (
+                    <div key={item.id} className="ps-7">
+                      <HandoverCard
+                        tierLabel={lastStop?.tier === 'caution' ? tr('tierCaution') : tr('tierHardStop')}
+                        why={lastStop?.why ?? ''}
+                      />
+                    </div>
+                  )
                 case 'error':
                   return (
                     <div key={item.id} className="ps-7">
@@ -491,7 +585,14 @@ export default function ChatPage() {
               }
             })}
 
-            {busy && <TypingIndicator stageLabel={stageLabel} />}
+            {busy && (
+              <div className="flex items-center gap-1.5 ps-7">
+                <TypingIndicator stageLabel={stageLabel} />
+                <Button variant="ghost" size="sm" onClick={skipBeats}>
+                  {tr('skip')}
+                </Button>
+              </div>
+            )}
                 </>
               )
             })()}

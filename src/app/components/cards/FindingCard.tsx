@@ -9,6 +9,7 @@ import { Textarea } from '../ui/Field'
 import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { ReasoningPill } from '../trust/ReasoningPill'
+import { LegalText } from '../trust/LegalText'
 import { CardActions } from './CardActions'
 
 export interface FindingCardData {
@@ -96,7 +97,9 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
                 {tr('findingLawSays')}
               </dt>
-              <dd className="mt-1 text-sm text-fg-primary">{draft.lawSays}</dd>
+              <dd className="mt-1 text-sm text-fg-primary">
+                <LegalText text={draft.lawSays} />
+              </dd>
               {legal && (
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
                   <span className="font-mono text-2xs text-fg-secondary">

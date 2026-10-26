@@ -135,6 +135,16 @@ export interface UiStrings {
   autoDetect: Pack
   profileLangsNote: Pack
   profileCoverageNote: Pack
+  skip: Pack
+  jumpToLatest: Pack
+  factCheckTitle: Pack
+  factCheckSub: Pack
+  factConfirm: Pack
+  factCorrect: Pack
+  handoverTitle: Pack
+  handoverWhat: Pack
+  exhibitsLabel: Pack
+  stagesLabel: Pack
 }
 
 export const UI: UiStrings = {
@@ -293,6 +303,22 @@ export const UI: UiStrings = {
     ta: 'புள்ளிகள் இன்னும் வரைவு நிலையில் உள்ள மொழிகளைக் குறிக்கின்றன (AI-உருவாக்கம், மனித-ஆய்வு இல்லை). சட்ட உள்ளடக்கம் சரிபார்க்கப்படும் வரை ஆங்கிலத்திலேயே இருக்கும்.',
     ur: 'نقطے ان زبانوں کو ظاہر کرتے ہیں جو ابھی مسودے میں ہیں (AI-ساخته، انسانی جانچے نہیں)۔ قانونی مواد جانچے جانے تک انگریزی میں رہتا ہے۔',
   },
+  skip: { en: 'Skip', hi: 'छोड़ें', mr: 'वगळा', ta: 'தாண்டு', ur: 'چھوڑیں' },
+  jumpToLatest: { en: 'Jump to latest', hi: 'नवीनतम पर जाएँ', mr: 'अखेरच्यापर्यंत', ta: 'சமீபத்திற்குச் செல்', ur: 'تازہ ترین پر جائیں' },
+  factCheckTitle: { en: 'Did I get this right?', hi: 'क्या मैं सही समझा?', mr: 'बरोबर समजले का?', ta: 'சரியாகப் புரிந்ததா?', ur: 'کیا میں نے صحیح سمجھا؟' },
+  factCheckSub: {
+    en: 'Check each fact before I go further — you can correct any of them.',
+    hi: 'आगे बढ़ने से पहले हर तथ्य जाँचें — आप कोई भी सुधार सकते हैं।',
+    mr: 'पुढे जाण्यापूर्वी प्रत्येक वस्तुस्थिती तपासा — तुम्ही काहीही दुरुस्त करू शकता.',
+    ta: 'மேலும் செல்வதற்கு முன் ஒவ்வொரு உண்மையையும் சரிபார்க்கவும் — எதையும் திருத்தலாம்.',
+    ur: 'آگے بڑھنے سے پہلے ہر حقیقت جانچیں — آپ کوئی بھی درست کر سکتے ہیں۔',
+  },
+  factConfirm: { en: 'Yes, that’s right', hi: 'हाँ, सही है', mr: 'हो, बरोबर', ta: 'ஆம், சரி', ur: 'ہاں، درست ہے' },
+  factCorrect: { en: 'Correct it', hi: 'सुधारें', mr: 'दुरुस्त करा', ta: 'திருத்து', ur: 'درست کریں' },
+  handoverTitle: { en: 'Your handover packet', hi: 'आपका हैंडओवर पैकेट', mr: 'तुमचे हँडओव्हर पॅकेट', ta: 'உங்கள் கையளிப்புத் தொகுப்பு', ur: 'آپ کا ہینڈ اوور پیکٹ' },
+  handoverWhat: { en: 'What to bring', hi: 'क्या साथ लें', mr: 'काय घेऊन जावे', ta: 'என்ன எடுத்துச் செல்லவும்', ur: 'کیا ساتھ لیں' },
+  exhibitsLabel: { en: 'Exhibits', hi: 'साक्ष्य', mr: 'पुरावे', ta: 'ஆதாரங்கள்', ur: 'ثبوتات' },
+  stagesLabel: { en: 'Progress', hi: 'प्रगति', mr: 'प्रगती', ta: 'முன்னேற்றம்', ur: 'پیش رفت' },
 }
 
 export type UiKey = keyof UiStrings

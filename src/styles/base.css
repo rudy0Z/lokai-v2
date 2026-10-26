@@ -223,6 +223,141 @@ a,
 }
 
 /* ============================================================================
+   Streaming caret — v1 law: solid block, blinks while streaming, leaves
+   after the rest period. Reduced motion: caret suppressed entirely.
+   ============================================================================ */
+.stream-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1.05em;
+  margin-inline-start: 2px;
+  border-radius: 1.5px;
+  background: var(--c-brand-solid);
+  vertical-align: text-bottom;
+  animation: caret-blink 1.06s steps(1) infinite;
+}
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stream-caret {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   Document scan beat (ported from v1 ScanDocument, botanical reskin):
+   a green energy bar with a soft trailing tail sweeps the paper page.
+   ============================================================================ */
+.scan-page {
+  position: relative;
+  overflow: hidden;
+}
+.scan-bar {
+  position: absolute;
+  inset-inline: 10%;
+  top: 6%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    var(--c-brand-solid) 0%,
+    oklch(52% 0.07 160 / 0.45) 55%,
+    transparent 100%
+  );
+  box-shadow: 0 0 18px oklch(52% 0.07 160 / 0.5);
+  animation: scan-sweep 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes scan-sweep {
+  0% {
+    top: 6%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    top: 94%;
+    opacity: 0;
+  }
+}
+.scan-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    oklch(60% 0.06 160 / 0.07) 50%,
+    transparent 100%
+  );
+  background-size: 100% 46%;
+  background-repeat: no-repeat;
+  animation: scan-glow 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes scan-glow {
+  0% {
+    background-position: 0 -46%;
+  }
+  100% {
+    background-position: 0 146%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-bar,
+  .scan-page::before {
+    animation: none !important;
+    opacity: 0.35;
+  }
+}
+
+/* Orb thinking: inner gradient activity (Gemini: inner activity signals
+   analysis) — a slow directional drift under the surface. */
+.orb-activity {
+  position: absolute;
+  inset: 13%;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--orb-mid) 90deg,
+    transparent 210deg,
+    var(--orb-outer) 300deg,
+    transparent 360deg
+  );
+  filter: blur(7px);
+  opacity: 0.85;
+  animation: orb-drift 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+@keyframes orb-drift {
+  0% {
+    transform: rotate(0deg) scale(0.98);
+  }
+  50% {
+    transform: rotate(160deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb-activity {
+    animation: none !important;
+    opacity: 0.4;
+  }
+}
+
+/* ============================================================================
    Listening waveform — deterministic bar dance, green ink. Reduced motion
    holds a static mid-wave.
    ============================================================================ */

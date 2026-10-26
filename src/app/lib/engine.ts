@@ -1,18 +1,19 @@
 /**
  * Deterministic staged-progress engine (design law ported from v1's
  * responseEngine): responses arrive as narrated beats, durations scale with
- * the consequence class of the turn (heavier consequence = faster, fewer
- * theatrical beats), everything is skippable, and prefers-reduced-motion
- * collapses delays to near-zero. No model, no network — ever.
+ * the consequence class, everything is skippable (cancel resolves straight
+ * to the answer — v1's skip law), and prefers-reduced-motion collapses
+ * delays. No model, no network — ever.
  */
 export type BeatClass = 'stop' | 'caution' | 'explain' | 'disclose' | 'progress'
 
+/** retuned 2026-10-26: acknowledgment lands fast; narration stays honest */
 export const STAGE_MS_BY_CLASS: Record<BeatClass, number> = {
-  stop: 260,
-  caution: 520,
-  explain: 950,
-  disclose: 700,
-  progress: 620,
+  stop: 210,
+  caution: 330,
+  explain: 430,
+  disclose: 390,
+  progress: 310,
 }
 
 export interface Beat {
@@ -20,31 +21,11 @@ export interface Beat {
 }
 
 export const BEATS: Record<BeatClass, Beat[]> = {
-  stop: [
-    { label: 'stageReading' },
-    { label: 'stageChecking' },
-  ],
-  caution: [
-    { label: 'stageReading' },
-    { label: 'stageChecking' },
-    { label: 'stageWriting' },
-  ],
-  explain: [
-    { label: 'stageReading' },
-    { label: 'stageChecking' },
-    { label: 'stageChecking' },
-    { label: 'stageWriting' },
-    { label: 'stageWriting' },
-  ],
-  disclose: [
-    { label: 'stageReading' },
-    { label: 'stageChecking' },
-    { label: 'stageWriting' },
-  ],
-  progress: [
-    { label: 'stageReading' },
-    { label: 'stageWriting' },
-  ],
+  stop: [{ label: 'stageReading' }, { label: 'stageChecking' }],
+  caution: [{ label: 'stageReading' }, { label: 'stageChecking' }, { label: 'stageWriting' }],
+  explain: [{ label: 'stageReading' }, { label: 'stageChecking' }, { label: 'stageWriting' }],
+  disclose: [{ label: 'stageReading' }, { label: 'stageChecking' }, { label: 'stageWriting' }],
+  progress: [{ label: 'stageReading' }, { label: 'stageWriting' }],
 }
 
 const prefersReducedMotion = () =>
@@ -54,6 +35,8 @@ const prefersReducedMotion = () =>
 export interface RunOptions {
   /** jump straight to completion (skip affordance) */
   skip?: boolean
+  /** polled between beats — when it flips true, resolve immediately */
+  isCancelled?: () => boolean
   /** simulate a transport failure after the first beat (error-state demo) */
   failAfterFirstBeat?: boolean
 }
@@ -66,8 +49,8 @@ export class SimulatedFailure extends Error {
 
 /**
  * Walks the beat list for a class, invoking onStage with each beat label.
- * Resolves when done — or rejects with SimulatedFailure when the failure
- * injection is on. The caller decides what "the turn" is; this only paces it.
+ * Resolves when done (or when cancelled — skipping straight to the answer),
+ * rejects with SimulatedFailure when the failure injection is on.
  */
 export function runBeats(
   beatClass: BeatClass,
@@ -81,6 +64,10 @@ export function runBeats(
   return new Promise<void>((resolve, reject) => {
     let i = 0
     const step = () => {
+      if (opts.isCancelled?.()) {
+        resolve()
+        return
+      }
       if (i >= beats.length) {
         resolve()
         return

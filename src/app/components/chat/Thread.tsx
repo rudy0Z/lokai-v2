@@ -1,5 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
+import { useApp } from '../../lib/app-context'
+import { IconArrowLeft } from '../ui/icons'
 
 export interface ThreadProps {
   children: ReactNode
@@ -11,8 +13,10 @@ export interface ThreadProps {
 }
 
 export function Thread({ children, scrollKey, autoScroll = true, className }: ThreadProps) {
+  const { tr } = useApp()
   const ref = useRef<HTMLDivElement>(null)
   const firstRef = useRef(true)
+  const [away, setAway] = useState(false)
 
   useEffect(() => {
     if (!autoScroll) return
@@ -22,13 +26,38 @@ export function Thread({ children, scrollKey, autoScroll = true, className }: Th
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 160
     if (firstRef.current || nearBottom) {
       firstRef.current = false
-      el.scrollTo({ top: el.scrollHeight, behavior: firstRef.current ? 'auto' : 'smooth' })
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+      setAway(false)
     }
   }, [scrollKey, autoScroll])
 
+  const onScroll = () => {
+    const el = ref.current
+    if (!el) return
+    setAway(el.scrollHeight - el.scrollTop - el.clientHeight > 260)
+  }
+
   return (
-    <div ref={ref} className={cn('scroll-calm flex-1 overflow-y-auto overscroll-contain px-3.5 py-4', className)}>
-      <div className="flex flex-col gap-5">{children}</div>
+    <div className={cn('relative flex min-h-0 flex-1 flex-col', className)}>
+      <div
+        ref={ref}
+        onScroll={onScroll}
+        className="scroll-calm flex-1 overflow-y-auto overscroll-contain px-3.5 py-4"
+      >
+        <div className="flex flex-col gap-5">{children}</div>
+      </div>
+      {away && (
+        <button
+          type="button"
+          onClick={() =>
+            ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
+          }
+          className="pressable absolute bottom-3 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/30 bg-shell/80 px-3.5 py-2 text-2xs font-medium text-fg-primary shadow-large backdrop-blur-xl"
+        >
+          <IconArrowLeft className="size-3.5 -rotate-90" />
+          {tr('jumpToLatest')}
+        </button>
+      )}
     </div>
   )
 }

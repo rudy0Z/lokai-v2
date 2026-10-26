@@ -16,7 +16,7 @@ import { Button } from '../components/ui/Button'
 import { ConfidenceIndicator } from '../components/trust/ConfidenceIndicator'
 import { VerificationBadge } from '../components/trust/VerificationBadge'
 import { ReasoningPill } from '../components/trust/ReasoningPill'
-import { Skeleton } from '../components/ui/Skeleton'
+import { ScanDocument } from '../components/notice/ScanDocument'
 import { IconDoc, IconExternal } from '../components/ui/icons'
 import { runBeats } from '../lib/engine'
 
@@ -62,18 +62,8 @@ export default function NoticePage() {
   if (phase !== 'done') {
     return (
       <AppShell showTabs={false} topBarExtra={<Button variant="ghost" size="sm" onClick={() => history.back()}>{tr('back')}</Button>}>
-        <div className="flex flex-1 flex-col items-center justify-center gap-5 px-8">
-          <IconDoc className="size-10 text-fg-tertiary" />
-          <p className="text-center text-sm text-fg-secondary">
-            {phase === 'reading' ? tr('stageReading') : tr('stageChecking')}…{' '}
-            <span className="font-mono text-2xs" lang="en">{NOTICE_DOC.fileName}</span>
-          </p>
-          <div className="flex w-full max-w-[280px] flex-col gap-2">
-            <Skeleton className="h-3.5 w-4/5" />
-            <Skeleton className="h-3.5 w-3/5" />
-            <Skeleton className="h-3.5 w-2/3" />
-          </div>
-          <Badge tone="warning" variant="subtle">{tr('simulatedTag')}</Badge>
+        <div className="flex flex-1 flex-col items-center justify-center px-6">
+          <ScanDocument fileName={NOTICE_DOC.fileName} />
         </div>
       </AppShell>
     )

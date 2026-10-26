@@ -41,7 +41,7 @@ export function TabBar({ active }: { active: TabId }) {
               )}
             >
               <Icon className="size-5" strokeWidth={isActive ? 2 : 1.75} />
-              <span className={cn('text-2xs', isActive ? 'font-semibold' : 'font-medium')}>{tr(labelKey)}</span>
+              <span className="text-2xs font-medium">{tr(labelKey)}</span>
             </button>
           )
         })}

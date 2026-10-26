@@ -15,7 +15,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClass: Record<Variant, string> = {
   primary:
-    'bg-brand-solid text-on-brand-solid shadow-default enabled:hover:bg-brand-solid-hover enabled:active:bg-brand-solid-active',
+    'bg-brand-solid text-on-brand-solid enabled:hover:bg-brand-solid-hover enabled:active:bg-brand-solid-active',
   secondary:
     'bg-component text-fg-primary enabled:hover:bg-component-hover enabled:active:bg-component-active',
   ghost: 'bg-transparent text-fg-secondary enabled:hover:bg-hover-veil',

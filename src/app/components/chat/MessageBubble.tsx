@@ -11,6 +11,8 @@ export interface MessageBubbleProps {
   stale?: boolean
   onStaleAction?: () => void
   staleActionLabel?: string
+  /** quiet action row under assistant text (copy etc.) */
+  actions?: ReactNode
   className?: string
 }
 
@@ -25,6 +27,7 @@ export function MessageBubble({
   stale = false,
   onStaleAction,
   staleActionLabel,
+  actions,
   className,
 }: MessageBubbleProps) {
   if (role === 'system') {
@@ -43,6 +46,7 @@ export function MessageBubble({
           <span className="text-2xs font-medium text-fg-tertiary">LokAI</span>
         </div>
         <div className="min-w-0 text-fg-primary">{children}</div>
+        {actions && <div className="-mt-0.5 flex items-center gap-1">{actions}</div>}
       </div>
     )
   }

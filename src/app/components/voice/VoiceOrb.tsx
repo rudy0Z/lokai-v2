@@ -34,6 +34,7 @@ export function VoiceOrb({ state = 'idle', size = 'lg', className }: VoiceOrbPro
           <span className="orb-ring orb-ring--b" aria-hidden="true" />
         </>
       )}
+      {state === 'thinking' && <span className="orb-activity" aria-hidden="true" />}
       <span className="orb-core" aria-hidden="true">
         <IconMic className="size-6 text-fg-on-inverted" />
       </span>
