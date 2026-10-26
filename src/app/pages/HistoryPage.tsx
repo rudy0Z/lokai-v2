@@ -1,5 +1,6 @@
 import { useApp } from '../lib/app-context'
 import { navigate } from '../lib/router'
+import { isVaultCleared } from '../lib/vault'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { IconDoc } from '../components/ui/icons'
@@ -21,13 +22,14 @@ const tierBadge = { consumer: 'brand', notice: 'neutral', stop: 'warning' } as c
 
 export default function HistoryPage() {
   const { tr } = useApp()
+  const entries = isVaultCleared() ? [] : HISTORY
   return (
     <AppShell activeTab="history">
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-3">
           <h1 className="font-serif text-xl font-semibold text-fg-primary">{tr('historyTitle')}</h1>
-          {HISTORY.length === 0 && <p className="text-sm text-fg-tertiary">{tr('emptyHistory')}</p>}
-          {HISTORY.map((h) => (
+          {entries.length === 0 && <p className="text-sm text-fg-tertiary">{tr('emptyHistory')}</p>}
+          {entries.map((h) => (
             <button
               key={h.id}
               type="button"

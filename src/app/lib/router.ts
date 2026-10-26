@@ -12,7 +12,8 @@ function parse(): HashRoute {
 }
 
 export function navigate(to: string) {
-  window.location.hash = to.startsWith('/') ? to.slice(1) : to
+  // keep the leading '/': '#/matter/h1' must parse back as '/matter/h1'
+  window.location.hash = to.startsWith('/') ? to : `/${to}`
 }
 
 export function useHashRoute(): HashRoute {

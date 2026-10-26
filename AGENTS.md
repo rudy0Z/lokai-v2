@@ -69,8 +69,8 @@ src/app/pages/          ← routes; never reach past primitives
 ## Data conventions
 
 - Fictional sellers only (HomeKart). No real people, letterheads, or case numbers.
-- Indian channel metaphors are product copy: **1915**, **e-Daakhil**, **registered post with
-  acknowledgement due**, DLSA — always `[VERIFY]`-badged here.
+- Indian channel metaphors are product copy: **1915**, **e-Jagriti** (the consumer e-filing portal that
+  absorbed e-Daakhil), **registered post with acknowledgement due**, DLSA — always `[VERIFY]`-badged here.
 - Urdu/hi/mr/ta strings are AI-drafted (`reviewedByNativeSpeaker: false`) — never present unreviewed content
   as verified, and don't "fix" translations without flagging them.
 

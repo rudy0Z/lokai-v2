@@ -158,6 +158,7 @@ export const IconCamera = makeIcon(
   'camera',
 )
 export const IconStop = makeIcon(<rect x="7" y="7" width="10" height="10" rx="1.5" />, 'stop')
+export const IconPlay = makeIcon(<path d="M8 5.5v13l11-6.5z" />, 'play')
 export const IconExternal = makeIcon(
   <>
     <path d="M14 4h6v6" />

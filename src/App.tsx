@@ -12,11 +12,15 @@ import HistoryPage from './app/pages/HistoryPage'
 import SavedPage from './app/pages/SavedPage'
 import ProfilePage from './app/pages/ProfilePage'
 import MatterDetailPage from './app/pages/MatterDetailPage'
+import ReplayPage from './app/pages/ReplayPage'
 
 function Routes() {
   const { path } = useHashRoute()
   if (path.startsWith('/matter/')) {
     return <MatterDetailPage id={path.split('/')[2] ?? ''} />
+  }
+  if (path.startsWith('/replay')) {
+    return <ReplayPage id={path.split('/')[2]} />
   }
   switch (path) {
     case '/specimen':

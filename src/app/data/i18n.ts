@@ -149,6 +149,16 @@ export interface UiStrings {
   noticeCardBody: Pack
   noticeCardOpen: Pack
   listen: Pack
+  protectHelp: Pack
+  protectPolice: Pack
+  protectDlsa: Pack
+  protectGuide: Pack
+  replayWatch: Pack
+  replayBadge: Pack
+  replayHint: Pack
+  replayPlay: Pack
+  replayPause: Pack
+  replayRestart: Pack
 }
 
 export const UI: UiStrings = {
@@ -345,6 +355,34 @@ export const UI: UiStrings = {
     ur: 'نوٹس مفسر کھولیں',
   },
   listen: { en: 'Listen', hi: 'सुनें', mr: 'ऐका', ta: 'கேளுங்கள்', ur: 'سنیں' },
+  protectHelp: {
+    en: 'If you are in immediate danger, contact human help first:',
+    hi: 'अगर तुरंत ख़तरा है, तो पहले इंसानी मदद से संपर्क करें:',
+    mr: 'तात्काळ धोका असल्यास, आधी मानवी मदतीशी संपर्क करा:',
+    ta: 'உடனடி ஆபத்து இருந்தால், முதலில் மனித உதவியைத் தொடர்பு கொள்ளுங்கள்:',
+    ur: 'اگر فوری خطرہ ہے، تو پہلے انسانی مدد سے رابطہ کریں:',
+  },
+  protectPolice: { en: 'Emergency 112', hi: 'आपातकाल 112', mr: 'आपत्कालीन 112', ta: 'அவசரம் 112', ur: 'ایمرجنسی 112' },
+  protectDlsa: { en: 'Free legal aid (DLSA)', hi: 'मुफ़्त कानूनी सहायता (DLSA)', mr: 'मोफत कायदेशीर मदत (DLSA)', ta: 'இலவச சட்ட உதவி (DLSA)', ur: 'مفت قانونی امداد (DLSA)' },
+  protectGuide: {
+    en: 'Open the full safety guide',
+    hi: 'पूरी सुरक्षा गाइड खोलें',
+    mr: 'संपूर्ण सुरक्षा मार्गदर्शक उघडा',
+    ta: 'முழு பாதுகாப்பு வழிகாட்டியைத் திற',
+    ur: 'مکمل حفاظتی گائیڈ کھولیں',
+  },
+  replayWatch: { en: 'Watch a replay', hi: 'रीप्ले देखें', mr: 'रीप्ले पहा', ta: 'மறுஇயக்கத்தைப் பார்', ur: 'ریپلے دیکھیں' },
+  replayBadge: { en: 'Replay', hi: 'रीप्ले', mr: 'रीप्ले', ta: 'மறுஇயக்கம்', ur: 'ریپلے' },
+  replayHint: {
+    en: 'A scripted conversation with simulated human actions — this is how LokAI behaves. Nothing is live.',
+    hi: 'अनुकरित इंसानी क्रियाओं के साथ एक तैयार बातचीत — LokAI ऐसे व्यवहार करता है। कुछ भी लाइव नहीं है।',
+    mr: 'नक्कली मानवी कृतींसह एक तयार संभाषण — LokAI असे वागते. काहीही थेट नाही.',
+    ta: 'உருவகப்படுத்திய மனித செயல்களுடன் ஒரு தயாரிக்கப்பட்ட உரையாடல் — LokAI இப்படியே நடக்கிறது. எதுவும் நேரடியானது அல்ல.',
+    ur: 'نقل شدہ انسانی حرکات کے ساتھ ایک تیار گفتگو — LokAI ایسے ہی برتاؤ کرتا ہے۔ کچھ بھی لائیو نہیں۔',
+  },
+  replayPlay: { en: 'Play', hi: 'चलाएँ', mr: 'चालवा', ta: 'இயக்கு', ur: 'چلائیں' },
+  replayPause: { en: 'Pause', hi: 'रोकें', mr: 'थांबवा', ta: 'இடைநிறுத்து', ur: 'روکیں' },
+  replayRestart: { en: 'Restart', hi: 'फिर से', mr: 'पुन्हा सुरू', ta: 'மீண்டும் தொடங்கு', ur: 'دوبارہ شروع' },
 }
 
 export type UiKey = keyof UiStrings

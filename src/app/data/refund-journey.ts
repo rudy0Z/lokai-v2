@@ -68,7 +68,39 @@ export const SCENARIO_SEEDS: ScenarioSeed[] = [
   },
 ]
 
-/** Localized conversational beats (prepared languages; fallback to English elsewhere). */
+/**
+ * Emotion-matched acknowledgment tiers (audit Dimension 1): one register per
+ * detected intent — consumer hassle, notice anxiety, urgent distress. The
+ * verbatim echo is retired for the chip path; the FactCheckCard is now the
+ * single structured confirmation (anti-fatigue, Dimension 2).
+ */
+export type ReassuranceTone = 'hassle' | 'notice' | 'urgent'
+
+export const REASSURANCE: Record<ReassuranceTone, Partial<Record<LangCode, string>>> = {
+  hassle: {
+    en: 'That is frustrating — and you do not have to accept it. There are structured, free steps we can take, one at a time.',
+    hi: 'यह निराशाजनक है — और आपको इसे स्वीकार नहीं करना है। हम एक-एक करके कुछ व्यवस्थित, मुफ़्त कदम उठा सकते हैं।',
+    mr: 'हे निराशाजनक आहे — आणि तुम्ही ते स्वीकारण्याची गरज नाही. आपण एक-एक करून काही नियोजनबद्ध, मोफत पावले उचलू शकतो.',
+    ta: 'இது வருத்தம் தரும் விஷயம் — இதை ஏற்றுக்கொள்ள வேண்டியதில்லை. ஒவ்வொன்றாக சில ஒழுங்கமைந்த இலவச படிகளை எடுக்கலாம்.',
+    ur: 'یہ مایوس کن ہے — اور آپ کو اسے قبول نہیں کرنا۔ ہم ایک ایک کر کے کچھ منظم، مفت قدم اٹھا سکتے ہیں۔',
+  },
+  notice: {
+    en: 'Official notices look intimidating because of the formal legal language — but most are routine demands with a clear timeline. Let us read what it actually asks for.',
+    hi: 'सरकारी नोटिस औपचारिक कानूनी भाषा की वजह से डरावने लगते हैं — लेकिन ज़्यादातर सामान्य माँगें होती हैं जिनकी समय-सीमा साफ़ होती है। आइए पढ़ें कि वह असल में क्या कहता है।',
+    mr: 'शासकीय जाहीरनामी औपचारिक कायदेशीर भाषेमुळे भयानक वाटतात — पण बहुतेक साध्या मागण्या असतात, स्पष्ट मुदतीसह. ते प्रत्यक्षात काय मागतात ते वाचू.',
+    ta: 'அரசு அறிவிப்புகள் சட்டரீதியான மொழி காரணமாக பயமுறுத்தும் — ஆனால் பெரும்பாலன வழக்கமான கோரிக்கைகள், தெளிவான காலக்கெடுவுடன். அது உண்மையில் என்ன கேட்கிறது என்று படிப்போம்.',
+    ur: 'سرکاری نوٹس رسمی قانونی زبان کی وجہ سے خوفناک لگتے ہیں — لیکن اکثر عام مانگیں ہوتی ہیں جن کی مدت واضح ہوتی ہے۔ دیکھتے ہیں یہ اصل میں کیا کہتا ہے۔',
+  },
+  urgent: {
+    en: 'Take a breath — your safety and your rights come first. Let us make sure you do not take a step that puts either at risk.',
+    hi: 'एक गहरी साँस लें — आपकी सुरक्षा और अधिकार सबसे पहले। पहले यह सुनिश्चित करते हैं कि कोई कदम जोखिम में न डाले।',
+    mr: 'एक खोल श्वास घ्या — तुमची सुरक्षा आणि हक्क सर्वांत आधी. कोणतेही पाऊल धोक्यात न टाकता पाहू.',
+    ta: 'ஒரு மூச்சு விடுங்கள் — உங்கள் பாதுகாப்பும் உரிமைகளும் முதலில். எந்தப் படியும் ஆபத்தில் ஆகாது என்று உறுதி செய்வோம்.',
+    ur: 'ایک گہری سانس لیں — آپ کی حفاظت اور حقوق سب سے پہلے ہیں۔ پہلے یقینی بناتے ہیں کہ کوئی قدم خطرے میں نہ ڈالے۔',
+  },
+}
+
+/** Kept for the free-text consumer path (structural restatement, no echo). */
 export const JOURNEY_STRINGS: Record<
   string,
   Partial<Record<LangCode, string>>

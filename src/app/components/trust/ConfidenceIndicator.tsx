@@ -50,7 +50,7 @@ export function ConfidenceIndicator({ level, className }: ConfidenceIndicatorPro
         </p>
         <p
           className={cn(
-            'text-2xs',
+            'text-xs',
             level === 'clear' && 'text-on-positive-subtle/85',
             level === 'likely' && 'text-on-warning-subtle/85',
             level === 'unsure' && 'text-on-danger-subtle/85',

@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { LanguageSelect, ThemeToggle } from '../components/ui/shell'
 import { LogoMark } from '../components/ui/LogoMark'
 import { ALL_LANGS, LANGUAGES } from '../data/languages'
+import { markVaultCleared } from '../lib/vault'
 
 export default function ProfilePage() {
   const { tr, lang, setLang } = useApp()
@@ -83,6 +84,7 @@ export default function ProfilePage() {
                 } catch {
                   /* ignore */
                 }
+                markVaultCleared()
                 toast.success(tr('deleteYes'))
               }}
             />

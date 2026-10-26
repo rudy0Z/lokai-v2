@@ -7,7 +7,13 @@ import { IconDoc, IconPaperclip, IconSend, IconX } from '../ui/icons'
 
 export interface ComposerProps {
   onSend: (text: string, attachments: string[]) => void
+  /** fully disabled (gallery/idle surfaces) */
   disabled?: boolean
+  /**
+   * Send locked while the engine is busy — typing stays live (audit fix:
+   * the composer never locks the human out mid-turn).
+   */
+  sendLocked?: boolean
   offline?: boolean
   attachments: string[]
   onAttach: (name: string) => void
@@ -20,11 +26,20 @@ const MOCK_DOCS = ['bill-homekart.pdf', 'photo-when-opened.jpg']
  * Large rounded composer (ChatGPT/Gemini register) with a MOCK attachment
  * tray — real file inputs are forbidden by the verify gate.
  */
-export function Composer({ onSend, disabled, offline, attachments, onAttach, onRemoveAttachment }: ComposerProps) {
+export function Composer({
+  onSend,
+  disabled,
+  sendLocked,
+  offline,
+  attachments,
+  onAttach,
+  onRemoveAttachment,
+}: ComposerProps) {
   const { tr } = useApp()
   const [text, setText] = useState('')
   const [trayOpen, setTrayOpen] = useState(false)
   const areaRef = useRef<HTMLTextAreaElement>(null)
+  const sendDisabled = disabled || sendLocked
 
   useEffect(() => {
     const el = areaRef.current
@@ -35,7 +50,7 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
 
   const submit = () => {
     const value = text.trim()
-    if (!value || disabled || offline) return
+    if (!value || sendDisabled || offline) return
     onSend(value, attachments)
     setText('')
   }
@@ -135,11 +150,11 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
           <button
             type="button"
             aria-label={tr('composerSend')}
-            disabled={disabled || offline || text.trim() === ''}
+            disabled={sendDisabled || offline || text.trim() === ''}
             onClick={submit}
             className={cn(
               'pressable mb-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full transition-colors',
-              text.trim() === '' || disabled || offline
+              text.trim() === '' || sendDisabled || offline
                 ? 'bg-container text-fg-disabled'
                 : 'bg-brand-solid text-on-brand-solid shadow-default',
             )}
@@ -148,7 +163,7 @@ export function Composer({ onSend, disabled, offline, attachments, onAttach, onR
           </button>
         </div>
       </div>
-      {disabled && (
+      {sendLocked && !disabled && (
         <p className="mt-1.5 px-2 text-2xs text-fg-tertiary" role="status">
           <TypingHint />
         </p>

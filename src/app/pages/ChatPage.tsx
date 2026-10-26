@@ -6,7 +6,7 @@ import { runBeats, SimulatedFailure, type BeatClass } from '../lib/engine'
 import { classifyMatter, reRouteAsCaution, type ScopeDecision } from '../data/scope-rules'
 import {
   FINDING,
-  JOURNEY_STRINGS,
+  REASSURANCE,
   SCENARIO_SEEDS,
 } from '../data/refund-journey'
 import { AppShell } from '../components/ui/shell'
@@ -23,8 +23,9 @@ import { ActionLadder } from '../components/cards/ActionLadder'
 import { CautionCard } from '../components/cards/CautionCard'
 import { DemandNoticeReview } from '../components/cards/DemandNoticeReview'
 import { StopScreen } from '../components/stop/StopScreen'
+import { ProtectiveCard } from '../components/stop/ProtectiveCard'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
-import { IconCamera, IconKeyboard, IconCopy } from '../components/ui/icons'
+import { IconCamera, IconKeyboard, IconCopy, IconPlay } from '../components/ui/icons'
 import { useSpans } from '../lib/useSpans'
 import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
@@ -44,6 +45,7 @@ type ItemKind =
   | 'factcheck'
   | 'handover'
   | 'noticecard'
+  | 'protective'
 
 interface ChatItem {
   id: number
@@ -56,6 +58,8 @@ interface ChatItem {
   stream?: boolean
   /** a consumed question row (collapsed once answered) */
   done?: boolean
+  /** the scope decision attached to protective/handover items */
+  decision?: ScopeDecision
 }
 
 type AnswerId = '30' | '1to2' | '2plus' | 'notsure'
@@ -72,11 +76,9 @@ export default function ChatPage() {
   const [offline, setOffline] = useState(false)
   const [attachments, setAttachments] = useState<string[]>([])
   const [stopDecision, setStopDecision] = useState<ScopeDecision | null>(null)
-  const [stopPending, setStopPending] = useState(false)
   const [noticeOpen, setNoticeOpen] = useState(false)
   const [findingData, setFindingData] = useState<FindingCardData>(FINDING)
   const [factItems, setFactItems] = useState<FactItem[]>([])
-  const [lastStop, setLastStop] = useState<ScopeDecision | null>(null)
   const [composerOpen, setComposerOpen] = useState(false)
 
   const idRef = useRef(0)
@@ -118,21 +120,18 @@ export default function ChatPage() {
 
   /* ---- flows ---- */
 
-  const startConsumerFlow = (fail = false, userText?: string) => {
+  const startConsumerFlow = (fail = false, _userText?: string) => {
     run(
       'explain',
       () => {
-        // the scripted restatement belongs to the exact HomeKart demo seed;
-        // anything else gets an honest echo of the user's own words (P0-2)
-        const isExactMixerSeed = userText === SCENARIO_SEEDS[0]!.userMessage
-        const restatement = isExactMixerSeed
-          ? JOURNEY_STRINGS.restatement![lang] ?? JOURNEY_STRINGS.restatement!.en
-          : `“${(userText ?? '').trim()}”`
+        // Anti-fatigue (audit Dimension 2): NO verbatim echo — the emotion-
+        // matched acknowledgment only. The FactCheckCard is the single
+        // structured restatement of the facts, later in the thread.
         push(
           {
             kind: 'assistant',
             stream: true,
-            text: `${JOURNEY_STRINGS.reassurance![lang] ?? JOURNEY_STRINGS.reassurance!.en}\n\n${tr('restatePrefix')} ${restatement}`,
+            text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en,
           },
           { kind: 'chips', text: 'qWhen' },
         )
@@ -176,10 +175,14 @@ export default function ChatPage() {
     const decision = classifyMatter(text, lang)
 
     if (decision.tier === 'hard-stop') {
-      setStopPending(true)
+      // In-thread protective triage (audit Dimension 1): the stop lands in
+      // the conversation — no full-screen takeover. The composer stays live.
       run('stop', () => {
-        setStopPending(false)
-        setStopDecision(decision)
+        push(
+          { kind: 'system', text: tr('tierHardStop') },
+          { kind: 'protective', decision },
+          { kind: 'handover', decision },
+        )
       })
       return
     }
@@ -305,7 +308,6 @@ export default function ChatPage() {
     setItems([])
     setNoticeOpen(false)
     setStopDecision(null)
-    setStopPending(false)
     setFindingData(FINDING)
     if (seed.forceOffline) {
       seededRef.current = seedId
@@ -365,12 +367,13 @@ export default function ChatPage() {
         </Button>
       }
       footer={
-        // Trap-3A fix: no chat composer on the voice-first empty state, on the
-        // stop screen, or on the notice flows — one input model per screen
-        empty && !composerOpen ? undefined : noticeOpen || stopDecision || stopPending ? undefined : (
+        // Trap-3A fix: no chat composer on the voice-first empty state or the
+        // notice flows — one input model per screen. The stop flow keeps the
+        // composer live now (audit fix): only Send locks while beats run.
+        empty && !composerOpen ? undefined : noticeOpen || stopDecision ? undefined : (
           <Composer
             onSend={handleSend}
-            disabled={busy}
+            sendLocked={busy}
             offline={offline}
             attachments={attachments}
             onAttach={(name) => setAttachments((a) => [...a, name])}
@@ -381,19 +384,10 @@ export default function ChatPage() {
     >
       {noticeOpen ? (
         <DemandNoticeReview onBack={() => setNoticeOpen(false)} />
-      ) : stopDecision || stopPending ? (
+      ) : stopDecision ? (
         <StopScreen
           decision={stopDecision}
-          pending={stopPending}
-          onBack={() => {
-            // returning from a stop leaves the handover packet in the thread
-            if (stopDecision) {
-              setLastStop(stopDecision)
-              push({ kind: 'system', text: tr('tierHardStop') }, { kind: 'handover' })
-            }
-            setStopDecision(null)
-            setStopPending(false)
-          }}
+          onBack={() => setStopDecision(null)}
           onReRoute={tellMore}
         />
       ) : (
@@ -475,9 +469,19 @@ export default function ChatPage() {
                   </Chip>
                 </div>
                 <p className="text-2xs text-fg-tertiary">{tr('protoTag')}</p>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>
-                  Scenario launcher (dev)
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>
+                    Scenario launcher (dev)
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leadingIcon={<IconPlay className="size-3.5" />}
+                    onClick={() => navigate('/replay')}
+                  >
+                    {tr('replayWatch')}
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -600,12 +604,22 @@ export default function ChatPage() {
                       <FactCheckCard facts={factItems} onConfirm={confirmFacts} />
                     </MessageBubble>
                   )
+                case 'protective':
+                  return (
+                    <MessageBubble key={item.id} role="assistant">
+                      <ProtectiveCard
+                        decision={item.decision!}
+                        onOpenGuide={() => setStopDecision(item.decision ?? null)}
+                        onReRoute={tellMore}
+                      />
+                    </MessageBubble>
+                  )
                 case 'handover':
                   return (
                     <div key={item.id} className="ps-7">
                       <HandoverCard
-                        tierLabel={lastStop?.tier === 'caution' ? tr('tierCaution') : tr('tierHardStop')}
-                        why={lastStop?.why ?? ''}
+                        tierLabel={item.decision?.tier === 'caution' ? tr('tierCaution') : tr('tierHardStop')}
+                        why={item.decision?.why ?? ''}
                       />
                     </div>
                   )

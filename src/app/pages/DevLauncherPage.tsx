@@ -45,6 +45,9 @@ export default function DevLauncherPage() {
               <Button variant="secondary" size="sm" onClick={() => navigate('/notice')}>
                 Notice interpreter
               </Button>
+              <Button variant="secondary" size="sm" onClick={() => navigate('/replay')}>
+                Replay mode
+              </Button>
             </div>
           </Card>
 

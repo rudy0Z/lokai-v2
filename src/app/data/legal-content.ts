@@ -37,7 +37,8 @@ export const LEGAL_CONTENT: LegalEntry[] = [
     sectionRef: 'S. 35 [VERIFY — filing provision and current procedure]',
     verified: false,
     lastChecked: '2026-10-25',
-    notes: 'e-Daakhil is the electronic filing channel named in v1; re-verify status.',
+    notes:
+      'Electronic filing has moved to e-Jagriti (which absorbed the earlier e-Daakhil portal). Re-verify the current channel name and URL before any verified flip.',
   },
   {
     id: 'cpa-limitation',
