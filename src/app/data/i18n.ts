@@ -180,6 +180,50 @@ export interface UiStrings {
   noticeReviewBanner: Pack
   noticeSendHint: Pack
   noticeExplainer: Pack
+  /* ---- Case-Folder architecture (master build prompt) ---- */
+  sidebarTitle: Pack
+  sidebarHint: Pack
+  caseDaysLabel: Pack
+  newDayChat: Pack
+  caseMemory: Pack
+  caseSampleNote: Pack
+  quickSummarise: Pack
+  summaryGrievance: Pack
+  summaryStanding: Pack
+  summaryNext: Pack
+  continuityTitle: Pack
+  contChip1: Pack
+  contChip2: Pack
+  contChip3: Pack
+  continueDay: Pack
+  caseBadgeAria: Pack
+  /* ---- Recruiter sandbox ---- */
+  sandboxTitle: Pack
+  tabScenarios: Pack
+  tabReplays: Pack
+  tabInspector: Pack
+  scenarioLangLabel: Pack
+  testerHint: Pack
+  postFindingLabel: Pack
+  metaEvidence: Pack
+  metaVague: Pack
+  metaInformal: Pack
+  metaPushback: Pack
+  metaThreat: Pack
+  metaResolved: Pack
+  metaNotice: Pack
+  metaStop: Pack
+  metaRails: Pack
+  metaWorkplace: Pack
+  scn1Title: Pack
+  scn2Title: Pack
+  scn3Title: Pack
+  scn4Title: Pack
+  scn5Title: Pack
+  resetVault: Pack
+  vaultResetDone: Pack
+  factSigned: Pack
+  voiceSpotted: Pack
   copyHandoverNote: Pack
   coverageNotice: Pack
   langGroupFull: Pack
@@ -483,6 +527,48 @@ export const UI: UiStrings = {
     ta: 'இந்த வாசிப்பு அறிவிப்பில் என்ன உள்ளது என்பதை விளக்குகிறது — கட்டவா, தகராறு செய்யவா என்று சொல்லாது. தகராறுக்கு முதலில் ஒரு மனித உதவியாளரிடம் பேசுங்கள்.',
     ur: 'یہ پڑھائی بتاتی ہے کہ نوٹس میں کیا لکھا ہے — یہ نہیں بتاتی کہ ادا کریں یا تنازع کریں۔ تنازع کے لیے پہلے کسی انسانی مددگار سے بات کریں۔',
   },
+  sidebarTitle: { en: 'Case folders', hi: 'केस फ़ोल्डर', mr: 'बाब फोल्डर', ta: 'வழக்கு கோப்புறைகள்', ur: 'کیس فولڈر' },
+  sidebarHint: { en: 'Each case keeps its own memory, days and documents.', hi: 'हर केस की अपनी स्मृति, अपने दिन और अपने दस्तावेज़ होते हैं।', mr: 'प्रत्येक बाबेची स्वतःची स्मृती, दिवस व दस्तऐवज असतात.', ta: 'ஒவ்வொரு வழக்கிற்கும் அதன் சொந்த நினைவு, நாட்கள், ஆவணங்கள் உண்டு.', ur: 'ہر کیس کی اپنی یادداشت، اپنے دن اور اپنے دستاویزات ہوتے ہیں۔' },
+  caseDaysLabel: { en: 'Day chats', hi: 'दिनवार बातचीत', mr: 'दिवसानुसार संभाषणे', ta: 'நாள்வாரி உரையாடல்கள்', ur: 'روزوار گفتگو' },
+  newDayChat: { en: '+ New day chat in this case', hi: '+ इस केस में नई दिन-चैट', mr: '+ या बाबेत नवीन दिवस-संभाषण', ta: '+ இந்த வழக்கில் புதிய நாள் உரையாடல்', ur: '+ اس کیس میں نئی دن-گفتگو' },
+  caseMemory: { en: 'Case memory', hi: 'केस स्मृति', mr: 'बाब स्मृती', ta: 'வழக்கு நினைவு', ur: 'کیس یادداشت' },
+  caseSampleNote: { en: 'Prepared sample history — scripted, no live AI. New day chats inherit this memory.', hi: 'तैयार नमूना इतिहास — स्क्रिप्टेड, कोई लाइव AI नहीं। नई दिन-चैट यही स्मृति आगे ले जाती है।', mr: 'तयार नमुना इतिहास — स्क्रिप्टेड, लाइव AI नाही. नवीन दिवस-संभाषण हीच स्मृती पुढे नेते.', ta: 'தயார் செய்யப்பட்ட மாதிரி வரலாறு — ஸ்கிரிப்ட், நேரடி AI இல்லை. புதிய நாள் உரையாடல் இந்த நினைவை முன்வைக்கும்.', ur: 'تیار نمونہ تاریخ — اسکرپٹڈ، کوئی لائیو AI نہیں۔ نئی دن-گفتگو یہی یادداشت آگے لے جاتی ہے۔' },
+  quickSummarise: { en: '✦ Quick summarise thread', hi: '✦ थ्रेड का त्वरित सार', mr: '✦ थ्रेडचा झटपट सारांश', ta: '✦ நூலின் விரைவுச் சுருக்கம்', ur: '✦ گفتگو کا فوری خلاصہ' },
+  summaryGrievance: { en: 'The grievance', hi: 'शिकायत', mr: 'तक्रार', ta: 'புகார்', ur: 'شکایت' },
+  summaryStanding: { en: 'Legal standing', hi: 'कानूनी स्थिति', mr: 'कायदेशीर स्थान', ta: 'சட்ட நிலை', ur: 'قانونی حیثیت' },
+  summaryNext: { en: 'Last action & next move', hi: 'आख़िरी कदम और अगला कदम', mr: 'शेवटचे पाऊल व पुढचे पाऊल', ta: 'கடைசி படி & அடுத்த படி', ur: 'آخری قدم اور اگلا قدم' },
+  continuityTitle: { en: 'Where we left off', hi: 'जहाँ हम छोड़ गए थे', mr: 'आपण जिथे थांबलो होतो', ta: 'நாம் நின்ற இடம்', ur: 'جہاں ہم رکے تھے' },
+  contChip1: { en: 'They didn’t reply — move to Step 2 (1915 helpline)', hi: 'जवाब नहीं आया — चरण 2 (1915 हेल्पलाइन) पर जाएँ', mr: 'उत्तर आले नाही — पायरी 2 (1915 हेल्पलाइन) कडे जा', ta: 'பதில் இல்லை — படி 2 (1915 உதவி எண்) செல்', ur: 'جواب نہیں آیا — مرحلہ 2 (1915 ہیلپ لائن) پر جائیں' },
+  contChip2: { en: 'They replied with a rejection — help me counter it', hi: 'जवाब में मनाही है — जवाबी तैयार करें', mr: 'उत्तरात नकार आहे — प्रत्युत्तर तयार करा', ta: 'பதில் மறுப்பாக உள்ளது — எதிர்ப்பைத் தயார் செய்', ur: 'جواب میں انکار ہے — جوابی تیار کریں' },
+  contChip3: { en: 'They agreed to refund! Close this case', hi: 'उन्होंने रिफंड मान लिया! केस बंद करें', mr: 'त्यांनी परतावा मान्य केला! बाब बंद करा', ta: 'பணம் திரும்ப ஒப்பினார்கள்! வழக்கை மூடு', ur: 'انہوں نے رقم واپسی مان لی! کیس بند کریں' },
+  continueDay: { en: 'Continue', hi: 'आगे बढ़ें', mr: 'पुढे जा', ta: 'தொடர்', ur: 'جاری رکھیں' },
+  caseBadgeAria: { en: 'Active case', hi: 'सक्रिय केस', mr: 'सक्रिय बाब', ta: 'செயலில் வழக்கு', ur: 'فعال کیس' },
+  sandboxTitle: { en: '✦ Test sandbox', hi: '✦ टेस्ट सैंडबॉक्स', mr: '✦ चाचणी सॅंडबॉक्स', ta: '✦ சோதனை மணல்பெட்டி', ur: '✦ ٹیسٹ سینڈ باکس' },
+  tabScenarios: { en: 'Test yourself', hi: 'स्वयं जाँचें', mr: 'स्वतः चाचणी करा', ta: 'நீங்களே சோதியுங்கள்', ur: 'خود جانچیں' },
+  tabReplays: { en: 'Replays', hi: 'रीप्ले', mr: 'रीप्ले', ta: 'மறுஇயக்கம்', ur: 'ریپلے' },
+  tabInspector: { en: 'Inspector', hi: 'इंस्पेक्टर', mr: 'इन्स्पेक्टर', ta: 'ஆய்வு', ur: 'انسپکٹر' },
+  scenarioLangLabel: { en: 'Test language', hi: 'जाँच भाषा', mr: 'चाचणी भाषा', ta: 'சோதனை மொழி', ur: 'جانچ زبان' },
+  testerHint: { en: 'Pick a tester prompt — each one declares the path it stress-tests. Free typing still works.', hi: 'कोई टेस्टर प्रॉम्प्ट चुनें — हर एक घोषित करता है कि वह कौन-सा रास्ता जाँचता है। मुक्त टाइपिंग भी चलती है।', mr: 'चाचणी प्रॉम्प्ट निवडा — प्रत्येकी कोणता मार्ग तपासतो ते जाहीर करतो. मोकळे टाइपिंग सुद्धा चालते.', ta: 'சோதனை தூண்டுதலைத் தேர்ந்தெடுங்கள் — ஒவ்வொன்றும் எந்தப் பாதையைச் சோதிக்கிறது என்று அறிவிக்கிறது. சுதந்திரமாகத் தட்டச்சு செய்யலாம்.', ur: 'ٹیسٹر پرامپٹ چنیں — ہر ایک اعلان کرتا ہے کہ وہ کون سا راستہ جانچتا ہے۔ آزاد ٹائپنگ بھی چلتی ہے۔' },
+  postFindingLabel: { en: 'What happens next?', hi: 'आगे क्या होगा?', mr: 'पुढे काय होते?', ta: 'அடுத்து என்ன நடக்கும்?', ur: 'آگے کیا ہوگا؟' },
+  metaEvidence: { en: 'Path A · strong evidence → full ladder', hi: 'रास्ता A · पक्के सबूत → पूरी सीढ़ी', mr: 'मार्ग A · पक्के पुरावे → संपूर्ण जणू', ta: 'பாதை A · வலுவான ஆதாரம் → முழு படிகள்', ur: 'راستہ A · مضبوط ثبوت → مکمل سیڑھی' },
+  metaVague: { en: 'Path B · missing facts → clarifying gate', hi: 'रास्ता B · अधूरे तथ्य → स्पष्टीकरण गेट', mr: 'मार्ग B · अपूर्ण वस्तुस्थिती → स्पष्टीकरण गेट', ta: 'பாதை B · விடுபட்ட உண்மைகள் → விளக்க கதவு', ur: 'راستہ B · نامکمل حقائق → وضاحت گیٹ' },
+  metaInformal: { en: 'Path C · informal seller → caution', hi: 'रास्ता C · अनौपचारिक विक्रेता → सावधानी', mr: 'मार्ग C · अनौपचारिक विक्रेता → सावधानता', ta: 'பாதை C · முறைசாரா விற்பவர் → எச்சரிக்கை', ur: 'راستہ C · غیر رسمی فروشنر → احتیاط' },
+  metaPushback: { en: 'Path · seller pushback → counter-draft', hi: 'रास्ता · विक्रेता की ज़िद → जवाबी मसौदा', mr: 'मार्ग · विक्रेत्याची जिद → प्रत्युत्तर मसुदा', ta: 'பாதை · விற்பவர் எதிர்ப்பு → எதிர் வரைவு', ur: 'راستہ · فروشنر کا اصرار → جوابی مسودہ' },
+  metaThreat: { en: 'Path · intimidation → protective stop', hi: 'रास्ता · धमकी → सुरक्षात्मक रुकना', mr: 'मार्ग · धमकी → संरक्षक थांबवणे', ta: 'பாதை · மிரட்டல் → பாதுகாப்பு நிறுத்தம்', ur: 'راستہ · دھمکی → حفاظتی رکنے' },
+  metaResolved: { en: 'Path · resolution → close out', hi: 'रास्ता · समाधान → केस बंद', mr: 'मार्ग · निराकरण → बाब बंद', ta: 'பாதை · தீர்வு → வழக்கை மூடு', ur: 'راستہ · حل → کیس بند' },
+  metaNotice: { en: 'Path · notice → explain-only', hi: 'रास्ता · नोटिस → केवल समझाना', mr: 'मार्ग · जाहीरनामा → फक्त स्पष्टीकरण', ta: 'பாதை · அறிவிப்பு → விளக்கம் மட்டும்', ur: 'راستہ · نوٹس → صرف وضاحت' },
+  metaStop: { en: 'Path · hard stop', hi: 'रास्ता · पूर्ण रुकना', mr: 'मार्ग · पूर्ण थांबवणे', ta: 'பாதை · முழு நிறுத்தம்', ur: 'راستہ · مکمل رکنے' },
+  metaRails: { en: 'Path · payment rails → caution', hi: 'रास्ता · भुगतान मार्ग → सावधानी', mr: 'मार्ग · पेमेंट मार्ग → सावधानता', ta: 'பாதை · பணப் பாதை → எச்சரிக்கை', ur: 'راستہ · ادائیگی راستہ → احتیاط' },
+  metaWorkplace: { en: 'Path · workplace dues → caution', hi: 'रास्ता · कार्यस्थल बकाया → सावधानी', mr: 'मार्ग · कार्यस्थळ बाकी → सावधानता', ta: 'பாதை · பணியிட நிலுவை → எச்சரிக்கை', ur: 'راستہ · کاروبار باقیات → احتیاط' },
+  scn1Title: { en: 'Defective appliance, stonewalling support', hi: 'खराब उपकरण, बहाना करती सपोर्ट', mr: 'खराब उपकरण, टाळाटाळ करणारी सेवा', ta: 'பழுதான சாதனம், தாமதிக்கும் ஆதரவு', ur: 'خراب آلہ، بہانے کرتی سپورٹ' },
+  scn2Title: { en: 'Landlord holding the deposit', hi: 'मकान मालिक डिपॉज़िट रोके हुए', mr: 'मालक भरपगाडी धरून बसला', ta: 'முன்பணத்தை பிடித்துக்கொண்ட வீட்டு உரிமையாளர்', ur: 'محنتانہ روکے ہوئے مالک' },
+  scn3Title: { en: 'Vernacular municipal notice', hi: 'मातृभाषा का नगर निगम नोटिस', mr: 'मातृभाषेतील महापालिका जाहीरनामा', ta: 'தாய்மொழி நகர அறிவிப்பு', ur: 'مادری زبان کا میونسپل نوٹس' },
+  scn4Title: { en: 'Wrong UPI transfer / withheld dues', hi: 'गलत UPI ट्रांसफ़र / रोकी गई राशि', mr: 'चुकीचे UPI हस्तांतरण / रोखलेली रक्कम', ta: 'தவறான UPI பரிமாற்றம் / பிடித்தத் தொகை', ur: 'غلط UPI منتقلی / روکی گئی رقم' },
+  scn5Title: { en: 'Safety first — hard boundary', hi: 'सुरक्षा सबसे पहले — कठोर सीमा', mr: 'सुरक्षा सर्वांत आधी — कठोर मर्यादा', ta: 'பாதுகாப்பு முதலில் — கடுமையான எல்லை', ur: 'حفاظت سب سے پہلے — سخت حد' },
+  resetVault: { en: 'Reset local vault', hi: 'लोकल वॉल्ट रीसेट करें', mr: 'लोकल व्हॉल्ट रीसेट करा', ta: 'உள்ளூர் கிடங்கை மீட்டமை', ur: 'لوکل والٹ ری سیٹ کریں' },
+  vaultResetDone: { en: 'Local vault reset — sample history returns.', hi: 'लोकल वॉल्ट रीसेट — नमूना इतिहास लौट आया।', mr: 'लोकल व्हॉल्ट रीसेट — नमुना इतिहास परत आला.', ta: 'உள்ளூர் கிடங்கு மீட்டமைக்கப்பட்டது — மாதிரி வரலாறு திரும்பியது.', ur: 'لوکل والٹ ری سیٹ — نمونہ تاریخ واپس آ گیا۔' },
+  voiceSpotted: { en: 'Spotted in your transcript', hi: 'आपके ट्रांसक्रिप्ट में मिला', mr: 'तुमच्या ट्रान्स्क्रिप्टमध्ये आढळले', ta: 'உங்கள் எழுத்துப்பெயர்ப்பில் கண்டறியப்பட்டது', ur: 'آپ کے ٹرانسکرپٹ میں ملا' },
+  factSigned: { en: '✓ {n} case facts confirmed', hi: '✓ {n} केस तथ्य पक्के किए', mr: '✓ {n} बाब-वस्तुस्थिती निश्चित', ta: '✓ {n} வழக்கு உண்மைகள் உறுதி', ur: '✓ {n} کیس حقائق مستند' },
   copyHandoverNote: { en: 'Copy handover note', hi: 'हैंडओवर नोट कॉपी करें', mr: 'हँडओव्हर नोंद कॉपी करा', ta: 'கையளிப்புக் குறிப்பை நகலெடு', ur: 'ہینڈ اوور نوٹ کاپی کریں' },
   coverageNotice: {
     en: 'Interface translated (AI-drafted, unreviewed) — the legal cards below stay in English until the translation pass is human-reviewed. Everything else on this screen falls back to English by the visible coverage law.',

@@ -12,12 +12,17 @@ import HistoryPage from './app/pages/HistoryPage'
 import SavedPage from './app/pages/SavedPage'
 import ProfilePage from './app/pages/ProfilePage'
 import MatterDetailPage from './app/pages/MatterDetailPage'
+import CaseWorkspacePage from './app/pages/CaseWorkspacePage'
 import ReplayPage from './app/pages/ReplayPage'
 
 function Routes() {
   const { path } = useHashRoute()
   if (path.startsWith('/matter/')) {
     return <MatterDetailPage id={path.split('/')[2] ?? ''} />
+  }
+  if (path.startsWith('/case/')) {
+    const segs = path.split('/')
+    return <CaseWorkspacePage id={segs[2] ?? ''} dayParam={segs[3] === 'd' ? segs[4] : undefined} />
   }
   if (path.startsWith('/replay')) {
     return <ReplayPage id={path.split('/')[2]} />

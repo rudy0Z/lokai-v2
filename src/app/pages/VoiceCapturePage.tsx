@@ -5,6 +5,8 @@ import { useApp } from '../lib/app-context'
 import { navigate } from '../lib/router'
 import { LANG_ORDER, LANGUAGES, type LangCode } from '../data/languages'
 import { VOICE_SAMPLES, formatClock } from '../data/voice-samples'
+import { extractFacts } from '../lib/matter-facts'
+import { ISSUE_LABELS } from '../data/localized-content'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -110,6 +112,31 @@ export default function VoiceCapturePage() {
             <span className="absolute end-3 top-3 text-fg-tertiary" aria-hidden="true">
               <IconPencil className="size-4" />
             </span>
+            {/* entity spotting (master prompt Part 6): extracted legal entities
+                get a warm botanical tint so a stressed user verifies the
+                speech-to-text in one second */}
+            {(() => {
+              const ef = extractFacts(transcript)
+              const timeHit = /\b\d+\s*(?:days?|hours?|weeks?|महीने|दिन|घंटे|நாட்கள்|மணி|دن|گھنٹے)\s*(?:ago|back|पहले|முன்|پہلے)?/i.exec(transcript)?.[0]
+              const ISSUE_L = ISSUE_LABELS[lang] ?? ISSUE_LABELS.en!
+              const spotted = [ef.amount, ef.seller, ef.item, ef.issue ? ISSUE_L[ef.issue]! : '', timeHit ?? ''].filter(Boolean)
+              if (spotted.length === 0) return null
+              return (
+                <div className="mt-3 border-t border-line-subtle pt-2.5">
+                  <p className="text-2xs text-fg-tertiary">{tr('voiceSpotted')}</p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {spotted.map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-md bg-brand-subtle px-2 py-0.5 text-2xs font-medium text-on-brand-subtle underline decoration-brand-line decoration-dotted underline-offset-4"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
 
           <div className="flex flex-col gap-1.5">

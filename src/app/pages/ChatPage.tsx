@@ -5,7 +5,8 @@ import { navigate, useHashRoute } from '../lib/router'
 import { runBeats, SimulatedFailure, type BeatClass } from '../lib/engine'
 import { classifyMatter, reRouteAsCaution, SCOPE_RULES, type ScopeDecision } from '../data/scope-rules'
 import { REASSURANCE, SCENARIO_SEEDS } from '../data/refund-journey'
-import { FOLLOW_UPS } from '../data/localized-content'
+import { FOLLOW_UPS, INFORMAL_CAUTION } from '../data/localized-content'
+import { scenarioById, type TesterOption } from '../data/interactive-scenarios'
 import {
   extractFacts,
   factRows,
@@ -16,6 +17,8 @@ import {
   type FactRecord,
 } from '../lib/matter-facts'
 import { LANGUAGES } from '../data/languages'
+import { matterById } from '../data/matters'
+import { CaseContinuityHeader } from '../components/cases/CaseContinuityHeader'
 import { AppShell } from '../components/ui/shell'
 import { Banner } from '../components/ui/Banner'
 import { Button } from '../components/ui/Button'
@@ -38,6 +41,7 @@ import { useSpans } from '../lib/useSpans'
 import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
 import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
+import { TesterPrompts } from '../components/chat/TesterPrompts'
 import { Card } from '../components/ui/Card'
 
 type ItemKind =
@@ -55,10 +59,12 @@ type ItemKind =
   | 'closeout'
 
 interface ChatItem {
-  id: number
-  kind: ItemKind
-  text?: string
-  variant?: 'full' | 'free'
+    id: number
+    kind: ItemKind
+    text?: string
+    /** mock attachments sent with the message (rendered as evidence chips) */
+    atts?: string[]
+    variant?: 'full' | 'free'
   /** assistant text still revealing (caret streaming) */
   stream?: boolean
   /** the scope decision attached to protective/handover/caution items */
@@ -82,10 +88,12 @@ const RE_PROMISE =
 const RE_ESCALATE = /ignore|no reply|not respon|जवाब नहीं|जवाब नही|பதில் இல்லை|جواب نہیں/i
 
 export default function ChatPage() {
-  const { tr, lang } = useApp()
+  const { tr, lang, activeCaseId, setActiveCase } = useApp()
   const { params } = useHashRoute()
   const seedId = params.get('s')
   const spans = useSpans()
+  const activeCase = activeCaseId ? matterById(activeCaseId) : undefined
+  const scenario = scenarioById(seedId?.startsWith('scn') ? seedId : undefined)
 
   const [items, setItems] = useState<ChatItem[]>([])
   const [busy, setBusy] = useState(false)
@@ -102,6 +110,7 @@ export default function ChatPage() {
   const [matterFacts, setMatterFacts] = useState<FactRecord>(EMPTY_FACTS)
   const [findingData, setFindingData] = useState<FindingCardData>(() => buildFinding(EMPTY_FACTS, 'en'))
   const [factItems, setFactItems] = useState<FactItem[]>([])
+  const [factSigned, setFactSigned] = useState(false)
   const [composerOpen, setComposerOpen] = useState(false)
 
   const idRef = useRef(0)
@@ -206,8 +215,8 @@ export default function ChatPage() {
     })
   }
 
-  const handleSend = (text: string, _atts: string[], fail = false) => {
-    push({ kind: 'user', text })
+  const handleSend = (text: string, atts: string[], fail = false) => {
+    push({ kind: 'user', text, atts })
     lastUserRef.current = text
 
     // safety first: strong hard-stop signals win over everything, any turn
@@ -288,6 +297,7 @@ export default function ChatPage() {
       askRaw: values.ask !== rowInitial('ask') ? values.ask : undefined,
     }
     setMatterFacts(next)
+    setFactSigned(true)
     stageRef.current = 'engaged'
 
     if (next.when === '2plus' || next.when === 'ns') {
@@ -373,8 +383,85 @@ export default function ChatPage() {
     if (ok) toast.success(tr('copied'))
   }
 
+  /* continuity chips (case-folder model): a new day-chat answers from the
+     case's own language and memory — escalate / counter / close — without
+     re-running intake. Index routes the intent; text is what the user "said". */
+  const handleContinuityChip = (text: string, index: number) => {
+    push({ kind: 'user', text })
+    lastUserRef.current = text
+    stageRef.current = 'engaged'
+    const pack = FOLLOW_UPS[activeCase?.lang ?? lang] ?? FOLLOW_UPS.en!
+    if (index === 2) {
+      run('progress', () => {
+        push({ kind: 'assistant', stream: true, text: pack.general }, { kind: 'closeout' })
+      })
+    } else {
+      run('progress', () => {
+        push({ kind: 'assistant', stream: true, text: pack.escalate })
+      })
+    }
+  }
+
+  /* ---- branching-tester scenarios (master prompt Part 2): the option
+     DECLARES its path, so the route is deterministic — free typing still
+     goes through the classifier ---- */
+  const informalDecision = (): ScopeDecision => {
+    const pack = INFORMAL_CAUTION[lang] ?? INFORMAL_CAUTION.en!
+    return { tier: 'caution', ruleId: 'informal-seller', label: 'Informal seller', why: pack.body, certainty: 'matched' }
+  }
+
+  const handleScenarioOption = (o: TesterOption) => {
+    push({ kind: 'user', text: o.text })
+    lastUserRef.current = o.text
+    switch (o.route) {
+      case 'proceed':
+      case 'vague':
+        startConsumerFlow(false, o.text)
+        return
+      case 'informal':
+        startCautionFlow(informalDecision())
+        return
+      case 'stop': {
+        const d = classifyMatter(o.text, lang)
+        runProtective(d.tier === 'hard-stop' ? d : { ...d, tier: 'hard-stop' as const })
+        return
+      }
+      case 'notice':
+        run('progress', () => {
+          push(
+            { kind: 'assistant', stream: true, text: REASSURANCE.notice[lang] ?? REASSURANCE.notice.en },
+            { kind: 'noticecard' },
+          )
+        })
+        return
+      case 'pushback':
+        stageRef.current = 'engaged'
+        run('progress', () => {
+          push({ kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).escalate })
+        })
+        return
+      case 'resolved':
+        stageRef.current = 'engaged'
+        run('progress', () => {
+          push(
+            { kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).general },
+            { kind: 'closeout' },
+          )
+        })
+        return
+    }
+  }
+
+  const testerOptions: TesterOption[] | undefined = scenario
+    ? (stageRef.current === 'intake'
+        ? scenario.turn1[lang] ?? scenario.turn1.en
+        : scenario.postFinding?.[lang] ?? scenario.postFinding?.en)
+    : undefined
+
   const reset = () => {
     setItems([])
+    setActiveCase(null)
+    setFactSigned(false)
     setStopDecision(null)
     setProtectDecision(null)
     setNoticeOpen(false)
@@ -430,9 +517,16 @@ export default function ChatPage() {
      (deep-audit smoke fix: the old same-seed guard blocked re-launching a
      scenario after any in-thread activity, because ChatPage survives the
      hash navigation). StrictMode-safe without a guard: the double-invoked
-     effect's first timer is cleared by the effect cleanup. ---- */
+     effect's first timer is cleared by the effect cleanup.
+     A BRANCHING scenario seed (scn1…scn5) never auto-sends: the tester
+     picks the opening path from the prompt cards. ---- */
   useEffect(() => {
     if (!seedId) return
+    if (scenario) {
+      reset()
+      setComposerOpen(true)
+      return
+    }
     const seed = SCENARIO_SEEDS.find((s) => s.id === seedId)
     if (!seed) return
     reset()
@@ -525,20 +619,32 @@ export default function ChatPage() {
         </Button>
       }
       footer={
-        // one input model per screen: voice-first empty state and the notice
-        // flow show none; the active stop shows the protective action bar;
-        // everything else is the composer (typing stays live during beats).
-        empty && !composerOpen ? undefined : noticeOpen || stopDecision ? undefined : (
-          (protectiveFooter ?? (
-            <Composer
-              onSend={handleSend}
-              sendLocked={busy}
-              offline={offline}
-              attachments={attachments}
-              onAttach={(name) => setAttachments((a) => [...a, name])}
-              onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
-            />
-          ))
+        // one input model per screen: the caseless voice-first empty state and
+        // the notice flow show none (the continuity empty state KEEPS the
+        // composer — the chips and the composer are one input family); the
+        // active stop shows the protective action bar; everything else is the
+        // composer (typing stays live during beats). Tester prompt cards sit
+        // right above the composer during a branching scenario.
+        empty && !activeCase && !composerOpen ? undefined : noticeOpen || stopDecision ? undefined : (
+          protectiveFooter ?? (
+            <div className="flex flex-col gap-2">
+              {testerOptions && testerOptions.length > 0 && (
+                <TesterPrompts
+                  label={stageRef.current === 'intake' ? tr('testerHint') : tr('postFindingLabel')}
+                  options={testerOptions}
+                  onPick={handleScenarioOption}
+                />
+              )}
+              <Composer
+                onSend={handleSend}
+                sendLocked={busy}
+                offline={offline}
+                attachments={attachments}
+                onAttach={(name) => setAttachments((a) => [...a, name])}
+                onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
+              />
+            </div>
+          )
         )
       }
     >
@@ -573,7 +679,15 @@ export default function ChatPage() {
               const threadItems = focus ? items.filter((i) => i.id !== focus.id) : items
               return (
                 <>
-            {empty && (
+            {empty && activeCase && (
+              /* Case-Folder continuity: a new day chat NEVER opens blank —
+                 the case's own language leads with memory + follow-up + chips */
+              <div className="flex flex-1 flex-col justify-center gap-5 px-3.5 pb-8 pt-6">
+                <CaseContinuityHeader onChip={handleContinuityChip} />
+                <p className="text-center text-2xs text-fg-tertiary">{tr('caseSampleNote')}</p>
+              </div>
+            )}
+            {empty && !activeCase && (
               <div className="flex flex-col items-center gap-6 px-5 pb-10 pt-14 text-center">
                 <div>
                   <h1
@@ -775,6 +889,8 @@ export default function ChatPage() {
                       <FactCheckCard
                         facts={factItems}
                         whenOptions={whenOptions}
+                        signed={factSigned}
+                        onEdit={() => setFactSigned(false)}
                         onConfirm={confirmFacts}
                       />
                     </MessageBubble>

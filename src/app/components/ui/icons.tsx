@@ -159,6 +159,21 @@ export const IconCamera = makeIcon(
 )
 export const IconStop = makeIcon(<rect x="7" y="7" width="10" height="10" rx="1.5" />, 'stop')
 export const IconPlay = makeIcon(<path d="M8 5.5v13l11-6.5z" />, 'play')
+export const IconFolder = makeIcon(
+  <path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-10.5z" />,
+  'folder',
+)
+export const IconPanelLeft = makeIcon(
+  <>
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+    <path d="M9.5 4.5v15" />
+  </>,
+  'panel-left',
+)
+export const IconSparkle = makeIcon(
+  <path d="M12 4l1.7 5.3L19 11l-5.3 1.7L12 18l-1.7-5.3L5 11l5.3-1.7L12 4z" />,
+  'sparkle',
+)
 export const IconExternal = makeIcon(
   <>
     <path d="M14 4h6v6" />

@@ -13,9 +13,15 @@ export function SectionRef({ sectionRef, className }: { sectionRef: string; clas
   const clean = sectionRef.replace(/\s*\[VERIFY[^\]]*\]/g, '').trim()
 
   return (
-    <span className={'inline-flex flex-wrap items-center gap-2 ' + (className ?? '')}>
+    <span className={'inline-flex flex-wrap items-center gap-1.5 ' + (className ?? '')}>
       {clean && (
-        <span className="font-mono text-2xs text-fg-secondary" lang="en">
+        /* optical scaling (master prompt Part 6): the mono citation sits 1px
+           smaller than the Indic text around it, on a warm sunken chip, so
+           Latin monospace never overpowers Devanagari/Tamil/Nastaliq heights */
+        <span
+          className="rounded-md bg-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] tracking-[0.02em] text-fg-secondary"
+          lang="en"
+        >
           {clean}
         </span>
       )}

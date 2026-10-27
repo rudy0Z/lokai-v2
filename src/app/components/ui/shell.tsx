@@ -1,11 +1,15 @@
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { ALL_LANGS, LANGUAGES } from '../../data/languages'
+import { matterById } from '../../data/matters'
 import { navigate } from '../../lib/router'
 import { LogoMark } from './LogoMark'
+import { CaseSidebar } from './CaseSidebar'
+import { SandboxDrawer } from '../sandbox/SandboxDrawer'
 import { TabBar, type TabId } from './TabBar'
-import { IconMoon, IconSun } from './icons'
+import { IconFolder, IconMoon, IconPanelLeft, IconSun } from './icons'
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, toggleTheme, tr } = useApp()
@@ -109,7 +113,9 @@ export interface AppShellProps {
  * as translucent material (apple-design §12) inside the frame.
  */
 export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, children, footer }: AppShellProps) {
-  const { tr, setLang } = useApp()
+  const { tr, setLang, activeCaseId } = useApp()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const activeCase = activeCaseId ? matterById(activeCaseId) : undefined
   return (
     <div className="flex h-dvh justify-center bg-page sm:items-center sm:py-6">
       <ReviewerTour onUrdu={() => { setLang('ur'); navigate('/') }} />
@@ -122,11 +128,33 @@ export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, chi
         }
       >
         <header className="pointer-events-none z-30 flex items-center gap-2 bg-gradient-to-b from-shell via-shell/90 to-transparent px-4 pb-4 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-          <div className="pointer-events-auto flex items-center gap-2.5">
+          <div className="pointer-events-auto flex min-w-0 items-center gap-2">
+            {/* Case-Folder drawer toggle — the notebook icon, native chrome */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              aria-label={tr('sidebarTitle')}
+              className="pressable inline-flex size-10 shrink-0 items-center justify-center rounded-full text-fg-secondary hover:bg-hover-veil"
+            >
+              <IconPanelLeft className="size-[18px]" />
+            </button>
             <LogoMark />
             <span className="font-serif text-lg font-semibold tracking-[-0.01em] text-fg-primary">LokAI</span>
+            {activeCase && (
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                aria-label={tr('caseBadgeAria')}
+                className="pressable flex min-w-0 items-center gap-1.5 rounded-full bg-sunken px-2.5 py-1"
+              >
+                <IconFolder className="size-3 shrink-0 text-brand-fg" />
+                <span className="truncate font-mono text-2xs text-fg-secondary" lang={activeCase.lang}>
+                  {activeCase.titleNative}
+                </span>
+              </button>
+            )}
           </div>
-          <div className="pointer-events-auto ms-auto flex items-center gap-0.5">
+          <div className="pointer-events-auto ms-auto flex shrink-0 items-center gap-0.5">
             {topBarExtra}
             <LanguageSelect />
             <ThemeToggle />
@@ -140,6 +168,8 @@ export function AppShell({ activeTab = 'home', showTabs = true, topBarExtra, chi
         )}
         {showTabs && <TabBar active={activeTab} />}
         {!footer && showTabs && <div aria-hidden="true" className="h-[6.25rem] shrink-0" />}
+        <SandboxDrawer />
+        <CaseSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <p className="sr-only">{tr('roleLine')}</p>
       </div>
     </div>

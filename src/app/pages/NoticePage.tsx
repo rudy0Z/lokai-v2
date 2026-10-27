@@ -91,7 +91,7 @@ export default function NoticePage() {
           <section className="flex flex-col gap-2">
             <h2 className="text-sm font-semibold text-fg-primary">{tr('keyPoints')}</h2>
             <ol className="flex flex-col gap-2">
-              {NOTICE_FIELDS.map((field, i) => (
+              {NOTICE_FIELDS.map((field) => (
                 <li key={field.id}>
                   <div className="bg-card rounded-[22px]">
                     <button
@@ -100,11 +100,13 @@ export default function NoticePage() {
                       onClick={() => tapField(field)}
                       className="flex w-full items-center gap-3 p-3.5 text-start"
                     >
+                      {/* bidirectional grounding badge: [n] maps 1-to-1 to the
+                          original clause below (master prompt Part 5) */}
                       <span
                         className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle font-mono text-2xs font-semibold text-on-brand-subtle"
                         aria-hidden="true"
                       >
-                        {i + 1}
+                        {field.clauseIndex + 1}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-2xs text-fg-tertiary">
@@ -196,8 +198,13 @@ export default function NoticePage() {
                       : 'border-line-default bg-card',
                   )}
                 >
-                  <p className="text-base leading-relaxed text-fg-primary">{clause.text}</p>
-                  <p className="mt-1 text-2xs text-fg-tertiary" lang="en">
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 font-mono text-2xs text-fg-tertiary" lang="en">
+                      [{clause.index + 1}]
+                    </span>
+                    <p className="min-w-0 flex-1 text-base leading-relaxed text-fg-primary">{clause.text}</p>
+                  </div>
+                  <p className="mt-1 ps-6 text-2xs text-fg-tertiary" lang="en">
                     {clause.gloss}
                   </p>
                 </li>

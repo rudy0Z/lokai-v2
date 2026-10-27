@@ -6,7 +6,7 @@ import { legalById } from '../../data/legal-content'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
 import { Textarea } from '../ui/Field'
-import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
+import { type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
@@ -70,13 +70,32 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
     toast.success(tr('saveChanges'))
   }
 
+  const confLabel =
+    draft.confidence === 'clear' ? tr('confClear') : draft.confidence === 'likely' ? tr('confLikely') : tr('confUnsure')
+
   return (
     <Card className={cn('flex flex-col gap-3.5', stale && 'opacity-70')}>
-      {stale && (
-        <div className="-mb-1 flex items-center justify-between">
-          <Badge tone="warning" variant="subtle">{tr('stale')}</Badge>
-        </div>
-      )}
+      {/* top meta row — PASSIVE trust, quiet borderless labels (master prompt
+          Part 6: a strict two-tier hierarchy; interactive pills live below) */}
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+        {stale && <Badge tone="warning" variant="subtle">{tr('stale')}</Badge>}
+        {!editing && (
+          <span className="flex items-center gap-1.5 text-2xs font-medium text-fg-secondary">
+            <span
+              className={cn(
+                'size-2 shrink-0 rounded-full',
+                draft.confidence === 'clear' && 'bg-positive-solid',
+                draft.confidence === 'likely' && 'bg-warning-solid',
+                draft.confidence === 'unsure' && 'bg-danger-solid',
+              )}
+              aria-hidden="true"
+            />
+            {confLabel}
+          </span>
+        )}
+        {legal && <VerificationBadge verified={legal.verified} />}
+      </div>
+
       {editing ? (
         <div className="flex flex-col gap-2">
           <Textarea value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} rows={2} aria-label="title" />
@@ -102,15 +121,6 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
               <dd className="mt-1 text-sm text-fg-primary">
                 <LegalText text={draft.lawSays} />
               </dd>
-              {legal && (
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <span className="text-2xs text-fg-secondary" lang="en">
-                    {legal.source}
-                  </span>
-                  <SectionRef sectionRef={legal.sectionRef} />
-                  <VerificationBadge verified={legal.verified} />
-                </div>
-              )}
             </div>
             <div>
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
@@ -122,11 +132,20 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
         </>
       )}
 
-      <ConfidenceIndicator level={draft.confidence} />
-      <div className="flex flex-wrap items-center gap-2">
-        <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
+      {/* the evidence well — tonal surface shift instead of border-on-border;
+          the citation and the interactive pills live together here */}
+      <div className="flex flex-col gap-2.5 rounded-xl bg-sunken px-3.5 py-3">
+        {legal && (
+          <div className="flex flex-wrap items-center gap-2" lang="en">
+            <span className="text-2xs text-fg-secondary">{legal.source}</span>
+            <SectionRef sectionRef={legal.sectionRef} />
+          </div>
+        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
+          <ReasoningPill steps={draft.reasoningSteps} />
+        </div>
       </div>
-      <ReasoningPill steps={draft.reasoningSteps} />
 
       <CardActions
         editing={editing}

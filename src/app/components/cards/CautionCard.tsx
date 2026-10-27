@@ -1,6 +1,6 @@
 import { useApp } from '../../lib/app-context'
 import { JOURNEY_STRINGS } from '../../data/refund-journey'
-import { CAUTION_UNCLEAR, CAUTION_REASONING } from '../../data/localized-content'
+import { CAUTION_UNCLEAR, CAUTION_REASONING, INFORMAL_CAUTION } from '../../data/localized-content'
 import { legalById } from '../../data/legal-content'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Badge } from '../ui/Badge'
@@ -13,10 +13,10 @@ import { SectionRef } from '../trust/SectionRef'
 import { CardActions } from './CardActions'
 
 /**
- * Caution state — NOT an automatic stop (A2.4 / Phase 1 spec). TWO honest
- * faces (deep-audit fix: the downgrade law must not claim a time limit the
- * user never gave):
- *  - time-barred (ruleId 'possible-time-barred'): time limits may apply…
+ * Caution state — NOT an automatic stop (A2.4 / Phase 1 spec). THREE honest
+ * faces (the downgrade law must never claim a fact the user did not give):
+ *  - time-barred ('possible-time-barred'): time limits may apply…
+ *  - informal ('informal-seller'): a different dispute rail, human check first
  *  - unclear (any other caution): "I did not understand — one more detail",
  *    with three disambiguation doors, never a fabricated limitation warning.
  */
@@ -35,8 +35,10 @@ export function CautionCard({
 }) {
   const { tr, lang } = useApp()
   const timeBarred = decision?.ruleId === 'possible-time-barred'
+  const informal = decision?.ruleId === 'informal-seller'
   const legal = legalById('cpa-limitation')
   const unclear = CAUTION_UNCLEAR[lang] ?? CAUTION_UNCLEAR.en!
+  const informalPack = INFORMAL_CAUTION[lang] ?? INFORMAL_CAUTION.en!
   const reasoning = (CAUTION_REASONING[lang] ?? CAUTION_REASONING.en!)[
     timeBarred ? 'timeBarred' : 'unclear'
   ]
@@ -45,7 +47,7 @@ export function CautionCard({
     <Card className="flex flex-col gap-3.5 border-warning-line">
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
-          {timeBarred ? tr('cautionTitle') : unclear.title}
+          {timeBarred ? tr('cautionTitle') : informal ? informalPack.title : unclear.title}
         </h3>
         <Badge tone="warning" variant="subtle">{tr('tierCaution')}</Badge>
       </div>
@@ -60,6 +62,11 @@ export function CautionCard({
               <VerificationBadge verified={legal.verified} />
             </div>
           )}
+          <ConfidenceIndicator level="likely" />
+        </>
+      ) : informal ? (
+        <>
+          <p className="text-sm leading-relaxed text-fg-primary">{informalPack.body}</p>
           <ConfidenceIndicator level="likely" />
         </>
       ) : (
@@ -77,7 +84,9 @@ export function CautionCard({
         </>
       )}
 
-      <ReasoningPill steps={reasoning} />
+      <div className="rounded-xl bg-sunken px-3.5 py-3">
+        <ReasoningPill steps={informal ? informalPack.steps : reasoning} />
+      </div>
       <CardActions onDiscard={onDiscard} />
     </Card>
   )

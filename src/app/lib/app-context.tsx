@@ -15,6 +15,10 @@ interface AppContextValue {
   /** localized UI chrome string */
   tr: (key: UiKey) => string
   direction: 'ltr' | 'rtl'
+  /** the case folder a new day-chat will belong to (session-scope — a
+      refresh is a fresh visit; the case lives in the sidebar, not storage) */
+  activeCaseId: string | null
+  setActiveCase: (id: string | null) => void
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -32,6 +36,7 @@ function readStored<T extends string>(key: string, fallback: T, valid: readonly 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => readStored('lokai.theme', 'light', ['light', 'dark'] as const))
   const [lang, setLangState] = useState<LangCode>(() => readStored('lokai.lang', 'en', ALL_LANGS))
+  const [activeCaseId, setActiveCase] = useState<string | null>(null)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -75,8 +80,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       /** fallback law: full pack -> draft pack -> English, never a blank */
       tr: (key: UiKey) => UI[key]?.[lang] ?? UI_DRAFTS[key]?.[lang] ?? UI[key]?.en ?? '',
       direction: LANGUAGES[lang].direction,
+      activeCaseId,
+      setActiveCase,
     }),
-    [theme, toggleTheme, lang, setLang],
+    [theme, toggleTheme, lang, setLang, activeCaseId],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
