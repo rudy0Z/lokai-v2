@@ -1,6 +1,6 @@
 import { useApp } from '../lib/app-context'
 import { navigate } from '../lib/router'
-import { FINDING } from '../data/refund-journey'
+import { buildFinding, DEMO_FACTS } from '../lib/matter-facts'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { Banner } from '../components/ui/Banner'
@@ -37,6 +37,9 @@ function Section({ title, note, children }: { title: string; note?: string; chil
 
 export default function GalleryPage() {
   const { tr } = useApp()
+  // demo card built from the demo fact record — same builder as the live
+  // thread, so the gallery shows the real (variant-carrying) card
+  const FINDING_DEMO = buildFinding(DEMO_FACTS, 'en')
   const demo = (
     <span className="text-sm">
       The grinder arrived cracked and the seller refused a refund. <span lang="hi">मिक्सर ग्राइंडर टूटा हुआ आया।</span>
@@ -93,12 +96,12 @@ export default function GalleryPage() {
           </Section>
 
           <Section title="Reasoning pill" note="collapsible; always tagged as simulated (A7)">
-            <ReasoningPill steps={FINDING.reasoningSteps} />
+            <ReasoningPill steps={FINDING_DEMO.reasoningSteps} />
           </Section>
 
           <Section title="Finding card" note="generative card shell: serif heading, three zones, trust chrome, edit/regenerate/discard">
-            <FindingCard data={FINDING} />
-            <FindingCard data={{ ...FINDING, title: 'Stale variant — facts changed below' }} stale />
+            <FindingCard data={FINDING_DEMO} />
+            <FindingCard data={{ ...FINDING_DEMO, title: 'Stale variant — facts changed below' }} stale />
           </Section>
 
           <Section title="Action ladder" note="lowest risk first; free mode for the caution branch">

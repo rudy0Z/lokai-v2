@@ -24,7 +24,7 @@ export function ReasoningPill({ steps, className }: ReasoningPillProps) {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line-default bg-component px-3 text-2xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line-default bg-component px-3 text-2xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
       >
         <span>{tr('reasoningTitle')}</span>
         <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.18 }}>

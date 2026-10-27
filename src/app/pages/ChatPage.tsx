@@ -10,6 +10,8 @@ import {
   extractFacts,
   factRows,
   buildFinding,
+  issueKeyFromDisplay,
+  askKeyFromDisplay,
   EMPTY_FACTS,
   type FactRecord,
 } from '../lib/matter-facts'
@@ -90,7 +92,10 @@ export default function ChatPage() {
   const [stageLabel, setStageLabel] = useState<string | undefined>()
   const [offline, setOffline] = useState(false)
   const [attachments, setAttachments] = useState<string[]>([])
-  const [stage, setStage] = useState<ThreadStage>('intake')
+  /* stage lives in a ref: handleSend is invoked from timers, seeds and the
+     voice handoff with STALE render closures — a state read there applied
+     the previous conversation's stage to a fresh seed (found in smoke test). */
+  const stageRef = useRef<ThreadStage>('intake')
   const [protectDecision, setProtectDecision] = useState<ScopeDecision | null>(null)
   const [stopDecision, setStopDecision] = useState<ScopeDecision | null>(null)
   const [noticeOpen, setNoticeOpen] = useState(false)
@@ -100,7 +105,6 @@ export default function ChatPage() {
   const [composerOpen, setComposerOpen] = useState(false)
 
   const idRef = useRef(0)
-  const seededRef = useRef<string | null>(null)
   const retryRef = useRef<(() => void) | null>(null)
   const cancelRef = useRef(false)
   const lastUserRef = useRef('')
@@ -165,7 +169,7 @@ export default function ChatPage() {
 
   const runProtective = (decision: ScopeDecision) => {
     setProtectDecision(decision)
-    setStage('stopped')
+    stageRef.current = 'stopped'
     run('stop', () => {
       push(
         { kind: 'system', text: tr('tierHardStop') },
@@ -176,7 +180,7 @@ export default function ChatPage() {
   }
 
   const startCautionFlow = (decision: ScopeDecision) => {
-    setStage('engaged')
+    stageRef.current = 'engaged'
     run('caution', () => {
       push(
         { kind: 'system', text: tr('tierCaution') },
@@ -218,8 +222,8 @@ export default function ChatPage() {
       return
     }
 
-    if (stage !== 'intake') {
-      followUp(stage)
+    if (stageRef.current !== 'intake') {
+      followUp(stageRef.current)
       return
     }
 
@@ -269,16 +273,22 @@ export default function ChatPage() {
    * the honest time-barred caution.
    */
   const confirmFacts = (values: Record<string, string>) => {
+    // recover the normalized keys from the row's display text; if the user
+    // re-typed the row, carry their exact wording through as the raw text —
+    // their signed wording beats the normalized phrase in every template
+    const rowInitial = (key: string) => factItems.find((f) => f.key === key)?.value ?? ''
     const next: FactRecord = {
       item: values.item ?? '',
       seller: values.seller ?? '',
       amount: values.amount ?? '',
-      issue: (values.issue as FactRecord['issue']) ?? '',
-      ask: (values.ask as FactRecord['ask']) ?? '',
+      issue: issueKeyFromDisplay(values.issue ?? '', lang),
+      ask: askKeyFromDisplay(values.ask ?? '', lang),
       when: (values.when as FactRecord['when']) ?? '',
+      issueRaw: values.issue !== rowInitial('issue') ? values.issue : undefined,
+      askRaw: values.ask !== rowInitial('ask') ? values.ask : undefined,
     }
     setMatterFacts(next)
-    setStage('engaged')
+    stageRef.current = 'engaged'
 
     if (next.when === '2plus' || next.when === 'ns') {
       const rule = SCOPE_RULES.find((r) => r.id === 'possible-time-barred')!
@@ -335,7 +345,7 @@ export default function ChatPage() {
   const tellMore = () => {
     setProtectDecision(null)
     setStopDecision(null)
-    setStage('engaged')
+    stageRef.current = 'engaged'
     const decision = reRouteAsCaution(lang)
     push({ kind: 'system', text: tr('tierCaution') })
     run('caution', () => {
@@ -368,7 +378,7 @@ export default function ChatPage() {
     setStopDecision(null)
     setProtectDecision(null)
     setNoticeOpen(false)
-    setStage('intake')
+    stageRef.current = 'intake'
     setMatterFacts(EMPTY_FACTS)
     setFindingData(buildFinding(EMPTY_FACTS, 'en'))
     setFactItems([])
@@ -416,22 +426,21 @@ export default function ChatPage() {
     }
   }, [])
 
-  /* ---- scenario seeding (once per seed id; StrictMode-safe: the guard is
-     set only when the timer actually fires, so the double-invoked effect
-     re-schedules instead of silently skipping) ---- */
+  /* ---- scenario seeding — a seed CHANGE always starts a fresh conversation
+     (deep-audit smoke fix: the old same-seed guard blocked re-launching a
+     scenario after any in-thread activity, because ChatPage survives the
+     hash navigation). StrictMode-safe without a guard: the double-invoked
+     effect's first timer is cleared by the effect cleanup. ---- */
   useEffect(() => {
-    if (!seedId || seededRef.current === seedId) return
+    if (!seedId) return
     const seed = SCENARIO_SEEDS.find((s) => s.id === seedId)
     if (!seed) return
-    // launcher discipline: a fresh seed always starts a fresh conversation
     reset()
     if (seed.forceOffline) {
-      seededRef.current = seedId
       setOffline(true)
       return
     }
     const timer = window.setTimeout(() => {
-      seededRef.current = seedId
       handleSend(seed.userMessage, [], seed.simulateError ?? false)
     }, 450)
     return () => window.clearTimeout(timer)

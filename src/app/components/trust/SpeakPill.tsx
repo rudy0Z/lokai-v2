@@ -35,7 +35,7 @@ export function SpeakPill({ text, className }: { text: string; className?: strin
       aria-pressed={speaking}
       title={tr('simulatedTag')}
       className={cn(
-        'pressable inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-2xs font-medium transition-colors',
+        'pressable inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-2xs font-medium transition-colors',
         speaking ? 'bg-brand-solid text-on-brand-solid' : 'bg-component text-fg-secondary',
         className,
       )}

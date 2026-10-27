@@ -19,7 +19,7 @@ type CaptureState = 'listening' | 'review'
  * The whole surface is tagged simulated (A7).
  */
 export default function VoiceCapturePage() {
-  const { tr, lang } = useApp()
+  const { tr, lang, setLang } = useApp()
   const [phase, setPhase] = useState<CaptureState>('listening')
   const [seconds, setSeconds] = useState(0)
   const [transcript, setTranscript] = useState(VOICE_SAMPLES[lang] ?? VOICE_SAMPLES.en!)
@@ -43,6 +43,9 @@ export default function VoiceCapturePage() {
       toast.error(tr('errorTitle'))
       return
     }
+    // deep-audit fix: the reviewed "Detected language" is authoritative —
+    // the reply language follows it instead of ignoring the user's choice
+    if (detected !== 'auto' && detected !== lang) setLang(detected)
     try {
       window.sessionStorage.setItem('lokai.pendingTranscript', text)
     } catch {

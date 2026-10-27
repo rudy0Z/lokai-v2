@@ -89,6 +89,15 @@ a,
   color: oklch(24% 0.02 80);
 }
 
+/* deep-audit P1-7: form fields do not inherit color by default — without
+   this the dark theme's near-white ink lands on the light paper register
+   and the demand-notice review becomes illegible */
+.paper input,
+.paper textarea {
+  color: inherit;
+  caret-color: inherit;
+}
+
 /* Urdu / Nastaliq needs generous leading everywhere it appears */
 :lang(ur),
 :lang(ks),
@@ -117,8 +126,10 @@ a,
   height: 132px;
 }
 [data-theme="dark"] .voice-orb {
-  --orb-outer: oklch(62% 0.07 150 / 0.34);
-  --orb-mid: oklch(48% 0.08 155 / 0.6);
+  /* deep-audit P3-14: the signature must survive the night garden — lift the
+     halo off the near-black shell */
+  --orb-outer: oklch(66% 0.08 150 / 0.42);
+  --orb-mid: oklch(52% 0.09 155 / 0.62);
 }
 .orb-layer {
   position: absolute;

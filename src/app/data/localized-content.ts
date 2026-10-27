@@ -67,8 +67,11 @@ function fill(template: string, facts: FactRecord, lang: LangCode): string {
   const item = facts.item || PRODUCT_WORD[lang]!
   const seller = facts.seller || SELLER_WORD[lang]!
   const amount = facts.amount || '[amount]'
-  const issue = ISSUE_PHRASE[lang]?.[facts.issue || 'damaged'] ?? ISSUE_PHRASE.en.damaged!
-  const ask = ASK_PHRASE[lang]?.[facts.ask || 'refund'] ?? ASK_PHRASE.en.refund!
+  // the user's SIGNED wording wins over the normalized phrase: when they
+  // corrected the issue/ask row in the fact gate, that exact text flows
+  // verifiably into the finding and every draft
+  const issue = facts.issueRaw?.trim() || ISSUE_PHRASE[lang]?.[facts.issue || 'damaged'] || ISSUE_PHRASE.en.damaged!
+  const ask = facts.askRaw?.trim() || ASK_PHRASE[lang]?.[facts.ask || 'refund'] || ASK_PHRASE.en.refund!
   return template
     .replaceAll('{item}', item)
     .replaceAll('{seller}', seller)
@@ -498,4 +501,14 @@ export const CAUTION_REASONING: Pack<{ timeBarred: string[]; unclear: string[] }
       'دونوں صورتوں میں مفت قدم دستیاب رکھے',
     ],
   },
+}
+
+/* ---------- notice interpreter field labels (deep-audit Lens 2B) ---------- */
+
+export const NOTICE_FIELD_LABELS: Pack<Record<'amount' | 'period' | 'deadline' | 'penalty' | 'objections', string>> = {
+  en: { amount: 'Amount demanded', period: 'Assessment period', deadline: 'Payment deadline', penalty: 'Penalty mentioned', objections: 'Objection channel' },
+  hi: { amount: 'माँगी गई राशि', period: 'मूल्यांकन अवधि', deadline: 'भुगतान की अंतिम तारीख़', penalty: 'उल्लिखित जुर्माना', objections: 'आपत्ति का मार्ग' },
+  mr: { amount: 'मागणी केलेली रक्कम', period: 'मूल्यांकन कालावधी', deadline: 'पेमेंट अंतिम दिवस', penalty: 'नमूद दंड', objections: 'दाद मागण्याचा मार्ग' },
+  ta: { amount: 'கோரப்பட்ட தொகை', period: 'மதிப்பீட்டு காலம்', deadline: 'கட்டண காலக்கெடு', penalty: 'குறிப்பிட்ட அபராதம்', objections: 'ஆட்சேபனை வழி' },
+  ur: { amount: 'مانگی گئی رقم', period: 'تقین کی مدت', deadline: 'ادائیگی کی آخری تاریخ', penalty: 'ذکر شدہ جرمانہ', objections: 'اعتراض کا راستہ' },
 }

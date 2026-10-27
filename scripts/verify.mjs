@@ -260,6 +260,79 @@ const PAIRS = [
   }
 }
 
+/* ---------- 5. journey invariants (deep-audit P2-12) — the classifier's
+   BEHAVIOR is tested, not just its presence: a regression like the old
+   `length > 25 → proceed` shortcut must fail the gate ---------- */
+{
+  const { createRequire } = await import('node:module')
+  const require = createRequire(import.meta.url)
+  try {
+    const { transformSync } = require('esbuild')
+    const src = readFileSync(join(ROOT, 'src/app/data/scope-rules.ts'), 'utf8')
+    const { code } = transformSync(src, { loader: 'ts', format: 'cjs' })
+    const mod = { exports: {} }
+    new Function('exports', 'module', code)(mod.exports, mod)
+    const { classifyMatter } = mod.exports
+
+    const CASES = [
+      // [input, expected tier, expected certainty (optional)]
+      ['hello I want to ask something please help', 'caution', 'uncertain'],
+      ['my landlord will throw me out', 'hard-stop'],
+      ['the seller threatened me', 'hard-stop'],
+      ['my company bought goods with a GST invoice', 'hard-stop'],
+      ['I bought a mixer grinder and it arrived cracked, refund refused', 'proceed', 'matched'],
+      ['I bought it about 3 years ago and it broke', 'caution', 'matched'],
+    ]
+    for (const [text, tier, certainty] of CASES) {
+      const d = classifyMatter(text, 'en')
+      if (d.tier !== tier) fail(`classifier: "${text}" → ${d.tier}, expected ${tier}`)
+      else if (certainty && d.certainty !== certainty) {
+        fail(`classifier: "${text}" certainty ${d.certainty}, expected ${certainty}`)
+      } else ok(`classifier: "${text.slice(0, 34)}…" → ${tier}${certainty ? '/' + certainty : ''}`)
+    }
+
+    // the downgrade law, stated as an invariant: uncertain input may NEVER
+    // classify as proceed, whatever the rules grow to be
+    const d = classifyMatter('hello I want to ask something please help', 'en')
+    if (d.tier === 'proceed' && d.certainty === 'uncertain') {
+      fail('downgrade law violated: uncertain input classified proceed')
+    } else ok('downgrade law: uncertain never proceeds silently')
+  } catch (e) {
+    fail(`classifier invariant harness failed: ${e?.message ?? e}`)
+  }
+}
+
+/* localization-leak + wiring checks (deep-audit P1-3/P1-5 + follow-ups) */
+{
+  const ladder = readFileSync(join(ROOT, 'src/app/components/cards/ActionLadder.tsx'), 'utf8')
+  if (/lowest risk|official channel|mistakes cost/.test(ladder)) {
+    fail('ActionLadder: hardcoded English ladder strings leaked back — subtitles must come from i18n packs')
+  } else ok('localization: ladder subtitles come from i18n packs')
+
+  const i18n = readFileSync(join(ROOT, 'src/app/data/i18n.ts'), 'utf8')
+  for (const key of ['step1Sub', 'whatsappHint', 'verifyStamp', 'closeStep1', 'coverageNotice', 'noticeExplainer']) {
+    if (!i18n.includes(`${key}:`)) fail(`i18n.ts missing key ${key}`)
+  }
+  ok('localization: deep-audit chrome keys present in i18n packs')
+
+  const lc = readFileSync(join(ROOT, 'src/app/data/localized-content.ts'), 'utf8')
+  const variantCount = (lc.match(/variants: \[/g) ?? []).length
+  if (variantCount < 5) {
+    fail(`localized-content: expected finding variants for 5 languages, found ${variantCount}`)
+  } else ok(`localization: finding Regenerate variants present ×${variantCount}`)
+
+  const chat = readFileSync(join(ROOT, 'src/app/pages/ChatPage.tsx'), 'utf8')
+  for (const [needle, why] of [
+    ['FOLLOW_UPS', 'turn-aware follow-ups missing — composer re-runs Turn 1'],
+    ['protectiveFooter', 'protective action bar missing during active stops'],
+    ['whenOptions', 'fact gate missing the merged purchase-window row'],
+    ['focusSelector', 'card-top scroll focus missing'],
+  ]) {
+    if (!chat.includes(needle)) fail(`ChatPage: ${why}`)
+  }
+  ok('journey: stage machine, follow-ups, protective footer, merged gate, focus scroll all wired')
+}
+
 /* ---------- report ---------- */
 console.log('LokAI v2 verify gate')
 console.log('─'.repeat(60))

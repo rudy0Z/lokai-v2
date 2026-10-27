@@ -1,7 +1,8 @@
 import { useApp } from '../lib/app-context'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
-import { isVaultCleared } from '../lib/vault'
+import { isVaultCleared, getMatterLog } from '../lib/vault'
+import { formatDate } from '../lib/format'
 import { MatterFolder } from '../components/documents/MatterFolder'
 import { ExhibitPaper } from '../components/documents/ExhibitPaper'
 
@@ -21,6 +22,7 @@ export default function SavedPage() {
   const cleared = isVaultCleared()
   const exhibits = cleared ? [] : EXHIBITS
   const saved = cleared ? [] : SAVED
+  const userSaved = getMatterLog().saved ?? []
   return (
     <AppShell activeTab="saved">
       <div className="scroll-calm flex-1 overflow-y-auto px-4 pt-5">
@@ -56,6 +58,20 @@ export default function SavedPage() {
                 ))}
               </section>
             </>
+          )}
+
+          {/* items the user saved themselves via the closure card (§6c) —
+              real device-local records, shown even after a demo-data wipe */}
+          {userSaved.length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-sm font-semibold text-fg-primary">{tr('savedFromChat')}</h2>
+              {userSaved.map((s, i) => (
+                <div key={`${s.savedAt}-${i}`} className="rounded-[22px] bg-card p-4">
+                  <p className="text-sm font-medium text-fg-primary">{s.title}</p>
+                  <p className="mt-0.5 font-mono text-2xs text-fg-tertiary">{formatDate(s.savedAt)}</p>
+                </div>
+              ))}
+            </section>
           )}
         </div>
       </div>

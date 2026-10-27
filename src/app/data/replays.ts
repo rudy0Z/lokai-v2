@@ -35,7 +35,7 @@ export type ReplayStep =
   | { kind: 'voice'; seconds: number; transcript: string }
   /** the human sends a prepared document from the mock tray */
   | { kind: 'document'; doc: string }
-  | { kind: 'card'; card: 'factcheck' | 'finding' | 'ladder' | 'caution' | 'protective' | 'handover' | 'noticecard' | 'noticeSummary'; why?: string; mode?: 'full' | 'free' }
+  | { kind: 'card'; card: 'factcheck' | 'finding' | 'ladder' | 'caution' | 'protective' | 'handover' | 'noticecard' | 'noticeSummary'; why?: string; mode?: 'full' | 'free'; correction?: { key: string; value: string }; correctionAfterMs?: number }
   | { kind: 'pause'; ms: number }
 
 export interface ReplayScript {
@@ -68,13 +68,15 @@ export const REPLAY_SCRIPTS: ReplayScript[] = [
     lang: 'hi',
     outcome: 'proceed',
     blurb:
-      'A mixer grinder arrives cracked on delivery day and HomeKart customer care refuses a replacement — the most common e-commerce dispute in India. The human types in Hindi, sends the GST invoice and the saved refusal chat, signs the fact gate, and gets the finding plus the lowest-risk-first ladder.',
+      'A mixer grinder arrives cracked on delivery day and HomeKart customer care refuses a replacement — the most common e-commerce dispute in India. The human types in Hindi, sends the GST invoice and the saved refusal chat, catches one wrong fact in the gate and corrects it, then signs — and gets the finding plus the lowest-risk-first ladder.',
     facts: [
       { key: 'item', label: 'Item', value: 'मिक्सर ग्राइंडर (750W)' },
       { key: 'seller', label: 'Seller', value: 'HomeKart' },
       { key: 'issue', label: 'Issue', value: 'डिलीवरी पर जार टूटा' },
       { key: 'ask', label: 'Refused', value: 'रिप्लेसमेंट और रिफंड' },
-      { key: 'when', label: 'Bought', value: '2 अक्टूबर 2026 (बिल)' },
+      // starts with the chip answer (approximate) — the correction beat
+      // below fixes it from the invoice, showing WHY the gate exists
+      { key: 'when', label: 'Bought', value: 'पिछले 30 दिनों में' },
     ],
     steps: [
       { kind: 'think', ms: 1400 },
@@ -107,7 +109,14 @@ export const REPLAY_SCRIPTS: ReplayScript[] = [
       },
       { kind: 'think', ms: 1000 },
       { kind: 'document', doc: 'whatsapp-refusal' },
-      { kind: 'card', card: 'factcheck' },
+      {
+        kind: 'card',
+        card: 'factcheck',
+        // the human corrects the purchase date from the invoice — the
+        // finding below is built from the corrected record
+        correction: { key: 'when', value: '2 अक्टूबर 2026 (बिल)' },
+        correctionAfterMs: 1800,
+      },
       { kind: 'pause', ms: 1700 },
       { kind: 'card', card: 'finding' },
       { kind: 'pause', ms: 700 },

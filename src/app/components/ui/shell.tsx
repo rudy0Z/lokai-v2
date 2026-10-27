@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
-import { LANG_OPTIONS } from '../../data/languages'
+import { ALL_LANGS, LANGUAGES } from '../../data/languages'
 import { navigate } from '../../lib/router'
 import { LogoMark } from './LogoMark'
 import { TabBar, type TabId } from './TabBar'
@@ -15,7 +15,8 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggleTheme}
       aria-label={`${tr('themeLabel')}: ${theme}`}
       className={cn(
-        'pressable inline-flex size-10 items-center justify-center rounded-full text-fg-secondary',
+        // 44px target (deep-audit P2-11) — the toggle is used by older users
+        'pressable inline-flex size-11 items-center justify-center rounded-full text-fg-secondary',
         className,
       )}
     >
@@ -26,6 +27,9 @@ export function ThemeToggle({ className }: { className?: string }) {
 
 export function LanguageSelect({ className }: { className?: string }) {
   const { lang, setLang, tr } = useApp()
+  // honest grouping (deep-audit §6(e)): full languages vs interface preview
+  const full = ALL_LANGS.filter((c) => LANGUAGES[c].coverage === 'full')
+  const preview = ALL_LANGS.filter((c) => LANGUAGES[c].coverage !== 'full')
   return (
     <label className={cn('inline-flex items-center', className)}>
       <span className="sr-only">{tr('langLabel')}</span>
@@ -33,13 +37,22 @@ export function LanguageSelect({ className }: { className?: string }) {
         value={lang}
         onChange={(e) => setLang(e.target.value as typeof lang)}
         aria-label={tr('langLabel')}
-        className="h-10 cursor-pointer rounded-full bg-transparent px-1.5 text-sm font-medium text-fg-secondary focus-visible:outline-none"
+        className="min-h-11 cursor-pointer rounded-full bg-transparent px-1.5 text-sm font-medium text-fg-secondary focus-visible:outline-none"
       >
-        {Object.values(LANG_OPTIONS).map((o) => (
-          <option key={o.code} value={o.code}>
-            {o.short}
-          </option>
-        ))}
+        <optgroup label={tr('langGroupFull')}>
+          {full.map((c) => (
+            <option key={c} value={c}>
+              {LANGUAGES[c].short}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label={tr('langGroupPreview')}>
+          {preview.map((c) => (
+            <option key={c} value={c}>
+              {LANGUAGES[c].short}
+            </option>
+          ))}
+        </optgroup>
       </select>
     </label>
   )
@@ -70,7 +83,7 @@ function ReviewerTour({ onUrdu }: { onUrdu: () => void }) {
             key={s.n}
             type="button"
             onClick={s.go}
-            className="pressable flex min-h-9 items-center gap-2.5 rounded-xl px-2 text-start text-2xs font-medium text-fg-secondary transition-colors hover:bg-hover-veil"
+            className="pressable flex min-h-11 items-center gap-2.5 rounded-xl px-2 text-start text-2xs font-medium text-fg-secondary transition-colors hover:bg-hover-veil"
           >
             <span className="font-mono text-2xs text-brand-fg">{s.n}</span>
             {s.label}

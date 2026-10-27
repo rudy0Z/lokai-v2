@@ -9,6 +9,7 @@ import { Chip } from '../ui/Chip'
 import { ConfidenceIndicator } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { ReasoningPill } from '../trust/ReasoningPill'
+import { SectionRef } from '../trust/SectionRef'
 import { CardActions } from './CardActions'
 
 /**
@@ -54,9 +55,8 @@ export function CautionCard({
           <p className="text-sm text-fg-primary">{JOURNEY_STRINGS.cautionIntro![lang]}</p>
           {legal && (
             <div className="flex flex-wrap items-center gap-2" lang="en">
-              <span className="font-mono text-2xs text-fg-secondary">
-                {legal.source} · {legal.sectionRef}
-              </span>
+              <span className="text-2xs text-fg-secondary">{legal.source}</span>
+              <SectionRef sectionRef={legal.sectionRef} />
               <VerificationBadge verified={legal.verified} />
             </div>
           )}

@@ -5,10 +5,10 @@ import { legalById } from '../data/legal-content'
 import {
   NOTICE_DOC,
   NOTICE_FIELDS,
-  NOTICE_NEXT_STEPS,
   NOTICE_SUMMARY,
   type NoticeField,
 } from '../data/notice-interpretation'
+import { NOTICE_FIELD_LABELS, NOTICE_NEXT_STEPS_L } from '../data/localized-content'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { Banner } from '../components/ui/Banner'
@@ -16,6 +16,7 @@ import { Button } from '../components/ui/Button'
 import { ConfidenceIndicator } from '../components/trust/ConfidenceIndicator'
 import { VerificationBadge } from '../components/trust/VerificationBadge'
 import { ReasoningPill } from '../components/trust/ReasoningPill'
+import { SectionRef } from '../components/trust/SectionRef'
 import { ScanDocument } from '../components/notice/ScanDocument'
 import { SpeakPill } from '../components/trust/SpeakPill'
 import { IconDoc, IconExternal } from '../components/ui/icons'
@@ -106,7 +107,9 @@ export default function NoticePage() {
                         {i + 1}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-2xs text-fg-tertiary">{field.label}</span>
+                        <span className="block text-2xs text-fg-tertiary">
+                          {NOTICE_FIELD_LABELS[lang]?.[field.id as keyof (typeof NOTICE_FIELD_LABELS)['en']] ?? field.label}
+                        </span>
                         <span className="block text-sm font-medium text-fg-primary">{values[field.id]}</span>
                       </span>
                       {field.confidence !== 'clear' && (
@@ -135,19 +138,16 @@ export default function NoticePage() {
           <section className="flex flex-col gap-2">
             <h2 className="text-sm font-semibold text-fg-primary">{tr('whatNext')}</h2>
             <div className="grid grid-cols-1 gap-2">
-              {NOTICE_NEXT_STEPS.map((step) => (
+              {(NOTICE_NEXT_STEPS_L[lang] ?? NOTICE_NEXT_STEPS_L.en!).map((label) => (
                 <div
-                  key={step.id}
+                  key={label}
                   className="rounded-xl border border-line-default bg-card px-3.5 py-3 text-sm text-fg-primary"
                 >
-                  {step.label}
+                  {label}
                 </div>
               ))}
             </div>
-            <Banner tone="info">
-              This reading explains what the notice says — it does not tell you whether to pay or dispute. For a
-              dispute, talk to a human helper first.
-            </Banner>
+            <Banner tone="info">{tr('noticeExplainer')}</Banner>
           </section>
 
           {/* sources */}
@@ -161,7 +161,7 @@ export default function NoticePage() {
                 <IconDoc className="size-4 shrink-0 text-fg-tertiary" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-fg-primary">{legal.source}</p>
-                  <p className="font-mono text-2xs text-fg-secondary">{legal.sectionRef}</p>
+                  <SectionRef sectionRef={legal.sectionRef} />
                 </div>
                 <IconExternal className="size-3.5 shrink-0 text-fg-tertiary" />
               </div>

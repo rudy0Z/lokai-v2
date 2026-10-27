@@ -3,8 +3,8 @@ import { useApp } from '../lib/app-context'
 import { navigate } from '../lib/router'
 import { REPLAY_SCRIPTS, replayById, type ReplayScript } from '../data/replays'
 import { paperDocById } from '../data/documents'
-import { FINDING } from '../data/refund-journey'
 import { NOTICE_FIELDS, NOTICE_NEXT_STEPS } from '../data/notice-interpretation'
+import { buildFinding, factsFromRows } from '../lib/matter-facts'
 import { LANGUAGES } from '../data/languages'
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
@@ -17,7 +17,7 @@ import { StreamText } from '../components/chat/StreamText'
 import { FindingCard } from '../components/cards/FindingCard'
 import { ActionLadder } from '../components/cards/ActionLadder'
 import { CautionCard } from '../components/cards/CautionCard'
-import { FactCheckCard } from '../components/cards/FactCheckCard'
+import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
 import { HandoverCard } from '../components/cards/HandoverCard'
 import { ProtectiveCard } from '../components/stop/ProtectiveCard'
 import { DocumentPaper } from '../components/documents/DocumentPaper'
@@ -48,7 +48,7 @@ type ReplayItem =
   | { id: number; kind: 'chips'; question: string; options: string[]; select: number; tapped: boolean }
   | { id: number; kind: 'voice'; seconds: number; transcript: string; revealed: boolean }
   | { id: number; kind: 'document'; docId: string }
-  | { id: number; kind: 'card'; card: ReplayCardKind; why?: string; mode?: 'full' | 'free' }
+  | { id: number; kind: 'card'; card: ReplayCardKind; why?: string; mode?: 'full' | 'free'; facts?: FactItem[] }
 
 const sleep = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
 
@@ -159,6 +159,11 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
   const patch = (id: number, change: Partial<ReplayItem>) =>
     setItems((prev) => prev.map((i) => (i.id === id ? ({ ...i, ...change } as ReplayItem) : i)))
 
+  /* the replay's cards are built from the SAME builders as the live thread,
+     fed the script's facts — the theater and the product can never disagree */
+  const replayFacts = factsFromRows(script.facts ?? [])
+  const replayFinding = buildFinding(replayFacts, script.lang)
+
   useEffect(() => {
     if (!playing) return
     let dead = false
@@ -248,7 +253,26 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
           }
           case 'card': {
             if (!alive()) return
-            push({ kind: 'card', card: step.card, why: step.why, mode: 'mode' in step ? step.mode : undefined })
+            const itemId = push({
+              kind: 'card',
+              card: step.card,
+              why: step.why,
+              mode: 'mode' in step ? step.mode : undefined,
+              facts: step.card === 'factcheck' ? script.facts : undefined,
+            })
+            // the human-correction beat (deep-audit §6b): the simulated
+            // human catches a wrong fact in the gate and fixes it — proof
+            // of WHY the gate exists
+            if (step.card === 'factcheck' && step.correction && script.facts) {
+              await sleep((step.correctionAfterMs ?? 1600) / s)
+              if (!alive()) return
+              patch(itemId, {
+                facts: script.facts.map((f) =>
+                  f.key === step.correction!.key ? { ...f, value: step.correction!.value } : f,
+                ),
+              })
+              await sleep(900 / s)
+            }
             await sleep((step.card === 'factcheck' ? 1700 : 900) / s)
             break
           }
@@ -432,7 +456,8 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
                     return (
                       <MessageBubble key={item.id} role="assistant">
                         <FactCheckCard
-                          facts={script.facts ?? []}
+                          key={JSON.stringify(item.facts ?? script.facts ?? [])}
+                          facts={item.facts ?? script.facts ?? []}
                           onConfirm={() => {
                             /* simulated tap: the script continues */
                           }}
@@ -442,13 +467,13 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
                   if (item.card === 'finding')
                     return (
                       <MessageBubble key={item.id} role="assistant">
-                        <FindingCard data={FINDING} />
+                        <FindingCard data={replayFinding} />
                       </MessageBubble>
                     )
                   if (item.card === 'ladder')
                     return (
                       <div key={item.id} className="ps-7">
-                        <ActionLadder mode={item.mode ?? 'full'} onOpenNotice={() => navigate('/notice')} />
+                        <ActionLadder mode={item.mode ?? 'full'} onOpenNotice={() => navigate('/notice')} facts={replayFacts} />
                       </div>
                     )
                   if (item.card === 'caution')

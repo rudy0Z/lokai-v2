@@ -28,6 +28,13 @@ export interface FactRecord {
   ask: 'refund' | 'replacement' | 'both' | ''
   /** purchase-window key chosen in the fact gate: 30 | 1to2 | 2plus | ns */
   when: '30' | '1to2' | '2plus' | 'ns' | ''
+  /**
+   * The user's SIGNED wording when they corrected the issue/ask row in the
+   * fact gate — templates prefer this over the normalized phrase so the
+   * correction verifiably flows into the finding and the drafts.
+   */
+  issueRaw?: string
+  askRaw?: string
 }
 
 export const EMPTY_FACTS: FactRecord = { item: '', seller: '', amount: '', issue: '', ask: '', when: '' }
@@ -45,7 +52,7 @@ export const DEMO_FACTS: FactRecord = {
 const AMOUNT_RE =
   /(?:₹|rs\.?\s*|rupees?\s*|रुपय[ेe]?\s*|rupaye\s*)([\d][\d,]*(?:\.\d+)?)|([\d][\d,]*(?:\.\d+)?)\s*(?:₹|rupees?|rs\.?|रुपय[ेe]?)/i
 
-const SELLER_RE = /\bfrom\s+([A-Z][A-Za-z0-9&.']*)|\b([A-Z][A-Za-z0-9&.']*)\s+se\b/
+const SELLER_RE = /\bfrom\s+([A-Z][A-Za-z0-9&']*)|\b([A-Z][A-Za-z0-9&']*)\s+se\b/
 
 const ITEM_RE =
   /(mixer\s*grinder|mixer|grinder|mixie|smartphone|phone|mobile|laptop|television|tv|headphones?|earbuds?|watch|kettle|pressure cooker|washing machine|refrigerator|fridge|fan|iron|product|item|मिक्सर\s*ग्राइंडर|मिक्सर|ग्राइंडर|जूसर|फ़ोन|मोबाइल|उत्पाद|वस्तु|மிக்சர்\s*கிரைண்டர்|மிக்சர்|மிக்சி|கிரைண்டர்|போன்|சாதனம்|مکسر\s*گرائنڈر|گرائنڈر|مکسر|فون|موبائل)/i
@@ -123,5 +130,43 @@ export function buildFinding(facts: FactRecord, lang: LangCode): FindingCardData
     ...b,
     legalId: 'cpa-defect-goods',
     confidence: 'clear',
+  }
+}
+
+/** recover a normalized issue key from the gate's display text (edited text → '' + raw) */
+export function issueKeyFromDisplay(value: string, lang: LangCode): FactRecord['issue'] {
+  const L = ISSUE_LABELS[lang] ?? ISSUE_LABELS.en!
+  const hit = (Object.entries(L) as [string, string][]).find(([, v]) => v === value)?.[0] ?? ''
+  return (['cracked', 'broken', 'faulty', 'notworking'] as readonly string[]).includes(hit)
+    ? (hit as FactRecord['issue'])
+    : ''
+}
+
+/** recover a normalized ask key from the gate's display text */
+export function askKeyFromDisplay(value: string, lang: LangCode): FactRecord['ask'] {
+  const L = ASK_LABELS[lang] ?? ASK_LABELS.en!
+  const hit = (Object.entries(L) as [string, string][]).find(([, v]) => v === value)?.[0] ?? ''
+  return (['refund', 'replacement', 'both'] as readonly string[]).includes(hit)
+    ? (hit as FactRecord['ask'])
+    : ''
+}
+
+/**
+ * Replays store facts as display rows (FactItem[]); convert them into a
+ * FactRecord for the builders. Issue/ask arrive as the user's own words, so
+ * they are carried as the signed raw text.
+ */
+export function factsFromRows(rows: { key: string; value: string }[]): FactRecord {
+  const get = (k: string) => rows.find((r) => r.key === k)?.value ?? ''
+  const amount = get('amount')
+  return {
+    item: get('item'),
+    seller: get('seller'),
+    amount: /^₹?\s*[\d]/.test(amount) ? amount : '',
+    issue: '',
+    ask: '',
+    when: '',
+    issueRaw: get('issue') || undefined,
+    askRaw: get('ask') || undefined,
   }
 }

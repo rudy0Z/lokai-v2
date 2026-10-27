@@ -8,6 +8,7 @@ import { Card } from '../ui/Card'
 import { Textarea } from '../ui/Field'
 import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
+import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
 import { LegalText } from '../trust/LegalText'
 import { SpeakPill } from '../trust/SpeakPill'
@@ -103,9 +104,10 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
               </dd>
               {legal && (
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-2xs text-fg-secondary">
-                    {legal.source} · {legal.sectionRef}
+                  <span className="text-2xs text-fg-secondary" lang="en">
+                    {legal.source}
                   </span>
+                  <SectionRef sectionRef={legal.sectionRef} />
                   <VerificationBadge verified={legal.verified} />
                 </div>
               )}
