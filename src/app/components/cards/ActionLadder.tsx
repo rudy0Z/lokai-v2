@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
@@ -6,6 +6,7 @@ import { copyText } from '../../lib/format'
 import { legalById } from '../../data/legal-content'
 import { buildDrafts } from '../../lib/matter-facts'
 import type { FactRecord } from '../../lib/matter-facts'
+import type { DomainChannel } from '../../data/domain-playbooks'
 import { Badge } from '../ui/Badge'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
@@ -20,7 +21,14 @@ export interface ActionLadderProps {
   onOpenNotice?: () => void
   /** the signed matter record — every draft is built from it, never hardcoded */
   facts?: FactRecord
+  /** domain playbook overrides (master spec Part 1): when present the ladder
+      speaks the domain's own drafts, prep list, step titles and channel */
+  drafts?: string[]
+  prep?: string[]
+  stepTitles?: [string, string, string]
+  channel?: DomainChannel
   className?: string
+  initialExpandedStep?: 1 | 2 | 3
 }
 
 function StepNumber({ n, tone = 'brand' }: { n: number; tone?: 'brand' | 'positive' | 'warning' }) {
@@ -39,19 +47,26 @@ function StepNumber({ n, tone = 'brand' }: { n: number; tone?: 'brand' | 'positi
   )
 }
 
-/** Step 1: editable, copyable WhatsApp draft — built from the signed facts. */
-function WhatsAppStep({ facts }: { facts?: FactRecord }) {
+/** Step 1: editable, copyable WhatsApp draft — built from the signed facts,
+    or supplied verbatim by a domain playbook. */
+function WhatsAppStep({ facts, drafts: draftsProp }: { facts?: FactRecord; drafts?: string[] }) {
   const { tr, lang } = useApp()
   const [text, setText] = useState('')
   const [idx, setIdx] = useState(0)
+  const [copied, setCopied] = useState(false)
 
-  const drafts = buildDrafts(facts ?? { item: '', seller: '', amount: '', issue: '', ask: '', when: '' }, lang)
+  const drafts = useMemo<string[]>(
+    () =>
+      draftsProp ??
+      buildDrafts(facts ?? { item: '', seller: '', amount: '', issue: '', ask: '', when: '' }, lang).drafts,
+    [facts, lang, draftsProp],
+  )
 
   useEffect(() => {
-    setText(drafts.drafts[idx] ?? '')
+    setText(drafts[idx] ?? '')
     // re-build whenever the signed facts, language or variant change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [facts, lang, idx])
+  }, [facts, lang, idx, drafts])
 
   return (
     <div className="flex flex-col gap-2.5">
@@ -63,6 +78,11 @@ function WhatsAppStep({ facts }: { facts?: FactRecord }) {
         aria-label="WhatsApp draft"
         className="scroll-calm w-full resize-y rounded-xl border border-line-default bg-container p-3 font-sans text-sm leading-relaxed text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
       />
+      {copied && (
+        <p className="rounded-xl bg-positive-subtle px-3 py-2 text-2xs text-on-positive-subtle">
+          {tr('ladderCopied')}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2">
         <Button
           variant="primary"
@@ -70,8 +90,10 @@ function WhatsAppStep({ facts }: { facts?: FactRecord }) {
           leadingIcon={<IconPencil className="size-3.5" />}
           onClick={async () => {
             const ok = await copyText(text)
-            if (ok) toast.success(tr('copied'))
-            else toast.error(tr('errorTitle'))
+            if (ok) {
+              toast.success(tr('copied'))
+              setCopied(true)
+            } else toast.error(tr('errorTitle'))
           }}
         >
           {tr('copy')}
@@ -80,7 +102,7 @@ function WhatsAppStep({ facts }: { facts?: FactRecord }) {
           variant="secondary"
           size="sm"
           leadingIcon={<IconRefresh className="size-3.5" />}
-          onClick={() => setIdx((i) => (i + 1) % drafts.drafts.length)}
+          onClick={() => setIdx((i) => (i + 1) % drafts.length)}
         >
           {tr('regenerate')}
         </Button>
@@ -89,17 +111,19 @@ function WhatsAppStep({ facts }: { facts?: FactRecord }) {
   )
 }
 
-/** Step 2: free national helpline with prep list. */
-function HelplineStep() {
+/** Step 2: the domain's escalation channel (1915 / 1930 / DLSA / SAMADHAN)
+    with its prep list — tokens come only from legal-content-backed data. */
+function ChannelStep({ prep, channel }: { prep?: string[]; channel?: DomainChannel }) {
   const { tr } = useApp()
-  const legal = legalById('national-consumer-helpline')
+  const legal = legalById(channel?.legalId ?? 'national-consumer-helpline')
+  const prepItems = prep ?? (['prepItem1', 'prepItem2', 'prepItem3', 'prepItem4'] as const).map((k) => tr(k))
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-xl border border-brand-line-subtle bg-brand-subtle px-3.5 py-3">
         <div className="flex items-baseline gap-2">
           <IconPhone className="size-4 translate-y-0.5 text-on-brand-subtle" />
           <span className="font-mono text-2xl font-semibold text-on-brand-subtle" lang="en">
-            1915
+            {channel?.token ?? '1915'}
           </span>
           <Badge tone="positive" variant="subtle">{tr('badgeFree')}</Badge>
         </div>
@@ -111,10 +135,10 @@ function HelplineStep() {
       <div>
         <p className="text-2xs font-semibold text-fg-secondary">{tr('haveReady')}</p>
         <ul className="mt-1.5 flex flex-col gap-1.5">
-          {(['prepItem1', 'prepItem2', 'prepItem3', 'prepItem4'] as const).map((key) => (
-            <li key={key} className="flex items-start gap-2 text-sm text-fg-primary">
+          {prepItems.map((item) => (
+            <li key={item} className="flex items-start gap-2 text-sm text-fg-primary">
               <IconCheck className="mt-1 size-3.5 shrink-0 text-positive-fg" />
-              {tr(key)}
+              {item}
             </li>
           ))}
         </ul>
@@ -123,30 +147,43 @@ function HelplineStep() {
   )
 }
 
-export function ActionLadder({ mode = 'full', onOpenNotice, facts, className }: ActionLadderProps) {
+export function ActionLadder({
+  mode = 'full',
+  onOpenNotice,
+  facts,
+  drafts,
+  prep,
+  stepTitles,
+  channel,
+  className,
+  initialExpandedStep,
+}: ActionLadderProps) {
   const { tr } = useApp()
   return (
     <section className={cn('flex flex-col gap-2.5', className)} aria-label={tr('ladderTitle')}>
       <p className="text-2xs font-medium text-fg-tertiary">{tr('ladderTitle')}</p>
       <Disclosure
         leading={<StepNumber n={1} tone="positive" />}
-        title={tr('step1Title')}
+        title={stepTitles?.[0] ?? tr('step1Title')}
         subtitle={tr('step1Sub')}
+        defaultOpen={initialExpandedStep === 1 || initialExpandedStep === undefined}
       >
-        <WhatsAppStep facts={facts} />
+        <WhatsAppStep facts={facts} drafts={drafts} />
       </Disclosure>
       <Disclosure
         leading={<StepNumber n={2} />}
-        title={tr('step2Title')}
+        title={stepTitles?.[1] ?? tr('step2Title')}
         subtitle={tr('step2Sub')}
+        defaultOpen={initialExpandedStep === 2}
       >
-        <HelplineStep />
+        <ChannelStep prep={prep} channel={channel} />
       </Disclosure>
       {mode === 'full' && (
         <Disclosure
           leading={<StepNumber n={3} tone="warning" />}
-          title={tr('step3Title')}
+          title={stepTitles?.[2] ?? tr('step3Title')}
           subtitle={tr('step3Sub')}
+          defaultOpen={initialExpandedStep === 3}
         >
           <div className="flex flex-col gap-2.5">
             <Banner tone="warning">{tr('ladderBanner')}</Banner>

@@ -1,4 +1,5 @@
 import type { LangCode } from './languages'
+import type { DomainId, DomainBranch } from './domain-playbooks'
 
 /**
  * Scope classification (Phase 2) — visible, editable, NEVER hidden in prose.
@@ -140,6 +141,8 @@ export interface ScopeDecision {
   why: string
   /** matched = a rule fired; uncertain = downgrade law applied */
   certainty: 'matched' | 'uncertain'
+  /** the domain playbook this decision belongs to (multi-domain engine) */
+  domain?: { id: DomainId; branch: DomainBranch }
 }
 
 const CONSUMER_SIGNALS =

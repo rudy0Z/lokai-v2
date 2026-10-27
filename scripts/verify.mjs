@@ -217,6 +217,8 @@ const PAIRS = [
   ['fg-secondary', 'sunken', 4.5],
   ['on-brand-solid', 'brand-solid', 4.5],
   ['brand-fg', 'shell', 4.5],
+  ['brand-fg', 'card', 4.5],
+  ['brand-fg', 'sunken', 4.5],
   ['on-brand-subtle', 'brand-subtle', 4.5],
   ['on-positive-solid', 'positive-solid', 4.5],
   ['on-positive-subtle', 'positive-subtle', 4.5],

@@ -107,7 +107,10 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
           <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
             {draft.title}
           </h3>
-          <dl className="flex flex-col gap-3" lang="en">
+          {/* NO lang="en" here: buildFinding localizes the body — an English
+              scope would strip :lang() font stacks and Nastaliq leading from
+              the card's main reading surface (DESIGN-AUDIT P1-2) */}
+          <dl className="flex flex-col gap-3">
             <div>
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
                 {tr('findingWhatHappened')}

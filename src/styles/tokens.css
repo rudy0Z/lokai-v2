@@ -369,6 +369,11 @@
 
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
+  /* promoted from arbitrary values (DESIGN-AUDIT P3 text-scale sweep) */
+  --text-sm-plus: 0.9375rem;
+  --text-sm-plus--line-height: 1.5rem;
+  --text-docket: 0.8125rem;
+  --text-docket--line-height: 1.125rem;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }

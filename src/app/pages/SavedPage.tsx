@@ -50,7 +50,7 @@ export default function SavedPage() {
               <section className="flex flex-col gap-2">
                 <h2 className="text-sm font-semibold text-fg-primary">{tr('savedTitle')}</h2>
                 {saved.map((s) => (
-                  <div key={s.id} className="rounded-[22px] bg-card p-4">
+                  <div key={s.id} className="rounded-2xl bg-card p-4">
                     <Badge tone="neutral" variant="outline" lang="en">{s.kind}</Badge>
                     <p className="mt-2 text-sm font-medium text-fg-primary" lang="en">{s.title}</p>
                     <p className="mt-0.5 font-mono text-2xs text-fg-tertiary" lang="en">{s.meta}</p>
@@ -66,7 +66,7 @@ export default function SavedPage() {
             <section className="flex flex-col gap-2">
               <h2 className="text-sm font-semibold text-fg-primary">{tr('savedFromChat')}</h2>
               {userSaved.map((s, i) => (
-                <div key={`${s.savedAt}-${i}`} className="rounded-[22px] bg-card p-4">
+                <div key={`${s.savedAt}-${i}`} className="rounded-2xl bg-card p-4">
                   <p className="text-sm font-medium text-fg-primary">{s.title}</p>
                   <p className="mt-0.5 font-mono text-2xs text-fg-tertiary">{formatDate(s.savedAt)}</p>
                 </div>

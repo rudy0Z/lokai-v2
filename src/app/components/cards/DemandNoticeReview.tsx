@@ -17,13 +17,26 @@ import { IconArrowLeft, IconCopy } from '../ui/icons'
  * Fields are BUILT FROM THE SIGNED FACTS (deep-audit fix) — no hardcoded
  * order numbers, amounts or dates.
  */
-export function DemandNoticeReview({ facts, onBack }: { facts: FactRecord; onBack: () => void }) {
+export function DemandNoticeReview({
+  facts,
+  subjectOverride,
+  bodyOverride,
+  onBack,
+}: {
+  facts: FactRecord
+  /** domain-playbook overrides (multi-domain engine) — the editable notice
+      speaks the domain's own demand, not the mixer template */
+  subjectOverride?: string
+  bodyOverride?: string
+  onBack: () => void
+}) {
   const { tr, lang } = useApp()
   const notice = buildNotice(facts, lang)
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries([
       ...notice.fields.map((f) => [f.key, f.value]),
-      ['body', notice.body],
+      ['subject', subjectOverride ?? notice.fields.find((f) => f.key === 'subject')?.value ?? ''],
+      ['body', bodyOverride ?? notice.body],
     ]),
   )
   const [consented, setConsented] = useState(false)
@@ -31,7 +44,11 @@ export function DemandNoticeReview({ facts, onBack }: { facts: FactRecord; onBac
 
   const compose = () =>
     [
-      ...notice.fields.map((f) => `${f.label}: ${values[f.key] ?? ''}`),
+      ...notice.fields.map((f) =>
+        f.key === 'subject' && subjectOverride
+          ? `${f.label}: ${values.subject ?? ''}`
+          : `${f.label}: ${values[f.key] ?? ''}`,
+      ),
       values.body ?? '',
     ]
       .join('\n\n')

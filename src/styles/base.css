@@ -88,6 +88,15 @@ a,
   color: var(--c-on-brand-subtle);
 }
 
+/* theme-switch suppression (better-ui recipe): every color transition on the
+   page would fire at once during the ivory<->night swap */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 /* Thin, calm scrollbars inside the app frame */
 .scroll-calm {
   scrollbar-width: thin;
@@ -231,8 +240,9 @@ a,
    product. Sage layers over the ivory ground; core disc in standout ink.
    ============================================================================ */
 .voice-orb {
-  --orb-outer: oklch(76% 0.055 140 / 0.34);
-  --orb-mid: oklch(62% 0.075 150 / 0.55);
+  /* light-theme lift (DESIGN-AUDIT P2-3): 0.34 alpha vanished on 98%-L ivory */
+  --orb-outer: oklch(72% 0.065 140 / 0.5);
+  --orb-mid: oklch(60% 0.08 150 / 0.66);
   --orb-core: var(--c-standout);
   position: relative;
   display: grid;
@@ -538,12 +548,7 @@ a,
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* reduced-motion: the targeted blocks above (pressable, stagger, orb,
+   caret, scan, waveform) already collapse motion — a global 0.01ms kill
+   here destroyed opacity/color feedback and dead-coded those blocks
+   (DESIGN-AUDIT P2-1, per Emil's "reduced = fewer/gentler, not zero") */

@@ -355,7 +355,11 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
           </Button>
           <div className="ms-auto flex min-w-8 items-center gap-1.5">
             <div className="h-1 w-16 overflow-hidden rounded-full bg-container" aria-hidden="true">
-              <div className="h-full rounded-full bg-brand-solid transition-all duration-300" style={{ width: `${progress}%` }} />
+              {/* transform-only: scaleX instead of animated width (DESIGN-AUDIT P3) */}
+              <div
+                className="h-full w-full origin-left rounded-full bg-brand-solid transition-transform duration-300"
+                style={{ transform: `scaleX(${progress / 100})` }}
+              />
             </div>
             <span className="text-2xs tabular-nums text-fg-tertiary">{progress}%</span>
           </div>

@@ -34,7 +34,7 @@ export default function HistoryPage() {
               key={h.id}
               type="button"
               onClick={() => navigate(`/matter/${h.id}`)}
-              className="pressable flex items-center gap-3 bg-card rounded-[22px] p-4 text-start transition-colors"
+              className="pressable flex items-center gap-3 bg-card rounded-2xl p-4 text-start transition-colors"
             >
               <IconDoc className="size-5 shrink-0 text-fg-tertiary" />
               <span className="min-w-0 flex-1">

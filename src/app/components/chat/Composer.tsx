@@ -64,6 +64,7 @@ export function Composer({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.16 }}
+            style={{ transformOrigin: 'bottom center' }}
             className="absolute inset-x-0 bottom-full mb-2 rounded-2xl border border-line-default bg-modal p-3 shadow-large"
             role="dialog"
             aria-label={tr('attachTitle')}
@@ -93,7 +94,7 @@ export function Composer({
 
       <div
         className={cn(
-          'rounded-[26px] bg-sunken transition-shadow duration-200',
+          'rounded-3xl bg-sunken transition-shadow duration-200',
           offline ? 'opacity-60' : 'focus-within:shadow-[0_0_0_1.5px_var(--c-brand-line)]',
         )}
       >

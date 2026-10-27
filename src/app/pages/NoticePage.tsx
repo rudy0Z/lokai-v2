@@ -76,7 +76,7 @@ export default function NoticePage() {
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
           {/* what this means */}
-          <section className="bg-card rounded-[22px] p-4">
+          <section className="bg-card rounded-2xl p-4">
             <div className="flex items-start justify-between gap-2">
               <h1 className="font-serif text-xl font-semibold leading-snug text-fg-primary">{tr('noticeMeaning')}</h1>
               <SpeakPill text={NOTICE_SUMMARY[lang] ?? NOTICE_SUMMARY.en!} className="shrink-0" />
@@ -93,7 +93,7 @@ export default function NoticePage() {
             <ol className="flex flex-col gap-2">
               {NOTICE_FIELDS.map((field) => (
                 <li key={field.id}>
-                  <div className="bg-card rounded-[22px]">
+                  <div className="bg-card rounded-2xl">
                     <button
                       type="button"
                       aria-expanded={openField?.id === field.id}

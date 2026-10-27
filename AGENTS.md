@@ -40,7 +40,7 @@ src/app/pages/          ← routes; never reach past primitives
 
 - Use token utilities (`bg-shell`, `text-fg-secondary`, `border-line-default`, `rounded-2xl`…). Raw hex,
   inline `fontFamily`/`fontSize`/`lineHeight` in TSX fail the gate.
-- **ONE accent** (deep navy `brand-*`). Saffron exists only inside the logo mark (`--c-spark`), never as UI
+- **ONE accent** (deep botanical green `brand-*`). Saffron exists only inside the logo mark (`--c-spark`), never as UI
   accent. Status colors are semantic only.
 - Elevation is border-first (`border-line-default`); shadows (`shadow-default/large/xl`) are rare and soft.
 - Light and dark are equal citizens: dark theme = pure re-pointing in `[data-theme="dark"]`. New token pairs

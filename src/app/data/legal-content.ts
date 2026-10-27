@@ -71,6 +71,76 @@ export const LEGAL_CONTENT: LegalEntry[] = [
     notes: 'Prototype shows a clearly-marked placeholder contact until real data is added.',
   },
   {
+    id: 'cpa-ecommerce-grievance',
+    claim:
+      'An online marketplace must run a grievance process for defective deliveries, and its own store policy cannot shorten or waive the remedies the law gives the consumer.',
+    source: 'Consumer Protection (E-Commerce) Rules, 2020',
+    sectionRef: '[VERIFY — rule citation & acknowledgement window]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the refund-domain playbook. Owner must verify the rule citation and the acknowledgement window before any flip.',
+  },
+  {
+    id: 'tpa-wear-tear',
+    claim:
+      'A tenant must return premises as received, allowing for reasonable wear and tear — routine repainting after a long stay is the owner’s cost, and deductions need itemised bills.',
+    source: 'Transfer of Property Act, 1888 (India)',
+    sectionRef: 'S. 108 [VERIFY — clause letter; state rent acts may override]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the deposit-domain playbook. State-specific rent/control acts must be checked before any flip.',
+  },
+  {
+    id: 'tpa-implied-tenancy',
+    claim:
+      'Regular rent payments and a deposit transfer can establish a month-to-month tenancy even without a written agreement.',
+    source: 'Transfer of Property Act, 1888 (India)',
+    sectionRef: 'S. 106 [VERIFY — tacit month-to-month tenancy]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the deposit informal (no-agreement) caution.',
+  },
+  {
+    id: 'contract-mistake-72',
+    claim:
+      'Money paid to another person by mistake can be recovered — the recipient has no right to keep it.',
+    source: 'Indian Contract Act, 1872 (India)',
+    sectionRef: 'S. 72 [VERIFY — money paid by mistake]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the UPI wrong-credit playbook.',
+  },
+  {
+    id: 'npci-wrong-credit',
+    claim:
+      'Banks and the UPI operator run a dispute window for wrongly credited transfers, and the receiving bank can place a hold on the credited amount.',
+    source: 'NPCI UPI dispute redressal mechanism',
+    sectionRef: '[VERIFY — circular number & dispute window]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the UPI playbook ladder. Circular number deliberately unstated until verified.',
+  },
+  {
+    id: 'payment-wages-ff',
+    claim:
+      'After the notice period is served and assets are cleared, earned wages and the relieving certificate must be released; a free online labour-portal claim exists for withholding.',
+    source: 'Payment of Wages Act, 1936 / labour grievance portals',
+    sectionRef: '[VERIFY — act applicability & portal URL]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the salary playbook. Portal name lives here only, [VERIFY]-badged.',
+  },
+  {
+    id: 'cyber-fraud-report',
+    claim:
+      'A national cybercrime reporting channel exists to flag fraudulent or withheld payment transactions quickly, and the receiving account can be flagged.',
+    source: 'National cybercrime reporting portal / helpline',
+    sectionRef: '1930 [VERIFY — number & portal]',
+    verified: false,
+    lastChecked: '2026-10-28',
+    notes: 'Backs the refund-informal and UPI playbooks. Same [VERIFY] pattern as the 1915 entry.',
+  },
+  {
     id: 'mmc-property-tax',
     claim:
       'Municipal corporations issue annual property-tax demands under their governing municipal act; the demand notice states the amount, the period, and the payment deadline.',

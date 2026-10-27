@@ -223,6 +223,8 @@ export interface UiStrings {
   resetVault: Pack
   vaultResetDone: Pack
   factSigned: Pack
+  ladderCopied: Pack
+  voiceMetaCaption: Pack
   voiceSpotted: Pack
   copyHandoverNote: Pack
   coverageNotice: Pack
@@ -569,6 +571,8 @@ export const UI: UiStrings = {
   vaultResetDone: { en: 'Local vault reset — sample history returns.', hi: 'लोकल वॉल्ट रीसेट — नमूना इतिहास लौट आया।', mr: 'लोकल व्हॉल्ट रीसेट — नमुना इतिहास परत आला.', ta: 'உள்ளூர் கிடங்கு மீட்டமைக்கப்பட்டது — மாதிரி வரலாறு திரும்பியது.', ur: 'لوکل والٹ ری سیٹ — نمونہ تاریخ واپس آ گیا۔' },
   voiceSpotted: { en: 'Spotted in your transcript', hi: 'आपके ट्रांसक्रिप्ट में मिला', mr: 'तुमच्या ट्रान्स्क्रिप्टमध्ये आढळले', ta: 'உங்கள் எழுத்துப்பெயர்ப்பில் கண்டறியப்பட்டது', ur: 'آپ کے ٹرانسکرپٹ میں ملا' },
   factSigned: { en: '✓ {n} case facts confirmed', hi: '✓ {n} केस तथ्य पक्के किए', mr: '✓ {n} बाब-वस्तुस्थिती निश्चित', ta: '✓ {n} வழக்கு உண்மைகள் உறுதி', ur: '✓ {n} کیس حقائق مستند' },
+  ladderCopied: { en: '✓ Draft copied to your clipboard — nothing was sent. If the deadline passes, come back for Step 2.', hi: '✓ मसौदा क्लिपबोर्ड पर कॉपी हुआ — कुछ नहीं भेजा गया। समय-सीमा निकल जाए तो चरण 2 पर लौटें।', mr: '✓ मसुदा क्लिपबोर्डवर कॉपी झाला — काहीही पाठवले नाही. मुदत उलटली तर पायरी 2 साठी परत या.', ta: '✓ வரைவு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது — எதுவும் அனுப்பப்படவில்லை. காலக்கெடு முடிந்தால் படி 2-க்குத் திரும்புங்கள்.', ur: '✓ مسودہ کلپ بورڈ پر کاپی ہوا — کچھ نہیں بھیجا گیا۔ مدت گزر جائے تو مرحلہ 2 پر واپس آئیں۔' },
+  voiceMetaCaption: { en: 'Voice transcript · Entities verified', hi: 'वॉइस ट्रांसक्रिप्ट · तत्व जाँचे गए', mr: 'व्हॉइस ट्रान्स्क्रिप्ट · घटक तपासले', ta: 'குரல் எழுத்துப்பெயர்ப்பு · உறுப்புகள் சரிபார்க்கப்பட்டன', ur: 'وائس ٹرانسکرپٹ · اجزاء جانچے گئے' },
   copyHandoverNote: { en: 'Copy handover note', hi: 'हैंडओवर नोट कॉपी करें', mr: 'हँडओव्हर नोंद कॉपी करा', ta: 'கையளிப்புக் குறிப்பை நகலெடு', ur: 'ہینڈ اوور نوٹ کاپی کریں' },
   coverageNotice: {
     en: 'Interface translated (AI-drafted, unreviewed) — the legal cards below stay in English until the translation pass is human-reviewed. Everything else on this screen falls back to English by the visible coverage law.',

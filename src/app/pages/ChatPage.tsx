@@ -7,6 +7,7 @@ import { classifyMatter, reRouteAsCaution, SCOPE_RULES, type ScopeDecision } fro
 import { REASSURANCE, SCENARIO_SEEDS } from '../data/refund-journey'
 import { FOLLOW_UPS, INFORMAL_CAUTION } from '../data/localized-content'
 import { scenarioById, type TesterOption } from '../data/interactive-scenarios'
+import { domainPack, type DomainId, type DomainBranch } from '../data/domain-playbooks'
 import {
   extractFacts,
   factRows,
@@ -19,6 +20,7 @@ import {
 import { LANGUAGES } from '../data/languages'
 import { matterById } from '../data/matters'
 import { CaseContinuityHeader } from '../components/cases/CaseContinuityHeader'
+import { ThreadSummaryCard } from '../components/cases/ThreadSummaryCard'
 import { AppShell } from '../components/ui/shell'
 import { Banner } from '../components/ui/Banner'
 import { Button } from '../components/ui/Button'
@@ -36,11 +38,12 @@ import { StopScreen } from '../components/stop/StopScreen'
 import { ProtectiveCard } from '../components/stop/ProtectiveCard'
 import { HandoverCard, WHAT_TO_BRING } from '../components/cards/HandoverCard'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
-import { IconCamera, IconKeyboard, IconCopy, IconPlay } from '../components/ui/icons'
+import { IconCamera, IconFolder, IconKeyboard, IconCopy, IconPlay } from '../components/ui/icons'
 import { useSpans } from '../lib/useSpans'
 import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
 import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
+import { StatutoryCounterCard } from '../components/cards/StatutoryCounterCard'
 import { TesterPrompts } from '../components/chat/TesterPrompts'
 import { Card } from '../components/ui/Card'
 
@@ -57,30 +60,40 @@ type ItemKind =
   | 'noticecard'
   | 'protective'
   | 'closeout'
+  | 'counter'
 
 interface ChatItem {
-    id: number
-    kind: ItemKind
-    text?: string
-    /** mock attachments sent with the message (rendered as evidence chips) */
-    atts?: string[]
-    variant?: 'full' | 'free'
+  id: number
+  kind: ItemKind
+  text?: string
+  /** mock attachments sent with the message (rendered as evidence chips) */
+  atts?: string[]
+  /** the message came through the simulated voice capture — render the note header */
+  voice?: boolean
+  variant?: 'full' | 'free'
   /** assistant text still revealing (caret streaming) */
   stream?: boolean
   /** the scope decision attached to protective/handover/caution items */
   decision?: ScopeDecision
+  initialExpandedStep?: 1 | 2 | 3
+  counterData?: {
+    title: string
+    statutoryBasis: string
+    replyText: string
+  }
 }
 
 /**
  * Conversational stage (deep-audit P0 fix): follow-ups in the composer are
  * no longer re-classified as Turn 1. intake = before the first finding;
+ * clarifying = waiting for missing facts (Turn 1.5 loop);
  * engaged = a finding/ladder/caution is on the table; stopped = a protective
  * stop landed. Safety patterns (strongStop) always win over the stage.
  */
-type ThreadStage = 'intake' | 'engaged' | 'stopped'
+type ThreadStage = 'intake' | 'clarifying' | 'engaged' | 'stopped'
 
 const CARD_KINDS = new Set<ItemKind>([
-  'finding', 'ladder', 'caution', 'factcheck', 'protective', 'handover', 'noticecard', 'closeout', 'error',
+  'finding', 'ladder', 'caution', 'factcheck', 'protective', 'handover', 'noticecard', 'closeout', 'counter', 'error',
 ])
 
 const RE_PROMISE =
@@ -112,11 +125,14 @@ export default function ChatPage() {
   const [factItems, setFactItems] = useState<FactItem[]>([])
   const [factSigned, setFactSigned] = useState(false)
   const [composerOpen, setComposerOpen] = useState(false)
+  const [domain, setDomain] = useState<{ id: DomainId; branch: DomainBranch } | null>(null)
+  const [subSummaryOpen, setSubSummaryOpen] = useState(false)
 
   const idRef = useRef(0)
   const retryRef = useRef<(() => void) | null>(null)
   const cancelRef = useRef(false)
   const lastUserRef = useRef('')
+  const voiceRef = useRef(false)
 
   const nextId = () => ++idRef.current
   const push = (...newItems: Omit<ChatItem, 'id'>[]) =>
@@ -203,10 +219,11 @@ export default function ChatPage() {
   const followUp = (currentStage: ThreadStage) => {
     const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
     const text = lastUserRef.current
+    const domainPackLive = domain ? domainPack(domain.id, domain.branch, lang) : null
     const msg = RE_PROMISE.test(text)
       ? pack.outcome
       : RE_ESCALATE.test(text)
-        ? pack.escalate
+        ? (domainPackLive?.escalate ?? pack.escalate)
         : currentStage === 'stopped'
           ? pack.stopped
           : pack.general
@@ -216,7 +233,8 @@ export default function ChatPage() {
   }
 
   const handleSend = (text: string, atts: string[], fail = false) => {
-    push({ kind: 'user', text, atts })
+    push({ kind: 'user', text, atts, voice: voiceRef.current })
+    voiceRef.current = false
     lastUserRef.current = text
 
     // safety first: strong hard-stop signals win over everything, any turn
@@ -231,8 +249,9 @@ export default function ChatPage() {
       return
     }
 
-    if (stageRef.current !== 'intake') {
-      followUp(stageRef.current)
+    if (activeCase || stageRef.current !== 'intake') {
+      stageRef.current = 'engaged'
+      followUp('engaged')
       return
     }
 
@@ -282,6 +301,46 @@ export default function ChatPage() {
    * the honest time-barred caution.
    */
   const confirmFacts = (values: Record<string, string>) => {
+    setFactSigned(true)
+    stageRef.current = 'engaged'
+
+    /* domain flows: the playbook's own finding or caution, built from the
+       signed rows — never the mixer script */
+    if (domain) {
+      const pack = domainPack(domain.id, domain.branch, lang)
+      if (domain.branch === 'informal' && pack.caution) {
+        const decision: ScopeDecision = {
+          tier: 'caution',
+          ruleId: 'domain-' + domain.id,
+          label: domain.id,
+          why: pack.caution.body,
+          certainty: 'matched',
+          domain,
+        }
+        run('caution', () => {
+          push({ kind: 'caution', decision }, { kind: 'ladder', variant: 'full' })
+        })
+        return
+      }
+      const f = pack.finding
+      run('progress', () => {
+        setFindingData({
+          title: f.title,
+          whatHappened:
+            pack.facts.find((x) => x.key === 'timeline')?.value ??
+            pack.facts.find((x) => x.key === 'position')?.value ??
+            '',
+          lawSays: f.lawSays,
+          means: f.means,
+          legalId: f.legalId,
+          confidence: 'clear',
+          reasoningSteps: f.reasoning,
+        })
+        push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' }, { kind: 'closeout' })
+      })
+      return
+    }
+
     // recover the normalized keys from the row's display text; if the user
     // re-typed the row, carry their exact wording through as the raw text —
     // their signed wording beats the normalized phrase in every template
@@ -390,14 +449,92 @@ export default function ChatPage() {
     push({ kind: 'user', text })
     lastUserRef.current = text
     stageRef.current = 'engaged'
-    const pack = FOLLOW_UPS[activeCase?.lang ?? lang] ?? FOLLOW_UPS.en!
-    if (index === 2) {
+    const cLang = activeCase?.lang ?? lang
+
+    if (index === 0) {
+      // Chip 1: Ghosted after 48h -> Step 2 NCH / regulatory docket prep
       run('progress', () => {
-        push({ kind: 'assistant', stream: true, text: pack.general }, { kind: 'closeout' })
+        push(
+          {
+            kind: 'assistant',
+            stream: true,
+            text:
+              cLang === 'hi'
+                ? '48 घंटे तक कोई लिखित जवाब न मिलना सेवा में कमी का स्पष्ट दस्तावेज़ी सबूत है। अब हम चरण 2: राष्ट्रीय उपभोक्ता हेल्पलाइन (1915) या मध्यस्थता पर आगे बढ़ते हैं — आपका डॉकेट तैयार है।'
+                : cLang === 'mr'
+                  ? '४८ तास कोणतेही उत्तर न मिळणे हा टाळाटाळीचा थेट पुरावा आहे. आता आपण पायरी २: राष्ट्रीय ग्राहक हेल्पलाइन (१९१५) किंवा लवादाकडे जाऊ.'
+                  : cLang === 'ta'
+                    ? '48 மணி நேரமாக பதில் வராதது சேவைக் குறைபாட்டின் தெளிவான ஆவணம். இப்போது படி 2: தேசிய நுகர்வோர் உதவி எண் (1915)-க்கு செல்லலாம்.'
+                    : cLang === 'ur'
+                      ? '48 گھنٹے تک کوئی تحریری جواب نہ ملنا عدم توجہی کا واضح ثبوت ہے۔ اب ہم مرحلہ 2: قومی کنزیومر ہیلپ لائن (1915) پر آگے بڑھتے ہیں۔'
+                      : '48 hours with no reply gives you a documented paper trail of non-responsiveness. Under statutory grievance rules, you now advance to Step 2: National Consumer Helpline (1915) or regulatory docket prep.',
+          },
+          { kind: 'ladder', variant: 'full', initialExpandedStep: 2 },
+        )
+      })
+    } else if (index === 1) {
+      // Chip 2: Rejected / Seller pushback -> Statutory counter-reply card with 1-tap copy
+      const counterText =
+        activeCase?.id === 'h2'
+          ? 'Under Section 108(m) of the Transfer of Property Act, 1882 and Section 70 of Indian Contract Act, normal wear-and-tear and painting are the landlord’s statutory obligation. Withholding ₹35,000 without actual GST damage bills is legally unsustainable. Please refund the ₹35,000 within 7 days, failing which legal proceedings will follow.'
+          : activeCase?.id === 'h3'
+            ? 'In response to Assessment Notice, I submit that the claimed arrears of ₹18,450 are disputed under Section 149 of Municipal Corporation Act due to faulty meter assessment. Kindly fix a hearing date within the statutory 15-day objection window.'
+            : `Under Section 84 of the Consumer Protection Act, 2019, goods that arrive defective out of the box (Dead on Arrival) entitle the consumer to a full refund or replacement. Company store policy cannot waive statutory liability. Please arrange pickup and refund of ${activeCase?.amount ?? '₹8,999'} within 48 hours.`
+      run('progress', () => {
+        push(
+          {
+            kind: 'assistant',
+            stream: true,
+            text:
+              cLang === 'hi'
+                ? 'कंपनी या मकान मालिक की आंतरिक पॉलिसी कानूनी अधिकारों को नहीं काट सकती। यहाँ आपके लिए लक्षित कानूनी जवाबी संदेश तैयार है:'
+                : cLang === 'mr'
+                  ? 'कंपनी किंवा मालकाचे अंतर्गत नियम कायदेशीर तरतुदींना डावलू शकत नाहीत. आपल्यासाठी कायदेशीर प्रतिवाद संदेश खाली तयार आहे:'
+                  : cLang === 'ta'
+                    ? 'கம்பெனி அல்லது ஓனரின் உள் பாலிசி சட்ட உரிமைகளை குறைக்க முடியாது. வாட்ஸ்அப் அனுப்ப சட்டபூர்வ பதில் கீழே தயாராக உள்ளது:'
+                    : cLang === 'ur'
+                      ? 'کمپنی یا مالک کی اندرونی پالیسی قانونی حقوق کو کم نہیں کر سکتی۔ آپ کے لیے قانونی جوابی پیغام نیچے تیار ہے:'
+                      : 'A seller or landlord’s internal policy cannot shorten statutory remedies. Here is a targeted statutory counter-reply with your locked facts ready for WhatsApp:',
+          },
+          {
+            kind: 'counter',
+            counterData: {
+              title: 'Statutory Counter-Reply (WhatsApp)',
+              statutoryBasis:
+                activeCase?.id === 'h2'
+                  ? 'Transfer of Property Act, 1882 · S. 108(m) [VERIFY]'
+                  : activeCase?.id === 'h3'
+                    ? 'Municipal Corporation Act · S. 149 [VERIFY]'
+                    : 'Consumer Protection Act, 2019 · S. 84 [VERIFY]',
+              replyText: counterText,
+            },
+          },
+        )
       })
     } else {
+      // Chip 3: Agreed / Resolved -> CloseOutCard + mark resolved
+      if (activeCase) {
+        activeCase.resolved = true
+        activeCase.statusLine = 'Resolved · User recorded'
+      }
       run('progress', () => {
-        push({ kind: 'assistant', stream: true, text: pack.escalate })
+        push(
+          {
+            kind: 'assistant',
+            stream: true,
+            text:
+              cLang === 'hi'
+                ? 'बहुत बढ़िया — आपके शांत और दस्तावेज़ी तरीक़े से विवाद हल हुआ! मैंने इस केस को आपके फोल्डर में “सुलझा हुआ” (Resolved) दर्ज कर दिया है।'
+                : cLang === 'mr'
+                  ? 'अभिनंदन — आपल्या शांत आणि कागदोपत्री प्रयत्नांमुळे वाद सुटला! मी हा खटला आपल्या फोल्डरमध्ये “निकाली” नोंदवला आहे.'
+                  : cLang === 'ta'
+                    ? 'அருமை — உங்கள் அமைதியான ஆவணப் பதிவு பலன் தந்தது! இந்த வழக்கின் தீர்வை உங்கள் கோப்பில் பதிவு செய்துவிட்டேன்.'
+                    : cLang === 'ur'
+                      ? 'شاندار — آپ کے پرامن اور تحریری ثبوتوں سے معاملہ حل ہو گیا! میں نے اس کیس کو آپ کے فولڈر میں “حل شدہ” درج کر دیا ہے۔'
+                      : 'That is a great outcome — your calm, documented paper trail resolved the issue. I have closed this matter and archived the final resolution record in your Case Folder.',
+          },
+          { kind: 'closeout' },
+        )
       })
     }
   }
@@ -410,14 +547,56 @@ export default function ChatPage() {
     return { tier: 'caution', ruleId: 'informal-seller', label: 'Informal seller', why: pack.body, certainty: 'matched' }
   }
 
+  /* multi-domain engine (master spec Part 1): the option enters its domain
+     playbook — domain empathy, domain fact rows, domain finding/caution and
+     a domain ladder. The generic refund flow stays for free-typed input. */
+  const startDomainFlow = (o: TesterOption) => {
+    const id = o.domain!
+    const branch = o.branch ?? 'standard'
+    run('explain', () => {
+      const pack = domainPack(id, branch, lang)
+      setDomain({ id, branch })
+      setFactItems(
+        o.factOverrides
+          ? pack.facts.map((f) => ({ ...f, value: o.factOverrides!.find((x) => x.key === f.key)?.value ?? f.value }))
+          : pack.facts,
+      )
+      setFactSigned(false)
+      push({ kind: 'assistant', stream: true, text: pack.empathy }, { kind: 'factcheck' })
+    })
+  }
+
   const handleScenarioOption = (o: TesterOption) => {
     push({ kind: 'user', text: o.text })
     lastUserRef.current = o.text
+    if (o.domain) {
+      startDomainFlow(o)
+      return
+    }
     switch (o.route) {
       case 'proceed':
-      case 'vague':
         startConsumerFlow(false, o.text)
         return
+      case 'vague': {
+        stageRef.current = 'clarifying'
+        run('explain', () => {
+          push({
+            kind: 'assistant',
+            stream: true,
+            text:
+              lang === 'hi'
+                ? 'मैं समझ सकता हूँ कि यह स्थिति परेशान करने वाली है। आपके कानूनी अधिकार और सही कदम तय करने के लिए, क्या आप दो बातें बता सकते हैं: (1) सामान या डिपॉज़िट की कुल राशि कितनी है, और (2) यह कितने दिन पहले हुआ था?'
+                : lang === 'mr'
+                  ? 'मी समजू शकतो की ही परिस्थिती त्रासदायक आहे. आपले कायदेशीर हक्क ठरवण्यासाठी, कृपया दोन गोष्टी सांगा: (1) एकूण रक्कम किती अडकली आहे, आणि (2) हे किती दिवसांपूर्वी घडले होते?'
+                  : lang === 'ta'
+                    ? 'இது கவலையளிக்கும் விஷயம் என்பதை புரிந்து கொள்ள முடிகிறது. சட்டபூர்வ வழியை தீர்மானிக்க, இரண்டு விஷயங்களை கூறுங்கள்: (1) பொருட்கள் அல்லது முன்பணத்தின் தொகை எவ்வளவு, மற்றும் (2) இது எத்தனை நாட்களுக்கு முன் நடந்தது?'
+                    : lang === 'ur'
+                      ? 'میں سمجھ سکتا ہوں کہ یہ صورتحال پریشان کن ہے۔ قانونی حل طے کرنے کے لیے، کیا آپ دو باتیں بتا سکتے ہیں: (1) کل رقم کتنی ہے، اور (2) یہ کتنے دن پہلے ہوا تھا؟'
+                      : 'I understand this is stressful. To pin down your exact statutory leverage, could you tell me: (1) what was the purchase or deposit amount, and (2) how many days or weeks ago did this happen?',
+          })
+        })
+        return
+      }
       case 'informal':
         startCautionFlow(informalDecision())
         return
@@ -455,12 +634,15 @@ export default function ChatPage() {
   const testerOptions: TesterOption[] | undefined = scenario
     ? (stageRef.current === 'intake'
         ? scenario.turn1[lang] ?? scenario.turn1.en
-        : scenario.postFinding?.[lang] ?? scenario.postFinding?.en)
+        : stageRef.current === 'clarifying'
+          ? scenario.clarifyPrompts?.[lang] ?? scenario.clarifyPrompts?.en
+          : scenario.postFinding?.[lang] ?? scenario.postFinding?.en)
     : undefined
 
   const reset = () => {
     setItems([])
     setActiveCase(null)
+    setDomain(null)
     setFactSigned(false)
     setStopDecision(null)
     setProtectDecision(null)
@@ -495,6 +677,7 @@ export default function ChatPage() {
       } catch {
         /* ignore */
       }
+      voiceRef.current = true
       handleSend(pending!.trim(), [])
     }, 450)
     return () => window.clearTimeout(t)
@@ -625,12 +808,18 @@ export default function ChatPage() {
         // active stop shows the protective action bar; everything else is the
         // composer (typing stays live during beats). Tester prompt cards sit
         // right above the composer during a branching scenario.
-        empty && !activeCase && !composerOpen ? undefined : noticeOpen || stopDecision ? undefined : (
+        empty && !activeCase && !composerOpen && !scenario ? undefined : noticeOpen || stopDecision ? undefined : (
           protectiveFooter ?? (
             <div className="flex flex-col gap-2">
               {testerOptions && testerOptions.length > 0 && (
                 <TesterPrompts
-                  label={stageRef.current === 'intake' ? tr('testerHint') : tr('postFindingLabel')}
+                  label={
+                    stageRef.current === 'intake'
+                      ? tr('testerHint')
+                      : stageRef.current === 'clarifying'
+                        ? 'Clarification replies · 1-tap test'
+                        : tr('postFindingLabel')
+                  }
                   options={testerOptions}
                   onPick={handleScenarioOption}
                 />
@@ -649,7 +838,13 @@ export default function ChatPage() {
       }
     >
       {noticeOpen ? (
-        <DemandNoticeReview key={`${lang}-${matterFacts.amount}-${matterFacts.item}`} facts={matterFacts} onBack={() => setNoticeOpen(false)} />
+        <DemandNoticeReview
+          key={`${lang}-${matterFacts.amount}-${matterFacts.item}`}
+          facts={matterFacts}
+          subjectOverride={domain ? domainPack(domain.id, domain.branch, lang).noticeSubject : undefined}
+          bodyOverride={domain ? domainPack(domain.id, domain.branch, lang).noticeBody : undefined}
+          onBack={() => setNoticeOpen(false)}
+        />
       ) : stopDecision ? (
         <StopScreen
           decision={stopDecision}
@@ -658,6 +853,51 @@ export default function ChatPage() {
         />
       ) : (
         <>
+          {/* Context Sub-Bar (master spec Part 4): the 390px header stays
+              [sidebar | logo | lang | theme]; the case context + live-summary
+              affordance live on their own slim strip below it */}
+          {activeCase && !noticeOpen && !stopDecision && (
+            <>
+              <div className="flex h-[34px] shrink-0 items-center justify-between border-b border-line-subtle bg-sunken/70 px-4">
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <IconFolder className="size-3.5 shrink-0 text-brand-fg" />
+                  <span className="truncate text-2xs font-medium text-fg-primary" lang={activeCase.lang}>
+                    {activeCase.titleNative}
+                  </span>
+                  <span className="ms-1 shrink-0 font-mono text-2xs text-fg-tertiary" lang={activeCase.lang}>
+                    {activeCase.memory.find((m) => /step|चरण|ಹಂತ|निलை|مرحلہ/i.test(m.label))?.value ?? activeCase.statusLine}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSubSummaryOpen((v) => !v)}
+                  aria-expanded={subSummaryOpen}
+                  className="pressable shrink-0 rounded-full px-2 py-0.5 text-2xs font-medium text-brand-fg"
+                >
+                  {tr('quickSummarise')}
+                </button>
+              </div>
+              {subSummaryOpen && (
+                <div className="border-b border-line-subtle bg-sunken/40 px-4 py-3">
+                  <ThreadSummaryCard
+                    lang={activeCase.lang}
+                    summary={{
+                      grievance:
+                        [matterFacts.item, matterFacts.amount].filter(Boolean).join(' · ') ||
+                        activeCase.continuity.memoryLine,
+                      standing:
+                        stageRef.current === 'engaged'
+                          ? (lang === 'en' ? 'Finding on the table — see the card above' : tr('confClearDesc'))
+                          : tr('factCheckSub'),
+                      next:
+                        activeCase.memory.find((m) => /step|चरण|ಹಂತ|निलை|مرحلہ/i.test(m.label))?.value ??
+                        activeCase.statusLine,
+                    }}
+                  />
+                </div>
+              )}
+            </>
+          )}
           {(offline || LANGUAGES[lang].coverage !== 'full') && (
             <div className="flex flex-col gap-2 px-3.5 pt-3">
               {offline && <Banner tone="offline">{tr('offlineBanner')}</Banner>}
@@ -698,7 +938,7 @@ export default function ChatPage() {
                   >
                     {tr('greeting')}
                   </h1>
-                  <p className="mx-auto mt-3 max-w-[320px] text-[0.95rem] leading-relaxed text-fg-secondary">
+                  <p className="mx-auto mt-3 max-w-[320px] text-sm-plus leading-relaxed text-fg-secondary">
                     {tr('greetingSub')}
                   </p>
                 </div>
@@ -720,7 +960,7 @@ export default function ChatPage() {
                   <button
                     type="button"
                     onClick={() => navigate('/notice')}
-                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-[22px] bg-card px-3 py-5 transition-colors"
+                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card px-3 py-5 transition-colors"
                   >
                     <IconCamera className="size-6 text-brand-fg" />
                     <span className="text-base font-medium text-fg-primary">{tr('addNotice')}</span>
@@ -735,7 +975,7 @@ export default function ChatPage() {
                         60,
                       )
                     }}
-                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-[22px] bg-card px-3 py-5 transition-colors"
+                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card px-3 py-5 transition-colors"
                   >
                     <IconKeyboard className="size-6 text-brand-fg" />
                     <span className="text-base font-medium text-fg-primary">{tr('typeInstead')}</span>
@@ -775,6 +1015,7 @@ export default function ChatPage() {
                       key={item.id}
                       role="user"
                       dataId={item.id}
+                      voiceMeta={item.voice ? { duration: '0:18', edited: true } : undefined}
                     >
                       {item.text}
                     </MessageBubble>
@@ -852,13 +1093,30 @@ export default function ChatPage() {
                       />
                     </MessageBubble>
                   )
-                case 'ladder':
+                case 'ladder': {
+                  const dp = domain ? domainPack(domain.id, domain.branch, lang) : null
                   return (
                     <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
                       <ActionLadder
                         mode={item.variant ?? 'full'}
                         onOpenNotice={() => setNoticeOpen(true)}
                         facts={matterFacts}
+                        drafts={dp?.drafts}
+                        prep={dp?.prep}
+                        stepTitles={dp?.stepTitles}
+                        channel={dp?.channel}
+                        initialExpandedStep={item.initialExpandedStep}
+                      />
+                    </div>
+                  )
+                }
+                case 'counter':
+                  return (
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                      <StatutoryCounterCard
+                        title={item.counterData?.title}
+                        statutoryBasis={item.counterData?.statutoryBasis}
+                        replyText={item.counterData?.replyText ?? ''}
                       />
                     </div>
                   )
@@ -888,7 +1146,7 @@ export default function ChatPage() {
                     <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <FactCheckCard
                         facts={factItems}
-                        whenOptions={whenOptions}
+                        whenOptions={factItems.some((f) => f.key === 'when') ? whenOptions : []}
                         signed={factSigned}
                         onEdit={() => setFactSigned(false)}
                         onConfirm={confirmFacts}

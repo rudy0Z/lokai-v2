@@ -1,6 +1,7 @@
 import { useApp } from '../../lib/app-context'
 import { JOURNEY_STRINGS } from '../../data/refund-journey'
 import { CAUTION_UNCLEAR, CAUTION_REASONING, INFORMAL_CAUTION } from '../../data/localized-content'
+import { domainPack } from '../../data/domain-playbooks'
 import { legalById } from '../../data/legal-content'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Badge } from '../ui/Badge'
@@ -36,6 +37,10 @@ export function CautionCard({
   const { tr, lang } = useApp()
   const timeBarred = decision?.ruleId === 'possible-time-barred'
   const informal = decision?.ruleId === 'informal-seller'
+  // domain-playbook caution (deposit no-agreement, salary bond, …)
+  const domainCaution = decision?.domain
+    ? domainPack(decision.domain.id as never, decision.domain.branch, lang).caution
+    : undefined
   const legal = legalById('cpa-limitation')
   const unclear = CAUTION_UNCLEAR[lang] ?? CAUTION_UNCLEAR.en!
   const informalPack = INFORMAL_CAUTION[lang] ?? INFORMAL_CAUTION.en!
@@ -47,12 +52,17 @@ export function CautionCard({
     <Card className="flex flex-col gap-3.5 border-warning-line">
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
-          {timeBarred ? tr('cautionTitle') : informal ? informalPack.title : unclear.title}
+          {timeBarred ? tr('cautionTitle') : domainCaution ? domainCaution.title : informal ? informalPack.title : unclear.title}
         </h3>
         <Badge tone="warning" variant="subtle">{tr('tierCaution')}</Badge>
       </div>
 
-      {timeBarred ? (
+      {domainCaution ? (
+        <>
+          <p className="text-sm leading-relaxed text-fg-primary">{domainCaution.body}</p>
+          <ConfidenceIndicator level="likely" />
+        </>
+      ) : timeBarred ? (
         <>
           <p className="text-sm text-fg-primary">{JOURNEY_STRINGS.cautionIntro![lang]}</p>
           {legal && (
@@ -85,7 +95,7 @@ export function CautionCard({
       )}
 
       <div className="rounded-xl bg-sunken px-3.5 py-3">
-        <ReasoningPill steps={informal ? informalPack.steps : reasoning} />
+        <ReasoningPill steps={domainCaution ? domainCaution.steps : informal ? informalPack.steps : reasoning} />
       </div>
       <CardActions onDiscard={onDiscard} />
     </Card>

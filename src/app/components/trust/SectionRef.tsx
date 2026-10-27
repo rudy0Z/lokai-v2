@@ -19,7 +19,7 @@ export function SectionRef({ sectionRef, className }: { sectionRef: string; clas
            smaller than the Indic text around it, on a warm sunken chip, so
            Latin monospace never overpowers Devanagari/Tamil/Nastaliq heights */
         <span
-          className="rounded-md bg-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] tracking-[0.02em] text-fg-secondary"
+          className="rounded-md bg-sunken px-1.5 py-0.5 font-mono text-docket tracking-[0.02em] text-fg-secondary"
           lang="en"
         >
           {clean}

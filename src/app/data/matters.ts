@@ -31,6 +31,8 @@ export interface CaseDoc {
 export interface DayTurn {
   role: 'user' | 'assistant'
   text: string
+  /** the turn came through the simulated voice capture — render the note header */
+  voice?: boolean
 }
 
 export interface DaySummary {
@@ -39,6 +41,15 @@ export interface DaySummary {
   next: string
 }
 
+export type DayCardKind =
+  | 'factcheck'
+  | 'finding'
+  | 'ladder'
+  | 'caution'
+  | 'notice'
+  | 'closeout'
+  | 'counter'
+
 export interface CaseDay {
   id: string
   /** monospace date stamp, e.g. 'Oct 21' */
@@ -46,6 +57,7 @@ export interface CaseDay {
   title: string
   summary?: DaySummary
   turns: DayTurn[]
+  cards?: DayCardKind[]
 }
 
 export interface CaseContinuity {
@@ -122,8 +134,9 @@ export const MATTERS: MatterRecord[] = [
           standing: 'Defect-in-goods under the Consumer Protection Act, 2019 — leverage High [VERIFY].',
           next: 'Step 1 draft copied to WhatsApp; written reply requested within 7 days.',
         },
+        cards: ['factcheck', 'finding', 'ladder'],
         turns: [
-          { role: 'user', text: 'I bought a Mixwell 750W mixer grinder from HomeKart for ₹8,999. It arrived with a cracked jar and customer care refused a refund or replacement.' },
+          { role: 'user', text: 'I bought a Mixwell 750W mixer grinder from HomeKart for ₹8,999. It arrived with a cracked jar and customer care refused a refund or replacement.', voice: true },
           { role: 'assistant', text: 'That is frustrating — and you do not have to accept it. Your facts are signed and the invoice is filed as Exhibit A. First step: one firm, polite message in writing.' },
           { role: 'assistant', text: 'Draft 1 is in your documents — it cites the defect in plain words and asks for a written reply within 7 days. Nothing sends itself; you paste it into WhatsApp.' },
         ],
@@ -137,6 +150,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'A policy line is not the law — damage on arrival can still count as a defect [VERIFY].',
           next: 'Step 2 prep: the free 1915 helpline script and call checklist added to the case.',
         },
+        cards: ['ladder'],
         turns: [
           { role: 'user', text: 'They replied: "as per company policy electronics only have brand warranty, no refund". What now??' },
           { role: 'assistant', text: 'A policy line is not the law — goods that arrive damaged can count as a defect under the Consumer Protection Act, 2019 [VERIFY]. Keep that reply; it is now evidence.' },
@@ -152,6 +166,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'Unchanged defect claim, now with a documented refusal trail.',
           next: 'Draft 3 (formal demand notice) open for review behind its consent gate; registered post with acknowledgement due.',
         },
+        cards: ['ladder'],
         turns: [
           { role: 'user', text: 'If they keep refusing I want the formal notice ready. Is it drafted?' },
           { role: 'assistant', text: 'It is — Draft 3 sits behind its review screen: every field editable, every mistake yours to catch, and an explicit consent before it exists.' },
@@ -207,8 +222,9 @@ export const MATTERS: MatterRecord[] = [
           standing: 'उचित कटौती का बोझ मकान मालिक पर — लिखित बिल माँगा जा सकता है [VERIFY]।',
           next: 'मसौदा 1: आइटम-वार कटौती की लिखित माँग, 7 दिन की समय-सीमा।',
         },
+        cards: ['factcheck', 'finding', 'ladder'],
         turns: [
-          { role: 'user', text: 'पुणे में फ्लैट खाली किया, एक महीने का नोटिस दिया था। मकान मालिक ₹50,000 की डिपॉज़िट में से ₹35,000 पेंटिंग-क्लीनिंग कहकर रख रहा है, कोई बिल नहीं दिखाया।' },
+          { role: 'user', text: 'पुणे में फ्लैट खाली किया, एक महीने का नोटिस दिया था। मकान मालिक ₹50,000 की डिपॉज़िट में से ₹35,000 पेंटिंग-क्लीनिंग कहकर रख रहा है, कोई बिल नहीं दिखाया।', voice: true },
           { role: 'assistant', text: 'आपने प्रक्रिया सही निभाई है — अब दस्तावेज़ बोलेंगे। किराया UPI रिकॉर्ड और हैंडओवर चैट पहले सबूत हैं; वे आपके दस्तावेज़ों में दर्ज हैं।' },
           { role: 'assistant', text: 'मसौदा 1 तैयार है — हर कटौती का बिल माँगता लेख, 7 दिन की लिखित समय-सीमा के साथ। कुछ भी स्वयं नहीं भेजा जाता; आप ही WhatsApp में पेस्ट करेंगे।' },
         ],
@@ -222,6 +238,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'अपरिवर्तित; सबूत की सूची पूरी।',
           next: 'चरण 2 की तैयारी: किराया प्राधिकरण / कानूनी सहायता मध्यस्थता।',
         },
+        cards: ['counter', 'ladder'],
         turns: [
           { role: 'user', text: 'मकान मालिक ने मसौदा पढ़ा ही नहीं, कोई जवाब नहीं।' },
           { role: 'assistant', text: 'कोई बात नहीं — लिखित रिकॉर्ड आपके पक्ष में है। एक रन्ग ऊपर: मध्यस्थता की तैयारी आपके दस्तावेज़ों में जोड़ दी है, तारीख़ें संभाल कर रखें।' },
@@ -274,6 +291,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'ही मागणी आहे, सीलिंग नाही — देय तारीख व दाद मुदत स्पष्ट [VERIFY].',
           next: 'पाच प्रमुख मुद्दे पडताळले; देय तारीख कालदर्शिकेत नोंदवली.',
         },
+        cards: ['notice', 'ladder'],
         turns: [
           { role: 'user', text: 'महानगरपालिकेचा मालमत्ता कराचा जाहीरनामा आलाय — ₹18,450 लाल शेकड़ीत लिहिलाय. घर शिक्कामार्फत होतं का?' },
           { role: 'assistant', text: 'घाबरू नका — ही मागणी आहे, सीलिंग नाही. प्रत्येक ओळ तुमच्या भाषेत वाचून काढली आहे; रक्कम, मुदत आणि देय तारीख पडताळा.' },
@@ -289,6 +307,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'आक्षेपाची मुदत सुरू आहे; जुन्या पावत्या पुराव्यात जोडल्या.',
           next: 'आक्षेप लेख्याचा मसुदा दस्तऐवजांत जोडला — मानवी सल्ल्याने तपासा.',
         },
+        cards: ['ladder'],
         turns: [
           { role: 'user', text: 'रक्कम जास्त वाटतेय. दाद कसा द्यावा?' },
           { role: 'assistant', text: 'आक्षेप लेख्याचा मसुदा तयार आहे — आकारणी कॉपी आणि जुन्या पावत्या जोडा. हे स्पष्टीकरण आहे; निर्णय तुमचा, पक्की तपासणी माणसाकडून.' },
@@ -342,6 +361,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'வந்ததும் உடைந்த பொருள் — குறை ஆவணம் ஆதாரத்துடன் [VERIFY].',
           next: 'படி 1 வரைவு WhatsApp-இல் ஒட்டப்பட்டது; எழுத்துப்பூர்வ பதில் கோரப்பட்டது.',
         },
+        cards: ['factcheck', 'finding', 'ladder'],
         turns: [
           { role: 'user', text: 'ஹோம்கார்ட்டில் ₹14,500 மொபைல் வாங்கினேன் — டெலிவரியிலேயே ஸ்கிரீன் பழுது. ரீஃபண்ட் மறுத்தார்கள்.' },
           { role: 'assistant', text: 'வருத்தம் தரும் விஷயம் — இதை ஏற்றுக்கொள்ள வேண்டியதில்லை. உண்மைகளை உறுதிசெய்து, முதல் படியை எழுத்துப்பூர்வமாக எடுப்போம்.' },
@@ -356,6 +376,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'தீர்வு — பயனரே பதிவு செய்தார்; செயலி எதுவும் அனுப்பவில்லை.',
           next: 'முடிவு பதிவு ஆவணத்தில்; ரசீதுகளை வைத்திருங்கள்.',
         },
+        cards: ['closeout'],
         turns: [
           { role: 'user', text: 'வாட்ஸ்அப் மெசேஜ் அனுப்பிய இரண்டு நாளில் அவர்களே பிக்கப் ஒத்துக்கொண்டார்கள்!' },
           { role: 'assistant', text: 'அருமை — நடந்ததை இப்போதே பதிவு செய்யுங்கள். செயலி எதுவும் அனுப்பவில்லை; இந்தப் பதிவு உங்கள் சாதனத்திலேயே.' },
@@ -408,6 +429,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'درخواست کا نمبر اور تاریخیں ریکارڈ ہیں — بل کی ہر سطر سمجھائی گئی [VERIFY]۔',
           next: 'بل کے نمایاں نکات تسلیخی جانچ گئے؛ مدت نوٹ کی گئی۔',
         },
+        cards: ['notice', 'ladder'],
         turns: [
           { role: 'user', text: 'بجلی کا بل ₹6,200 آیا ہے — پچھلے مہینے سے میٹر خراب تھا، درخواست دے چکا ہوں مگر ٹیم نہیں آئی۔' },
           { role: 'assistant', text: 'آپ نے صحیح قدم اٹھایا — درخواست کا نمبر اور تاریخیں آپ کا ثبوت ہیں۔ میں بل کی ہر سطر آپ کی زبان میں سمجھاتا ہوں۔' },
@@ -422,6 +444,7 @@ export const MATTERS: MatterRecord[] = [
           standing: 'اعتراض کی مدت جاری؛ پرانا بل اور درخواست کی رسید ثبوت ہیں۔',
           next: 'اعتراض و درستگی کا مسودہ دستاویزات میں شامل — وضاحت صرف، فیصلہ صارف کا۔',
         },
+        cards: ['ladder'],
         turns: [
           { role: 'user', text: 'اب کیا لکھوں؟' },
           { role: 'assistant', text: 'اعتراض اور درستگی کا مسودہ تیار ہے — پرانا بل اور درخواست کی رسید ساتھ رکھیں۔ یہ صرف وضاحت ہے، فیصلہ آپ کا۔' },

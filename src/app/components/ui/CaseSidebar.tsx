@@ -60,7 +60,7 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
               </button>
             </div>
 
-            <div className="scroll-calm flex-1 overflow-y-auto px-3 pb-6 pt-1">
+            <div className="scroll-calm flex-1 overflow-y-auto overscroll-contain px-3 pb-6 pt-1">
               <div className="flex flex-col gap-1.5">
                 {MATTERS.map((m) => {
                   const isActive = activeCaseId === m.id

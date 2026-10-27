@@ -5,4 +5,9 @@ dist
 .v2c
 qa/
 lokai-codebase.txt
-
+# local skill/tool installs (DESIGN-AUDIT housekeeping)
+.agents/
+.claude/
+.codex/
+agent/
+skills-lock.json

@@ -9,6 +9,11 @@ import { Card } from '../components/ui/Card'
 import { MessageBubble } from '../components/chat/MessageBubble'
 import { ExhibitPaper } from '../components/documents/ExhibitPaper'
 import { ThreadSummaryCard } from '../components/cases/ThreadSummaryCard'
+import { FactCheckCard } from '../components/cards/FactCheckCard'
+import { FindingCard } from '../components/cards/FindingCard'
+import { ActionLadder } from '../components/cards/ActionLadder'
+import { CloseOutCard } from '../components/cards/CloseOutCard'
+import { StatutoryCounterCard } from '../components/cards/StatutoryCounterCard'
 import { IconArrowLeft, IconFolder, IconPlus } from '../components/ui/icons'
 import { cn } from '../lib/cn'
 
@@ -106,13 +111,57 @@ function CaseBody({
 
           <div className="flex flex-col gap-4">
             {day.turns.map((t, i) => (
-              <MessageBubble key={i} role={t.role}>
+              <MessageBubble key={i} role={t.role} voiceMeta={t.voice ? { duration: '0:14', edited: true } : undefined}>
                 <p className="whitespace-pre-line text-sm leading-relaxed" lang={matter.lang}>
                   {t.text}
                 </p>
               </MessageBubble>
             ))}
           </div>
+
+          {/* mounted structural cards from this historical session */}
+          {day.cards?.includes('factcheck') && (
+            <FactCheckCard
+              signed={true}
+              facts={matter.memory.map((m) => ({ key: m.label, label: m.label, value: m.value }))}
+              onConfirm={() => {}}
+            />
+          )}
+
+          {day.cards?.includes('finding') && matter.finding && (
+            <FindingCard
+              data={{
+                title: matter.finding.title,
+                whatHappened:
+                  matter.memory.find((m) => m.label.toLowerCase().includes('matter') || m.label.toLowerCase().includes('विवाद'))
+                    ?.value ?? '',
+                lawSays: matter.finding.summary,
+                means: matter.titleNative + ' — ' + matter.statusLine,
+                legalId: 'cpa-defect-goods',
+                confidence: 'clear',
+                reasoningSteps: [matter.finding.summary],
+              }}
+            />
+          )}
+
+          {day.cards?.includes('counter') && (
+            <StatutoryCounterCard
+              title="Statutory Counter-Reply (WhatsApp)"
+              statutoryBasis="Transfer of Property Act, 1882 · S. 108(m) [VERIFY]"
+              replyText="Under Section 108(m) of the Transfer of Property Act, 1882 and Indian Contract Act, painting and regular wear-and-tear are the owner's responsibility. Deducting ₹35,000 without actual GST damage bills is legally unsustainable. Please transfer the remaining deposit."
+            />
+          )}
+
+          {day.cards?.includes('ladder') && (
+            <ActionLadder
+              mode="full"
+              initialExpandedStep={dayIndex === 0 ? 1 : 2}
+            />
+          )}
+
+          {day.cards?.includes('closeout') && (
+            <CloseOutCard findingTitle={matter.finding?.title} />
+          )}
 
           {/* evidence accumulated BY this day */}
           {docsUpTo(matter, dayIndex).length > 0 && (
@@ -130,6 +179,34 @@ function CaseBody({
               </div>
             </section>
           )}
+
+          {/* interactive continuation bar (master spec Trap 2) */}
+          <div className="flex flex-col gap-2 rounded-2xl border border-line-subtle bg-component p-3.5">
+            <p className="text-2xs font-semibold text-fg-secondary">Continue this case</p>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  setActiveCase(matter.id)
+                  navigate('/')
+                }}
+              >
+                Continue in this day chat
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                leadingIcon={<IconPlus className="size-3.5" />}
+                onClick={() => {
+                  setActiveCase(matter.id)
+                  navigate('/')
+                }}
+              >
+                {tr('newDayChat')}
+              </Button>
+            </div>
+          </div>
 
           <p className="text-center text-2xs text-fg-tertiary">{tr('caseSampleNote')}</p>
         </div>

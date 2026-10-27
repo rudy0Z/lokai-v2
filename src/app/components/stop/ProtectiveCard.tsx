@@ -23,7 +23,7 @@ export function ProtectiveCard({
 }) {
   const { tr, lang } = useApp()
   return (
-    <div className="rounded-[22px] bg-standout p-4 text-fg-on-inverted" role="status">
+    <div className="rounded-2xl bg-standout p-4 text-fg-on-inverted" role="status">
       <div className="flex items-center gap-2">
         <IconShield className="size-4 shrink-0 text-fg-on-inverted" />
         {/* A4b: tracking is a Latin-only nicety — condition it, never wrap localized text in lang="en" */}

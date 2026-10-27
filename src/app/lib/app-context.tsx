@@ -50,6 +50,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [lang])
 
   const toggleTheme = useCallback(() => {
+    // better-ui recipe: suppress every color transition during the swap, then
+    // restore after the next painted frame — otherwise the ivory<->night
+    // switch smears as all transitions fire at once
+    const root = document.documentElement
+    root.classList.add('theme-switching')
     setTheme((prev) => {
       const next = prev === 'light' ? 'dark' : 'light'
       try {
@@ -58,6 +63,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         /* ignore */
       }
       return next
+    })
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => root.classList.remove('theme-switching'))
     })
   }, [])
 
