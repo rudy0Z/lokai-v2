@@ -18,7 +18,7 @@ export function CaseContinuityHeader({ onChip }: { onChip: (text: string, index:
     <div className="mx-auto flex w-full max-w-[380px] flex-col gap-3">
       <section className="rounded-[22px] bg-sunken p-4" lang={matter.lang}>
         <p className="text-2xs font-semibold text-fg-secondary">{tr('continuityTitle')}</p>
-        <p className="mt-1.5 font-mono text-2xs text-fg-tertiary">{matter.continuity.memoryLine}</p>
+        <p className="mt-1.5 font-mono text-2xs tabular-nums text-fg-tertiary">{matter.continuity.memoryLine}</p>
         <p className="mt-2 font-serif text-base font-medium leading-relaxed text-fg-primary">
           {matter.continuity.followUp}
         </p>

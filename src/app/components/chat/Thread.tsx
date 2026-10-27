@@ -57,7 +57,7 @@ export function Thread({ children, scrollKey, autoScroll = true, focusSelector, 
       <div
         ref={ref}
         onScroll={onScroll}
-        className="scroll-calm flex-1 overflow-y-auto overscroll-contain px-3.5 py-4"
+        className="scroll-calm scroll-fade-y flex-1 overflow-y-auto overscroll-contain px-3.5 py-4"
       >
         <div className="flex flex-col gap-5">{children}</div>
       </div>

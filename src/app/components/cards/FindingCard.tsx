@@ -132,9 +132,9 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
         </>
       )}
 
-      {/* the evidence well — tonal surface shift instead of border-on-border;
-          the citation and the interactive pills live together here */}
-      <div className="flex flex-col gap-2.5 rounded-xl bg-sunken px-3.5 py-3">
+      {/* the evidence well — concentric nested radius (craft.gustavofior.com/nested-border-radius):
+          outer 24px - padding 16px = inner 8px (rounded-lg) */}
+      <div className="flex flex-col gap-2.5 rounded-lg bg-sunken px-3.5 py-3">
         {legal && (
           <div className="flex flex-wrap items-center gap-2" lang="en">
             <span className="text-2xs text-fg-secondary">{legal.source}</span>

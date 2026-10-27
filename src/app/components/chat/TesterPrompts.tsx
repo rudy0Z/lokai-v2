@@ -24,7 +24,7 @@ export function TesterPrompts({
           key={i}
           type="button"
           onClick={() => onPick(o)}
-          className="pressable flex flex-col gap-1 rounded-2xl border border-line-default bg-card px-3.5 py-2.5 text-start transition-colors hover:bg-component-hover"
+          className="pressable-card flex flex-col gap-1 rounded-2xl border border-line-default bg-card px-3.5 py-2.5 text-start transition-colors hover:bg-component-hover"
         >
           <span className="text-sm leading-snug text-fg-primary">{o.text}</span>
           <span className="font-mono text-2xs text-brand-fg">{tr(o.meta as never)}</span>

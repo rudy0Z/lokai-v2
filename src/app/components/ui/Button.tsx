@@ -30,6 +30,16 @@ const sizeClass: Record<Size, string> = {
   lg: 'h-12 px-6 text-base gap-2 rounded-full',
 }
 
+/** Optical alignment (craft.gustavofior.com/optical-alignment):
+ *  An icon has internal whitespace. Shave 2px off the icon side so
+ *  the button looks optically balanced rather than heavier on the icon side.
+ */
+const opticalPadding: Record<Size, { leading: string; trailing: string }> = {
+  sm: { leading: 'ps-2.5 pe-3.5', trailing: 'ps-3.5 pe-2.5' },
+  md: { leading: 'ps-4 pe-5', trailing: 'ps-5 pe-4' },
+  lg: { leading: 'ps-5 pe-6', trailing: 'ps-6 pe-5' },
+}
+
 export function Button({
   variant = 'secondary',
   size = 'md',
@@ -42,14 +52,24 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  const hasLeading = Boolean(leadingIcon || loading)
+  const hasTrailing = Boolean(trailingIcon && !loading)
+  const opticalClass =
+    hasLeading && !hasTrailing
+      ? opticalPadding[size].leading
+      : hasTrailing && !hasLeading
+        ? opticalPadding[size].trailing
+        : ''
+
   return (
     <button
       type="button"
       disabled={disabled || loading}
       className={cn(
-        'pressable inline-flex items-center justify-center font-medium transition-colors duration-150 select-none',
+        'pressable inline-flex items-center justify-center font-medium transition-colors duration-100 select-none',
         variantClass[variant],
         sizeClass[size],
+        opticalClass,
         block && 'w-full',
         (disabled || loading) && 'opacity-50 cursor-not-allowed',
         className,

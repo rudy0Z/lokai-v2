@@ -158,7 +158,9 @@ export const IconCamera = makeIcon(
   'camera',
 )
 export const IconStop = makeIcon(<rect x="7" y="7" width="10" height="10" rx="1.5" />, 'stop')
-export const IconPlay = makeIcon(<path d="M8 5.5v13l11-6.5z" />, 'play')
+/* Optical alignment (craft.gustavofior.com/optical-alignment):
+   Right-facing triangle has center-of-mass at 1/3 from base; nudged to optical center. */
+export const IconPlay = makeIcon(<path d="M9 5.5v13l11-6.5z" />, 'play')
 export const IconFolder = makeIcon(
   <path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-10.5z" />,
   'folder',

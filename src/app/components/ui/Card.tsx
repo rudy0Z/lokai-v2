@@ -12,7 +12,9 @@ export function Card({ raised = false, paper = false, className, ...rest }: Card
   return (
     <div
       className={cn(
-        'rounded-[22px] p-4',
+        /* Concentric nested radius (craft.gustavofior.com/nested-border-radius):
+           outer 24px - padding 16px = inner 8px (rounded-lg) for concentric wells */
+        'rounded-[24px] p-4',
         paper ? 'paper rounded-[18px] border border-warning-line/50' : 'bg-card',
         raised && !paper && 'shadow-large',
         className,

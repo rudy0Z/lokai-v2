@@ -103,7 +103,7 @@ export default function NoticePage() {
                       {/* bidirectional grounding badge: [n] maps 1-to-1 to the
                           original clause below (master prompt Part 5) */}
                       <span
-                        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle font-mono text-2xs font-semibold text-on-brand-subtle"
+                        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle font-mono text-2xs font-semibold tabular-nums text-on-brand-subtle"
                         aria-hidden="true"
                       >
                         {field.clauseIndex + 1}
@@ -199,7 +199,7 @@ export default function NoticePage() {
                   )}
                 >
                   <div className="flex items-start gap-2">
-                    <span className="mt-0.5 shrink-0 font-mono text-2xs text-fg-tertiary" lang="en">
+                    <span className="mt-0.5 shrink-0 font-mono text-2xs tabular-nums text-fg-tertiary" lang="en">
                       [{clause.index + 1}]
                     </span>
                     <p className="min-w-0 flex-1 text-base leading-relaxed text-fg-primary">{clause.text}</p>

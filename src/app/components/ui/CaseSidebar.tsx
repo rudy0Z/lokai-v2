@@ -96,8 +96,8 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
                             {m.titleNative}
                             {m.resolved && <span className="ms-1.5 text-fg-tertiary">✓</span>}
                           </span>
-                          {/* quiet mono docket line — no badges by design */}
-                          <span className="mt-0.5 block truncate font-mono text-2xs text-fg-tertiary" lang="en">
+                          {/* quiet mono docket line with tabular-nums (craft.gustavofior.com/tabular-numbers) */}
+                          <span className="mt-0.5 block truncate font-mono text-2xs tabular-nums text-fg-tertiary" lang="en">
                             {m.amount} · {m.statusLine}
                           </span>
                         </span>
@@ -116,7 +116,7 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
                                   navigate(`/case/${m.id}/d/${i}`)
                                   onClose()
                                 }}
-                                className="rounded-full bg-card px-2.5 py-1 font-mono text-2xs text-fg-secondary transition-colors hover:bg-component-hover"
+                                className="rounded-full bg-card px-2.5 py-1 font-mono text-2xs tabular-nums text-fg-secondary transition-colors hover:bg-component-hover"
                                 lang={m.lang}
                               >
                                 {d.dateLabel}

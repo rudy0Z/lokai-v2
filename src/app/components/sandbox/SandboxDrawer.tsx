@@ -132,7 +132,7 @@ export function SandboxDrawer() {
                         key={s.id}
                         type="button"
                         onClick={() => launch(s.id)}
-                        className="pressable rounded-xl bg-card px-3 py-2.5 text-start transition-colors hover:bg-component-hover"
+                        className="pressable rounded-[10px] bg-card px-3 py-2.5 text-start transition-colors hover:bg-component-hover"
                       >
                         <span className="block text-sm font-medium text-fg-primary">{tr(`scn${s.id.slice(3)}Title` as never)}</span>
                         <span className="mt-0.5 block font-mono text-2xs text-fg-tertiary" lang="en">
@@ -154,7 +154,7 @@ export function SandboxDrawer() {
                         setOpen(false)
                         navigate(`/replay/${s.id}`)
                       }}
-                      className="pressable rounded-xl bg-card px-3 py-2.5 text-start transition-colors hover:bg-component-hover"
+                      className="pressable rounded-[10px] bg-card px-3 py-2.5 text-start transition-colors hover:bg-component-hover"
                     >
                       <span className="block text-sm font-medium text-fg-primary" lang={s.lang}>
                         {s.label}
@@ -179,7 +179,7 @@ export function SandboxDrawer() {
                       key={l.label}
                       type="button"
                       onClick={l.go}
-                      className="min-h-10 rounded-xl bg-card px-3 text-start text-sm text-fg-primary transition-colors hover:bg-component-hover"
+                      className="min-h-10 rounded-[10px] bg-card px-3 text-start text-sm text-fg-primary transition-colors hover:bg-component-hover"
                       lang="en"
                     >
                       {l.label}
@@ -188,7 +188,7 @@ export function SandboxDrawer() {
                   <button
                     type="button"
                     onClick={resetVault}
-                    className="min-h-10 rounded-xl px-3 text-start text-sm text-danger-fg transition-colors hover:bg-danger-subtle"
+                    className="min-h-10 rounded-[10px] px-3 text-start text-sm text-danger-fg transition-colors hover:bg-danger-subtle"
                     lang="en"
                   >
                     {tr('resetVault')}

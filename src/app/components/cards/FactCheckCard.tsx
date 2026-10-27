@@ -66,7 +66,7 @@ export function FactCheckCard({
       <div className="flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-positive-line bg-positive-subtle px-3.5 py-2.5">
         <span className="text-2xs font-medium text-on-positive-subtle">
           {tr('factSigned').replace('{n}', String(facts.length))}
-          {glance && <span className="ms-1.5 font-mono">({glance})</span>}
+          {glance && <span className="ms-1.5 font-mono tabular-nums">({glance})</span>}
         </span>
         <button
           type="button"
