@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
 import { copyText } from '../../lib/format'
-import { NOTICE_FIELDS } from '../../data/refund-journey'
+import { buildNotice } from '../../lib/matter-facts'
+import type { FactRecord } from '../../lib/matter-facts'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
 import { Checkbox } from '../ui/Checkbox'
@@ -13,20 +14,26 @@ import { IconArrowLeft, IconCopy } from '../ui/icons'
  * Demand notice behind an explicit review + consent step (A2.7): paper
  * stationery register, every field editable, consent checkbox gates the
  * final render. Nothing is exported or sent by the app itself.
+ * Fields are BUILT FROM THE SIGNED FACTS (deep-audit fix) — no hardcoded
+ * order numbers, amounts or dates.
  */
-export function DemandNoticeReview({ onBack }: { onBack: () => void }) {
-  const { tr } = useApp()
+export function DemandNoticeReview({ facts, onBack }: { facts: FactRecord; onBack: () => void }) {
+  const { tr, lang } = useApp()
+  const notice = buildNotice(facts, lang)
   const [values, setValues] = useState<Record<string, string>>(
-    Object.fromEntries(NOTICE_FIELDS.map((f) => [f.key, f.value])),
+    Object.fromEntries([
+      ...notice.fields.map((f) => [f.key, f.value]),
+      ['body', notice.body],
+    ]),
   )
   const [consented, setConsented] = useState(false)
   const [finalText, setFinalText] = useState<string | null>(null)
 
   const compose = () =>
-    NOTICE_FIELDS.map((f) => {
-      if (f.key === 'body') return values.body
-      return `${f.label}: ${values[f.key]}`
-    })
+    [
+      ...notice.fields.map((f) => `${f.label}: ${values[f.key] ?? ''}`),
+      values.body ?? '',
+    ]
       .join('\n\n')
       .trim()
 
@@ -56,8 +63,7 @@ export function DemandNoticeReview({ onBack }: { onBack: () => void }) {
               {tr('noticeCopyAll')}
             </Button>
             <Banner tone="info" className="flex-1">
-              Copy it, paste it into a document, print on plain paper, and send by registered post with ACKNOWLEDGEMENT
-              DUE — keep the receipt.
+              {tr('noticeSendHint')}
             </Banner>
           </div>
         </div>
@@ -74,13 +80,10 @@ export function DemandNoticeReview({ onBack }: { onBack: () => void }) {
             {tr('back')}
           </Button>
         </div>
-        <Banner tone="warning">
-          Every field is editable and every mistake is yours to catch — that is why this screen exists. Check names,
-          dates, amounts and the order number letter by letter.
-        </Banner>
+        <Banner tone="warning">{tr('noticeReviewBanner')}</Banner>
 
         <div className="paper flex flex-col gap-4 rounded-[18px] p-5" lang="en">
-          {NOTICE_FIELDS.filter((f) => f.key !== 'body').map((f) => (
+          {notice.fields.map((f) => (
             <Field key={f.key} label={f.label}>
               {(id) => (
                 <Textarea
@@ -93,7 +96,7 @@ export function DemandNoticeReview({ onBack }: { onBack: () => void }) {
               )}
             </Field>
           ))}
-          <Field label="Body">
+          <Field label={notice.labels.body}>
             {(id) => (
               <Textarea
                 id={id}

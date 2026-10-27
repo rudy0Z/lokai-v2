@@ -9,10 +9,16 @@ export interface ThreadProps {
   scrollKey: string | number
   /** when false (empty state), no auto-scroll happens */
   autoScroll?: boolean
+  /**
+   * CSS selector for the card block that just mounted (finding, fact gate,
+   * protective card…). When present the thread scrolls its TOP into view —
+   * the reader starts at the headline instead of being yanked past it.
+   */
+  focusSelector?: string | null
   className?: string
 }
 
-export function Thread({ children, scrollKey, autoScroll = true, className }: ThreadProps) {
+export function Thread({ children, scrollKey, autoScroll = true, focusSelector, className }: ThreadProps) {
   const { tr } = useApp()
   const ref = useRef<HTMLDivElement>(null)
   const firstRef = useRef(true)
@@ -22,6 +28,14 @@ export function Thread({ children, scrollKey, autoScroll = true, className }: Th
     if (!autoScroll) return
     const el = ref.current
     if (!el) return
+    if (focusSelector) {
+      const target = el.querySelector(focusSelector)
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        setAway(false)
+        return
+      }
+    }
     // only follow when the user is already near the bottom (their content)
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 160
     if (firstRef.current || nearBottom) {
@@ -29,7 +43,8 @@ export function Thread({ children, scrollKey, autoScroll = true, className }: Th
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
       setAway(false)
     }
-  }, [scrollKey, autoScroll])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrollKey, autoScroll, focusSelector])
 
   const onScroll = () => {
     const el = ref.current

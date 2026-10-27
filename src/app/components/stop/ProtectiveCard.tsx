@@ -1,4 +1,6 @@
+import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
+import { copyText } from '../../lib/format'
 import { REASSURANCE } from '../../data/refund-journey'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Button } from '../ui/Button'
@@ -24,7 +26,8 @@ export function ProtectiveCard({
     <div className="rounded-[22px] bg-standout p-4 text-fg-on-inverted" role="status">
       <div className="flex items-center gap-2">
         <IconShield className="size-4 shrink-0 text-fg-on-inverted" />
-        <span className="text-2xs font-semibold tracking-wide" lang="en">
+        {/* A4b: tracking is a Latin-only nicety — condition it, never wrap localized text in lang="en" */}
+        <span className={'text-2xs font-semibold' + (lang === 'en' ? ' tracking-wide' : '')}>
           {tr('tierHardStop')}
         </span>
       </div>
@@ -36,7 +39,18 @@ export function ProtectiveCard({
 
       <p className="mt-3.5 text-2xs font-semibold text-fg-standout-secondary">{tr('protectHelp')}</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        <Button variant="inverted" size="sm" leadingIcon={<IconPhone className="size-3.5" />}>
+        {/* deep-audit fix: the emergency affordance is honest — a copy action
+            (the app cannot dial), not a decorative dead button */}
+        <Button
+          variant="inverted"
+          size="sm"
+          leadingIcon={<IconPhone className="size-3.5" />}
+          title={tr('simulatedTag')}
+          onClick={async () => {
+            const ok = await copyText('112')
+            if (ok) toast.success(`${tr('protectPolice')} — ${tr('copied')}`)
+          }}
+        >
           {tr('protectPolice')}
         </Button>
       </div>

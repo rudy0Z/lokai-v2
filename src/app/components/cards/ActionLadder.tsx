@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { copyText } from '../../lib/format'
 import { legalById } from '../../data/legal-content'
-import { HELPLINE_PREP, WHATSAPP_DRAFTS } from '../../data/refund-journey'
+import { buildDrafts } from '../../lib/matter-facts'
+import type { FactRecord } from '../../lib/matter-facts'
 import { Badge } from '../ui/Badge'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
@@ -17,6 +18,8 @@ export interface ActionLadderProps {
   /** full = all three steps; free = steps 1-2 + human help (caution branch) */
   mode?: 'full' | 'free'
   onOpenNotice?: () => void
+  /** the signed matter record — every draft is built from it, never hardcoded */
+  facts?: FactRecord
   className?: string
 }
 
@@ -36,17 +39,23 @@ function StepNumber({ n, tone = 'brand' }: { n: number; tone?: 'brand' | 'positi
   )
 }
 
-/** Step 1: editable, copyable WhatsApp draft. */
-function WhatsAppStep() {
-  const { tr } = useApp()
-  const [text, setText] = useState(WHATSAPP_DRAFTS[0]!)
+/** Step 1: editable, copyable WhatsApp draft — built from the signed facts. */
+function WhatsAppStep({ facts }: { facts?: FactRecord }) {
+  const { tr, lang } = useApp()
+  const [text, setText] = useState('')
   const [idx, setIdx] = useState(0)
+
+  const drafts = buildDrafts(facts ?? { item: '', seller: '', amount: '', issue: '', ask: '', when: '' }, lang)
+
+  useEffect(() => {
+    setText(drafts.drafts[idx] ?? '')
+    // re-build whenever the signed facts, language or variant change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facts, lang, idx])
 
   return (
     <div className="flex flex-col gap-2.5">
-      <p className="text-2xs text-fg-tertiary">
-        Edit anything before you send it. Nothing leaves your phone until you paste it into WhatsApp yourself.
-      </p>
+      <p className="text-2xs text-fg-tertiary">{tr('whatsappHint')}</p>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -71,11 +80,7 @@ function WhatsAppStep() {
           variant="secondary"
           size="sm"
           leadingIcon={<IconRefresh className="size-3.5" />}
-          onClick={() => {
-            const next = (idx + 1) % WHATSAPP_DRAFTS.length
-            setIdx(next)
-            setText(WHATSAPP_DRAFTS[next]!)
-          }}
+          onClick={() => setIdx((i) => (i + 1) % drafts.drafts.length)}
         >
           {tr('regenerate')}
         </Button>
@@ -86,6 +91,7 @@ function WhatsAppStep() {
 
 /** Step 2: free national helpline with prep list. */
 function HelplineStep() {
+  const { tr } = useApp()
   const legal = legalById('national-consumer-helpline')
   return (
     <div className="flex flex-col gap-3">
@@ -95,7 +101,7 @@ function HelplineStep() {
           <span className="font-mono text-2xl font-semibold text-on-brand-subtle" lang="en">
             1915
           </span>
-          <Badge tone="positive" variant="subtle">free</Badge>
+          <Badge tone="positive" variant="subtle">{tr('badgeFree')}</Badge>
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           <span className="text-2xs text-on-brand-subtle">{legal?.source}</span>
@@ -103,12 +109,12 @@ function HelplineStep() {
         </div>
       </div>
       <div>
-        <p className="text-2xs font-semibold text-fg-secondary">Have this ready before you call:</p>
-        <ul className="mt-1.5 flex flex-col gap-1.5" lang="en">
-          {HELPLINE_PREP.map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-fg-primary">
+        <p className="text-2xs font-semibold text-fg-secondary">{tr('haveReady')}</p>
+        <ul className="mt-1.5 flex flex-col gap-1.5">
+          {(['prepItem1', 'prepItem2', 'prepItem3', 'prepItem4'] as const).map((key) => (
+            <li key={key} className="flex items-start gap-2 text-sm text-fg-primary">
               <IconCheck className="mt-1 size-3.5 shrink-0 text-positive-fg" />
-              {item}
+              {tr(key)}
             </li>
           ))}
         </ul>
@@ -117,7 +123,7 @@ function HelplineStep() {
   )
 }
 
-export function ActionLadder({ mode = 'full', onOpenNotice, className }: ActionLadderProps) {
+export function ActionLadder({ mode = 'full', onOpenNotice, facts, className }: ActionLadderProps) {
   const { tr } = useApp()
   return (
     <section className={cn('flex flex-col gap-2.5', className)} aria-label={tr('ladderTitle')}>
@@ -125,24 +131,25 @@ export function ActionLadder({ mode = 'full', onOpenNotice, className }: ActionL
       <Disclosure
         leading={<StepNumber n={1} tone="positive" />}
         title={tr('step1Title')}
-        subtitle="₹0 · 10 minutes · lowest risk"
+        subtitle={tr('step1Sub')}
       >
-        <WhatsAppStep />
+        <WhatsAppStep facts={facts} />
       </Disclosure>
-      <Disclosure leading={<StepNumber n={2} />} title={tr('step2Title')} subtitle="free · official channel">
+      <Disclosure
+        leading={<StepNumber n={2} />}
+        title={tr('step2Title')}
+        subtitle={tr('step2Sub')}
+      >
         <HelplineStep />
       </Disclosure>
       {mode === 'full' && (
         <Disclosure
           leading={<StepNumber n={3} tone="warning" />}
           title={tr('step3Title')}
-          subtitle="strongest step · mistakes cost most here"
+          subtitle={tr('step3Sub')}
         >
           <div className="flex flex-col gap-2.5">
-            <Banner tone="warning">
-              This is the step where mistakes cost most. Open the draft, check every detail, and only confirm when
-              you are sure. A human helper can review it with you first.
-            </Banner>
+            <Banner tone="warning">{tr('ladderBanner')}</Banner>
             <Button variant="secondary" size="sm" onClick={onOpenNotice}>
               {tr('openNotice')}
             </Button>
@@ -150,9 +157,7 @@ export function ActionLadder({ mode = 'full', onOpenNotice, className }: ActionL
         </Disclosure>
       )}
       {mode === 'free' && (
-        <p className="px-1 text-2xs text-fg-tertiary">
-          The formal notice step is paused until your dates are checked — it is the step where mistakes cost most.
-        </p>
+        <p className="px-1 text-2xs text-fg-tertiary">{tr('ladderPausedNote')}</p>
       )}
     </section>
   )

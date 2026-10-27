@@ -15,6 +15,8 @@ export interface MessageBubbleProps {
   isAnswer?: boolean
   /** quiet action row under assistant text (copy etc.) */
   actions?: ReactNode
+  /** thread item id — lets the thread scroll this block's top into view */
+  dataId?: number
   className?: string
 }
 
@@ -31,6 +33,7 @@ export function MessageBubble({
   staleActionLabel,
   isAnswer = false,
   actions,
+  dataId,
   className,
 }: MessageBubbleProps) {
   if (role === 'system') {
@@ -43,7 +46,7 @@ export function MessageBubble({
 
   if (role === 'assistant') {
     return (
-      <div className={cn('flex flex-col gap-1.5', className)}>
+      <div className={cn('flex flex-col gap-1.5 scroll-mt-20', className)} data-chat-item={dataId}>
         <div className="flex items-center gap-2" aria-hidden="true">
           <LogoMark size="sm" />
           <span className="text-2xs font-medium text-fg-tertiary">LokAI</span>
@@ -55,7 +58,7 @@ export function MessageBubble({
   }
 
   return (
-    <div className={cn('flex flex-col items-end', className)}>
+    <div className={cn('flex flex-col items-end scroll-mt-20', className)} data-chat-item={dataId}>
       <div
         className={cn(
           'max-w-[85%] rounded-2xl border px-3.5 py-2.5 text-sm',
@@ -70,7 +73,7 @@ export function MessageBubble({
         <button
           type="button"
           onClick={onStaleAction}
-          className="pressable mt-1 inline-flex min-h-9 items-center gap-1.5 rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
+          className="pressable mt-1 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
         >
           {staleActionLabel}
         </button>

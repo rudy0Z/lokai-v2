@@ -160,6 +160,41 @@ export interface UiStrings {
   replayPause: Pack
   replayRestart: Pack
   replayFinished: Pack
+  /* deep-audit 2026-10-27 — ladder chrome previously hardcoded English in
+     ActionLadder.tsx; now real packs so Urdu stops scrambling bidi */
+  step1Sub: Pack
+  step2Sub: Pack
+  step3Sub: Pack
+  whatsappHint: Pack
+  haveReady: Pack
+  prepItem1: Pack
+  prepItem2: Pack
+  prepItem3: Pack
+  prepItem4: Pack
+  badgeFree: Pack
+  ladderBanner: Pack
+  ladderPausedNote: Pack
+  chipItConsumer: Pack
+  chipItOfficial: Pack
+  pickClosest: Pack
+  noticeReviewBanner: Pack
+  noticeSendHint: Pack
+  copyHandoverNote: Pack
+  coverageNotice: Pack
+  langGroupFull: Pack
+  langGroupPreview: Pack
+  verifyStamp: Pack
+  closeTitle: Pack
+  closeStep1: Pack
+  closeStep1Done: Pack
+  closeSave: Pack
+  closeSaveDone: Pack
+  closeResolved: Pack
+  closeResolvedDone: Pack
+  matterLogTitle: Pack
+  matterLogStep1: Pack
+  matterLogClosed: Pack
+  savedFromChat: Pack
 }
 
 export const UI: UiStrings = {
@@ -194,7 +229,8 @@ export const UI: UiStrings = {
   stageChecking: { en: 'Checking the rules', hi: 'नियम जाँच रहा हूँ', mr: 'नियम तपासत आहे', ta: 'விதிகளைச் சரிபார்க்கிறேன்', ur: 'قاعدے جانچ رہا ہوں' },
   stageWriting: { en: 'Preparing the answer', hi: 'उत्तर तैयार कर रहा हूँ', mr: 'उत्तर तयार करत आहे', ta: 'பதில் தயார் செய்கிறேன்', ur: 'جواب تیار کر رہا ہوں' },
   confClear: { en: 'Clear', hi: 'स्पष्ट', mr: 'स्पष्ट', ta: 'தெளிவு', ur: 'واضح' },
-  confClearDesc: { en: 'Fits a well-established situation.', hi: 'यह एक आम, स्थापित स्थिति है।', mr: 'ही एक सामान्य, स्थापित स्थिती आहे.', ta: 'இது நிலையான, நன்கு அறியப்பட்ட நிலை.', ur: 'یہ ایک عام، مستحکم صورت حال ہے۔' },
+  // deep-audit 2026-10-27 (friction 5): "Clear" must not read as contradicting the unverified badge
+  confClearDesc: { en: 'Fits a common consumer pattern — check the cited rule below.', hi: 'एक आम उपभोक्ता पैटर्न से मिलता है — नीचे दिया उद्धरण जाँचें।', mr: 'सामान्य ग्राहक-कृती नमुन्याशी जुळते — खालील उद्धरण तपासा.', ta: 'பொதுவான நுகர்வோர் போக்குடன் பொருந்துகிறது — கீழே மேற்கோளைச் சரிபார்க்கவும்.', ur: 'ایک عام صارف پیٹرن سے ملتا ہے — نیچے حوالہ دیکھ لیں۔' },
   confLikely: { en: 'Likely — please confirm', hi: 'संभव — पुष्टि करें', mr: 'संभव — खात्री करा', ta: 'இருக்கலாம் — உறுதிப்படுத்துங்கள்', ur: 'ممکن — تصدیق کریں' },
   confLikelyDesc: { en: 'Depends on a fact you should check.', hi: 'एक ऐसे तथ्य पर निर्भर है जो आप जाँच लें।', mr: 'एका अशा वस्तुस्थितीवर अवलंबून आहे जी तुम्ही तपासावी.', ta: 'நீங்கள் சரிபார்க்க வேண்டிய ஒரு உண்மையைச் சார்ந்தது.', ur: 'ایک ایسے حقیقت پر منحصر ہے جو آپ جانچ لیں۔' },
   confUnsure: { en: 'Not sure', hi: 'पक्का नहीं', mr: 'नक्की नाही', ta: 'உறுதியில்லை', ur: 'یقین نہیں' },
@@ -257,7 +293,8 @@ export const UI: UiStrings = {
   cautionTitle: { en: 'Time limits may apply', hi: 'समय-सीमा लागू हो सकती है', mr: 'वेळेची मर्यादा लागू असू शकते', ta: 'காலக்கெடு பொருந்தலாம்', ur: 'وقت کی حد لاگو ہو سکتی ہے' },
   restatePrefix: { en: 'So far I understand:', hi: 'अब तक मैं समझा हूँ:', mr: 'आतापर्यंत मला समजले:', ta: 'இதுவரை நான் புரிந்துகொண்டது:', ur: 'اب تک میں سمجھا:' },
   qWhen: { en: 'When did you buy it?', hi: 'आपने यह कब खरीदा?', mr: 'तुम्ही हे केव्हा विकत घेतले?', ta: 'இதை எப்போது வாங்கினீர்கள்?', ur: 'آپ نے یہ کب خریدا؟' },
-  ans30: { en: 'Within 30 days', hi: 'पिछले 30 दिनों में', mr: 'लग्नच्या 30 दिवसांत', ta: 'கடந்த 30 நாட்களில்', ur: 'پچھلے 30 دنوں میں' },
+  // deep-audit 2026-10-27: was "लग्नच्या" (= of the wedding) — wrong word
+  ans30: { en: 'Within 30 days', hi: 'पिछले 30 दिनों में', mr: 'गेल्या 30 दिवसांत', ta: 'கடந்த 30 நாட்களில்', ur: 'پچھلے 30 دنوں میں' },
   ans1to2: { en: '1 to 2 years ago', hi: '1–2 साल पहले', mr: '1–2 वर्षांपूर्वी', ta: '1–2 ஆண்டுகளுக்கு முன்', ur: '1–2 سال پہلے' },
   ans2plus: { en: 'More than 2 years ago', hi: '2 साल से पहले', mr: '2 वर्षांहून अधिक पूर्वी', ta: '2 ஆண்டுகளுக்கு முன்', ur: '2 سال سے پہلے' },
   ansNotSure: { en: 'Not sure', hi: 'याद नहीं', mr: 'आठवत नाही', ta: 'நினைவில்லை', ur: 'یاد نہیں' },
@@ -391,6 +428,89 @@ export const UI: UiStrings = {
     ta: 'மறுஇயக்கம் முடிந்தது — மீண்டும் பார்க்க மீண்டும் தொடங்குங்கள்.',
     ur: 'ریپلے مکمل — دوبارہ دیکھنے کے لیے دوبارہ چلائیں۔',
   },
+  step1Sub: { en: '₹0 · 10 minutes · lowest risk', hi: '₹0 · 10 मिनट · सबसे कम जोखिम', mr: '₹0 · 10 मिनिटे · सर्वात कमी धोका', ta: '₹0 · 10 நிமிடங்கள் · மிகக் குறைந்த ஆபத்து', ur: '₹0 · 10 منٹ · سب سے کم خطرہ' },
+  step2Sub: { en: 'free · official channel', hi: 'मुफ़्त · सरकारी चैनल', mr: 'मोफत · अधिकृत मार्ग', ta: 'இலவசம் · அரசு வழி', ur: 'مفت · سرکاری ذریعہ' },
+  step3Sub: { en: 'strongest step · mistakes cost most here', hi: 'सबसे बड़ा कदम · यहाँ ग़लती सबसे महँगी', mr: 'सर्वात मोठे पाऊल · येथे चूक सर्वात महाग', ta: 'மிக வலுவான படி · தவறு மிகவும் செலவாகும்', ur: 'سب سے بڑا قدم · غلطی یہاں سب سے مہنگی' },
+  whatsappHint: {
+    en: 'Edit anything before you send it. Nothing leaves your phone until you paste it into WhatsApp yourself.',
+    hi: 'भेजने से पहले कुछ भी बदलें। स्वयं WhatsApp में पेस्ट करने तक कुछ भी आपके फ़ोन से बाहर नहीं जाता।',
+    mr: 'पाठवण्यापूर्वी काहीही बदला. तुम्ही स्वतः WhatsApp मध्ये पेस्ट करेपर्यंत काहीही तुमच्या फोनबाहेर जात नाही.',
+    ta: 'அனுப்புவதற்கு முன் எதையும் திருத்துங்கள். நீங்களே WhatsApp-இல் ஒட்டும் வரை எதுவும் உங்கள் போனிலிருந்து வெளியே போகாது.',
+    ur: 'بھیجنے سے پہلے کچھ بھی تبدیل کریں۔ آپ کے خود واٹس ایپ میں پیسٹ کرنے تک کچھ بھی آپ کے فون سے باہر نہیں جاتا۔',
+  },
+  haveReady: { en: 'Have this ready before you call:', hi: 'कॉल से पहले यह तैयार रखें:', mr: 'कॉलआधी हे तयार ठेवा:', ta: 'அழைக்கும் முன் இதைத் தயாராக வையுங்கள்:', ur: 'کال سے پہلے یہ تیار رکھیں:' },
+  prepItem1: { en: 'Your bill or order confirmation', hi: 'आपका बिल या ऑर्डर पुष्टि', mr: 'तुमचे बिल किंवा ऑर्डर पुष्टीकरण', ta: 'உங்கள் பில் அல்லது ஆர்டர் உறுதிப்பாடு', ur: 'آپ کا بل یا آرڈر تصدیق' },
+  prepItem2: { en: 'Photos of the damaged item', hi: 'क्षतिग्रस्त वस्तु की फ़ोटो', mr: 'खराझालेल्या वस्तूचे छायाचित्र', ta: 'சேதமடைந்த பொருளின் புகைப்படங்கள்', ur: 'خراب چیز کی تصویریں' },
+  prepItem3: { en: 'Dates: purchase, delivery, and the refused call', hi: 'तारीख़ें: खरीद, डिलीवरी और मना की कॉल', mr: 'तारखा: खरेदी, डिलिव्हरी आणि नाकारलेला कॉल', ta: 'தேதிகள்: வாங்கியது, வந்தது, மறுத்த அழைப்பு', ur: 'تاریخیں: خریداری، ڈیلیوری، انکار کی کال' },
+  prepItem4: { en: 'What you are asking for: refund or replacement', hi: 'आप क्या माँग रहे हैं: रिफंड या रिप्लेसमेंट', mr: 'तुम्ही काय मागत आहात: पैसे परत की बदली', ta: 'நீங்கள் கேட்பது: பணம் திரும்பவா, மாற்றா?', ur: 'آپ کیا مانگ رہے ہیں: رقم واپسی یا تبدیلی' },
+  badgeFree: { en: 'free', hi: 'मुफ़्त', mr: 'मोफत', ta: 'இலவசம்', ur: 'مفت' },
+  ladderBanner: {
+    en: 'This is the step where mistakes cost most. Open the draft, check every detail, and only confirm when you are sure. A human helper can review it with you first.',
+    hi: 'यह वह कदम है जहाँ ग़लती सबसे महँगी पड़ती है। ड्राफ़्ट खोलें, हर विवरण जाँचें, और पक्के होने पर ही पक्का करें। कोई मानव सहायक पहले आपके साथ जाँच सकता है।',
+    mr: 'हे ते पाऊल आहे जिथे चूक सर्वात महाग पडते. मसुदा उघडा, प्रत्येक तपशील तपासा आणि खात्री झाल्यावरच निश्चित करा. मानवी मदतनीस आधी तुमच्यासोबत तपासू शकतो.',
+    ta: 'தவறு மிகவும் செலவாகும் படி இதுவே. வரைவைத் திறந்து ஒவ்வொரு விவரத்தையும் சரிபார்த்து, உறுதியானபின் மட்டும் உறுதிசெய்யுங்கள். ஒரு மனித உதவியாளர் முதலில் உங்களுடன் பார்க்கலாம்.',
+    ur: 'یہ وہ قدم ہے جہاں غلطی سب سے مہنگی پڑتی ہے۔ مسودہ کھولیں، ہر تفصیل جانچیں، اور یقین ہونے پر ہی تصدیق کریں۔ کوئی انسانی مددگار پہلے آپ کے ساتھ دیکھ سکتا ہے۔',
+  },
+  ladderPausedNote: {
+    en: 'The formal notice step is paused until your dates are checked — it is the step where mistakes cost most.',
+    hi: 'औपचारिक पत्र वाला कदम तब तक रुका है जब तक आपकी तारीख़ें जाँची न जाएँ — यही वह कदम है जहाँ ग़लती सबसे महँगी है।',
+    mr: 'तुमच्या तारखा तपासेपर्यंत औपचारिक नोटीसचे पाऊल थांबवले आहे — याच ठिकाणी चूक सर्वात महाग पडते.',
+    ta: 'உங்கள் தேதிகள் சரிபார்க்கப்படும் வரை முறையான அறிவிப்புப் படி நிறுத்தப்பட்டுள்ளது — தவறு மிகவும் செலவாகும் படி இதுவே.',
+    ur: 'آپ کی تاریخیں جانچنے تک رسمی نوٹس کا قدم روک دیا گیا ہے — غلطی یہیں سب سے مہنگی پڑتی ہے۔',
+  },
+  chipItConsumer: { en: 'It is a consumer purchase', hi: 'यह उपभोक्ता खरीद है', mr: 'ही ग्राहक खरेदी आहे', ta: 'இது நுகர்வோர் வாங்கல்', ur: 'یہ صارف خریداری ہے' },
+  chipItOfficial: { en: 'It is about an official notice', hi: 'यह किसी सरकारी नोटिस के बारे में है', mr: 'हा शासकीय जाहीरनाम्याविषयी आहे', ta: 'இது அரசு அறிவிப்பு பற்றியது', ur: 'یہ کسی سرکاری نوٹس کے بارے میں ہے' },
+  pickClosest: { en: 'What is this closest to?', hi: 'यह किसके सबसे करीब है?', mr: 'याशी सर्वात जुळणारे काय?', ta: 'இது எதற்கு அதிகம் நெருங்கியது?', ur: 'یہ کس کے سب سے قریب ہے؟' },
+  noticeReviewBanner: {
+    en: 'Every field is editable and every mistake is yours to catch — that is why this screen exists. Check names, dates, amounts and the order number letter by letter.',
+    hi: 'हर विवरण बदला जा सकता है और हर ग़लती पकड़ना आपका काम है — इसीलिए यह स्क्रीन है। नाम, तारीख़ें, रकमें और ऑर्डर नंबर अक्षर-दर-अक्षर जाँचें।',
+    mr: 'प्रत्येक तपशील बदलता येतो आणि प्रत्येक चूक पकडणे तुमचेच काम आहे — म्हणूनच हे स्क्रीन आहे. नावे, तारखा, रक्कमा व ऑर्डर क्रमांक अक्षरशः तपासा.',
+    ta: 'ஒவ்வொரு விவரத்தையும் திருத்தலாம், ஒவ்வொரு தவறையும் நீங்களே பிடிக்க வேண்டும் — அதற்கே இந்தத் திரை. பெயர்கள், தேதிகள், தொகைகள், ஆர்டர் எண்ணை எழுத்துவாரியாகச் சரிபார்க்கவும்.',
+    ur: 'ہر تفصیل تبدیل ہو سکتی ہے اور ہر غلطی پکڑنا آپ کا کام ہے — اسی لیے یہ اسکرین ہے۔ نام، تاریخیں، رقوم اور آرڈر نمبر حرف بہ حرف جانچیں۔',
+  },
+  noticeSendHint: {
+    en: 'Copy it, paste it into a document, print on plain paper, and send by registered post with ACKNOWLEDGEMENT DUE — keep the receipt.',
+    hi: 'इसे कॉपी करें, किसी दस्तावेज़ में पेस्ट करें, सादे काग़ज़ पर प्रिंट करें और पावती-सह रजिस्टर्ड डाक से भेजें — पावती संभाल कर रखें।',
+    mr: 'कॉपी करा, दस्तऐवजात पेस्ट करा, साध्या कागदावर प्रिंट करा आणि पावतीसह नोंदणीकृत पोस्टाने पाठवा — पावती जपून ठेवा.',
+    ta: 'நகலெடுத்து ஆவணத்தில் ஒட்டி, சாதாரண காகிதத்தில் அச்சிட்டு, அறிவிப்பு-விதிப்படி பதிவு அஞ்சலில் அனுப்புங்கள் — ரசீதை வைத்திருங்கள்.',
+    ur: 'کاپی کریں، کسی دستاویز میں پیسٹ کریں، سادہ کاغذ پر پرنٹ کریں اور رسید سمیت رجسٹرڈ پوسٹ سے بھیجیں — رسید محفوظ رکھیں۔',
+  },
+  copyHandoverNote: { en: 'Copy handover note', hi: 'हैंडओवर नोट कॉपी करें', mr: 'हँडओव्हर नोंद कॉपी करा', ta: 'கையளிப்புக் குறிப்பை நகலெடு', ur: 'ہینڈ اوور نوٹ کاپی کریں' },
+  coverageNotice: {
+    en: 'Interface translated (AI-drafted, unreviewed) — the legal cards below stay in English until the translation pass is human-reviewed. Everything else on this screen falls back to English by the visible coverage law.',
+  },
+  langGroupFull: { en: 'Full support', hi: 'पूर्ण सहायता', mr: 'पूर्ण मदत', ta: 'முழு ஆதரவு', ur: 'مکمل معاونت' },
+  langGroupPreview: { en: 'Preview — legal cards in English', hi: 'प्रीव्यू · कानूनी कार्ड अंग्रेज़ी में', mr: 'पूर्वावलोकन · कायदेशीर कार्ड इंग्रजीत', ta: 'முன்தோற்றம் · சட்ட அட்டைகள் ஆங்கிலத்தில்', ur: 'پیش نظارہ · قانونی کارڈ انگریزی میں' },
+  verifyStamp: { en: 'Unverified — needs sign-off', hi: 'जाँच बाक़ी — पुष्टि चाहिए', mr: 'तपासणी बाकी — पुष्टीकरण लागते', ta: 'சரிபார்ப்பு மீதி — ஒப்புதல் தேவை', ur: 'جانچ باقی — تصدیق درکار' },
+  closeTitle: {
+    en: 'Where would you like to leave this today?',
+    hi: 'आज इसे कहाँ छोड़ना चाहेंगे?',
+    mr: 'आज हे कुठे सोडायचे आहे?',
+    ta: 'இன்று இதை எங்கே விட்டுவிட விரும்புகிறீர்கள்?',
+    ur: 'آج اسے کہاں چھوڑنا چاہیں گے؟',
+  },
+  closeStep1: { en: 'I sent the Step 1 message — log today', hi: 'मैंने चरण 1 का संदेश भेज दिया — आज दर्ज करें', mr: 'मी पायरी 1 चा संदेश पाठवला — आज नोंदवा', ta: 'படி 1 செய்தியை அனுப்பிவிட்டேன் — இன்று பதிவு செய்', ur: 'میں نے مرحلہ 1 کا پیغام بھیج دیا — آج درج کریں' },
+  closeStep1Done: {
+    en: 'Logged {date}. If the seller does not reply in writing by the deadline in your draft, Step 2 (the free 1915 helpline) is next.',
+    hi: '{date} को दर्ज। अगर विक्रेता आपके ड्राफ़्ट की समय-सीमा में लिखित जवाब नहीं देता, तो अगला चरण 2 (मुफ़्त 1915 हेल्पलाइन) है।',
+    mr: '{date} रोजी नोंद. विक्रेता तुमच्या मसुद्याच्या मुदतीत लेखी उत्तर न देता आल्यास पुढची पायरी 2 (मोफत 1915 हेल्पलाइन) आहे.',
+    ta: '{date} பதிவு. உங்கள் வரைவின் காலக்கெடுவுக்குள் எழுத்துப்பூர்வ பதில் வரவில்லையென்றால் அடுத்த படி 2 (இலவச 1915 உதவி எண்).',
+    ur: '{date} کو درج۔ اگر فروشنر آپ کے مسودے کی مدت میں تحریری جواب نہ دے تو اگلا مرحلہ 2 (مفت 1915 ہیلپ لائن) ہے۔',
+  },
+  closeSave: { en: 'Save this finding and ladder for later', hi: 'यह निष्कर्ष और सीढ़ी बाद के लिए सहेजें', mr: 'हा निष्कर्ष व पावले नंतरसाठी सेव्ह करा', ta: 'இந்த கண்டுபிடிப்பையும் படிகளையும் பின்னருக்குச் சேமி', ur: 'یہ نتیجہ اور سیڑھی بعد کے لیے محفوظ کریں' },
+  closeSaveDone: { en: 'Saved to your Saved folder on this device.', hi: 'इसी डिवाइस पर आपके सेव्ह फ़ोल्डर में सहेजा गया।', mr: 'याच उपकरणावर तुमच्या सेव्ह फोल्डरमध्ये सेव्ह झाले.', ta: 'இந்தச் சாதனத்தில் உங்கள் சேமித்த கோப்புறையில் சேமிக்கப்பட்டது.', ur: 'اسی ڈیوائس پر آپ کے محفوظ فولڈر میں محفوظ ہو گیا۔' },
+  closeResolved: { en: 'My issue is resolved — close this matter', hi: 'मेरी समस्या हल हो गई — यह मामला बंद करें', mr: 'माझी समस्या सुटली — ही बाब बंद करा', ta: 'என் பிரச்சனை தீர்ந்தது — இந்த வழக்கை மூடு', ur: 'میرا مسئلہ حل ہو گیا — یہ معاملہ بند کریں' },
+  closeResolvedDone: {
+    en: 'Closed {date}. Nothing was sent by the app; this log stays on your device.',
+    hi: '{date} को बंद। ऐप ने कुछ नहीं भेजा; यह रिकॉर्ड आपके डिवाइस पर रहता है।',
+    mr: '{date} रोजी बंद. अॅपने काहीही पाठवले नाही; ही नोंद तुमच्या उपकरणावर राहते.',
+    ta: '{date} மூடப்பட்டது. செயலி எதுவும் அனுப்பவில்லை; இந்தப் பதிவு உங்கள் சாதனத்திலேயே இருக்கும்.',
+    ur: '{date} کو بند۔ ایپ نے کچھ نہیں بھیجا؛ یہ ریکارڈ آپ کے ڈیوائس پر رہتا ہے۔',
+  },
+  matterLogTitle: { en: 'Your log (on this device)', hi: 'आपका रिकॉर्ड (इसी डिवाइस पर)', mr: 'तुमची नोंद (याच उपकरणावर)', ta: 'உங்கள் பதிவு (இந்தச் சாதனத்தில்)', ur: 'آپ کا ریکارڈ (اسی ڈیوائس پر)' },
+  matterLogStep1: { en: 'Step 1 message logged', hi: 'चरण 1 का संदेश दर्ज', mr: 'पायरी 1 चा संदेश नोंदवला', ta: 'படி 1 செய்தி பதிவு', ur: 'مرحلہ 1 کا پیغام درج' },
+  matterLogClosed: { en: 'Matter closed', hi: 'मामला बंद', mr: 'बाब बंद', ta: 'வழக்கு மூடப்பட்டது', ur: 'معاملہ بند' },
+  savedFromChat: { en: 'Saved from conversations', hi: 'बातचीत से सहेजे गए', mr: 'संभाषणांतून सेव्ह केलेले', ta: 'உரையாடல்களிலிருந்து சேமித்தவை', ur: 'گفتگو سے محفوظ کیے گئے' },
 }
 
 export type UiKey = keyof UiStrings

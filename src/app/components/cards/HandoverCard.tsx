@@ -4,7 +4,7 @@ import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
 import { VerificationBadge } from '../trust/VerificationBadge'
 
-const WHAT_TO_BRING = [
+export const WHAT_TO_BRING = [
   'The bill or order confirmation',
   'Photos of the damaged item',
   'A written timeline of dates',

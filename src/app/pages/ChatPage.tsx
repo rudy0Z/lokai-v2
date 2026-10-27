@@ -3,12 +3,17 @@ import { toast } from 'sonner'
 import { useApp } from '../lib/app-context'
 import { navigate, useHashRoute } from '../lib/router'
 import { runBeats, SimulatedFailure, type BeatClass } from '../lib/engine'
-import { classifyMatter, reRouteAsCaution, type ScopeDecision } from '../data/scope-rules'
+import { classifyMatter, reRouteAsCaution, SCOPE_RULES, type ScopeDecision } from '../data/scope-rules'
+import { REASSURANCE, SCENARIO_SEEDS } from '../data/refund-journey'
+import { FOLLOW_UPS } from '../data/localized-content'
 import {
-  FINDING,
-  REASSURANCE,
-  SCENARIO_SEEDS,
-} from '../data/refund-journey'
+  extractFacts,
+  factRows,
+  buildFinding,
+  EMPTY_FACTS,
+  type FactRecord,
+} from '../lib/matter-facts'
+import { LANGUAGES } from '../data/languages'
 import { AppShell } from '../components/ui/shell'
 import { Banner } from '../components/ui/Banner'
 import { Button } from '../components/ui/Button'
@@ -16,27 +21,26 @@ import { Chip } from '../components/ui/Chip'
 import { Thread } from '../components/chat/Thread'
 import { MessageBubble } from '../components/chat/MessageBubble'
 import { TypingIndicator } from '../components/chat/TypingIndicator'
-import { QuickReplies } from '../components/chat/QuickReplies'
 import { Composer } from '../components/chat/Composer'
 import { FindingCard, type FindingCardData } from '../components/cards/FindingCard'
 import { ActionLadder } from '../components/cards/ActionLadder'
 import { CautionCard } from '../components/cards/CautionCard'
+import { CloseOutCard } from '../components/cards/CloseOutCard'
 import { DemandNoticeReview } from '../components/cards/DemandNoticeReview'
 import { StopScreen } from '../components/stop/StopScreen'
 import { ProtectiveCard } from '../components/stop/ProtectiveCard'
+import { HandoverCard, WHAT_TO_BRING } from '../components/cards/HandoverCard'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
 import { IconCamera, IconKeyboard, IconCopy, IconPlay } from '../components/ui/icons'
 import { useSpans } from '../lib/useSpans'
 import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
 import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
-import { HandoverCard } from '../components/cards/HandoverCard'
 import { Card } from '../components/ui/Card'
 
 type ItemKind =
   | 'user'
   | 'assistant'
-  | 'chips'
   | 'finding'
   | 'ladder'
   | 'caution'
@@ -46,23 +50,34 @@ type ItemKind =
   | 'handover'
   | 'noticecard'
   | 'protective'
+  | 'closeout'
 
 interface ChatItem {
   id: number
   kind: ItemKind
   text?: string
   variant?: 'full' | 'free'
-  stale?: boolean
-  role?: 'answer'
   /** assistant text still revealing (caret streaming) */
   stream?: boolean
-  /** a consumed question row (collapsed once answered) */
-  done?: boolean
-  /** the scope decision attached to protective/handover items */
+  /** the scope decision attached to protective/handover/caution items */
   decision?: ScopeDecision
 }
 
-type AnswerId = '30' | '1to2' | '2plus' | 'notsure'
+/**
+ * Conversational stage (deep-audit P0 fix): follow-ups in the composer are
+ * no longer re-classified as Turn 1. intake = before the first finding;
+ * engaged = a finding/ladder/caution is on the table; stopped = a protective
+ * stop landed. Safety patterns (strongStop) always win over the stage.
+ */
+type ThreadStage = 'intake' | 'engaged' | 'stopped'
+
+const CARD_KINDS = new Set<ItemKind>([
+  'finding', 'ladder', 'caution', 'factcheck', 'protective', 'handover', 'noticecard', 'closeout', 'error',
+])
+
+const RE_PROMISE =
+  /will i (?:really |actually )?(?:get|win|receive)|i will (?:get|win)|refund,?\s*right|pakka|मिलेगा|पक्का|मिलेल का|கிடைக்குமா|ملے گا|مل جائے گا|पैसे मिल/i
+const RE_ESCALATE = /ignore|no reply|not respon|जवाब नहीं|जवाब नही|பதில் இல்லை|جواب نہیں/i
 
 export default function ChatPage() {
   const { tr, lang } = useApp()
@@ -75,9 +90,12 @@ export default function ChatPage() {
   const [stageLabel, setStageLabel] = useState<string | undefined>()
   const [offline, setOffline] = useState(false)
   const [attachments, setAttachments] = useState<string[]>([])
+  const [stage, setStage] = useState<ThreadStage>('intake')
+  const [protectDecision, setProtectDecision] = useState<ScopeDecision | null>(null)
   const [stopDecision, setStopDecision] = useState<ScopeDecision | null>(null)
   const [noticeOpen, setNoticeOpen] = useState(false)
-  const [findingData, setFindingData] = useState<FindingCardData>(FINDING)
+  const [matterFacts, setMatterFacts] = useState<FactRecord>(EMPTY_FACTS)
+  const [findingData, setFindingData] = useState<FindingCardData>(() => buildFinding(EMPTY_FACTS, 'en'))
   const [factItems, setFactItems] = useState<FactItem[]>([])
   const [composerOpen, setComposerOpen] = useState(false)
 
@@ -85,6 +103,7 @@ export default function ChatPage() {
   const seededRef = useRef<string | null>(null)
   const retryRef = useRef<(() => void) | null>(null)
   const cancelRef = useRef(false)
+  const lastUserRef = useRef('')
 
   const nextId = () => ++idRef.current
   const push = (...newItems: Omit<ChatItem, 'id'>[]) =>
@@ -120,43 +139,92 @@ export default function ChatPage() {
 
   /* ---- flows ---- */
 
-  const startConsumerFlow = (fail = false, _userText?: string) => {
+  const startConsumerFlow = (fail = false, userText?: string) => {
     run(
       'explain',
       () => {
+        const facts = extractFacts(userText ?? '')
+        setMatterFacts(facts)
+        setFactItems(factRows(facts, lang))
         // Anti-fatigue (audit Dimension 2): NO verbatim echo — the emotion-
         // matched acknowledgment only. The FactCheckCard is the single
-        // structured restatement of the facts, later in the thread.
+        // structured confirmation (purchase window included), later in the
+        // thread.
         push(
           {
             kind: 'assistant',
             stream: true,
             text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en,
           },
-          { kind: 'chips', text: 'qWhen' },
+          { kind: 'factcheck' },
         )
       },
       fail,
     )
   }
 
-  const startCautionFlow = () => {
+  const runProtective = (decision: ScopeDecision) => {
+    setProtectDecision(decision)
+    setStage('stopped')
+    run('stop', () => {
+      push(
+        { kind: 'system', text: tr('tierHardStop') },
+        { kind: 'protective', decision },
+        { kind: 'handover', decision },
+      )
+    })
+  }
+
+  const startCautionFlow = (decision: ScopeDecision) => {
+    setStage('engaged')
     run('caution', () => {
       push(
         { kind: 'system', text: tr('tierCaution') },
-        { kind: 'caution' },
+        { kind: 'caution', decision },
         { kind: 'ladder', variant: 'free' },
       )
     })
   }
 
+  /** turn-aware follow-up (deep-audit P0-1): answer the human, never re-run Turn 1 */
+  const followUp = (currentStage: ThreadStage) => {
+    const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
+    const text = lastUserRef.current
+    const msg = RE_PROMISE.test(text)
+      ? pack.outcome
+      : RE_ESCALATE.test(text)
+        ? pack.escalate
+        : currentStage === 'stopped'
+          ? pack.stopped
+          : pack.general
+    run('progress', () => {
+      push({ kind: 'assistant', stream: true, text: msg })
+    })
+  }
+
   const handleSend = (text: string, _atts: string[], fail = false) => {
     push({ kind: 'user', text })
+    lastUserRef.current = text
 
-    // safety first: strong hard-stop signals never route to the notice reader
+    // safety first: strong hard-stop signals win over everything, any turn
     const strongStop = /evict|throw (?:us|me|him|her) out|threat|police|\bfir\b|धमकी|बेदखल|पुलिस|پولیس/i.test(text)
+    if (strongStop) {
+      const decision = classifyMatter(text, lang)
+      const d: ScopeDecision =
+        decision.tier === 'hard-stop'
+          ? decision
+          : { ...decision, tier: 'hard-stop' as const }
+      runProtective(d)
+      return
+    }
+
+    if (stage !== 'intake') {
+      followUp(stage)
+      return
+    }
+
     // notice-intent: a received legal/official/tax notice → the interpreter
-    // (explain-only), NOT the consumer script and NOT a fake "coming later" (Trap 2)
+    // (explain-only), NOT the consumer script and NOT a fake "coming later"
     const noticeIntent =
       /\b(?:legal|official|court|tax|municipal|property[- ]tax|govt|government)\s+notice\b/i.test(text) ||
       /\bnotice\s+(?:about|regarding|from|came|received)\b/i.test(text) ||
@@ -167,8 +235,13 @@ export default function ChatPage() {
       /जाहीरनामा (?:आल|मिळाल)/i.test(text) ||
       /(சட்ட|அரசு|வரி|மாநகர|சொத்து)[\s-]*அறிவிப்பு/i.test(text) ||
       /(قانونی|سرکاری|ٹیکس|بلدیہ|جائیداد)[\s-]*نوٹس/i.test(text)
-    if (!strongStop && noticeIntent) {
-      push({ kind: 'noticecard' })
+    if (noticeIntent) {
+      run('progress', () => {
+        push(
+          { kind: 'assistant', stream: true, text: REASSURANCE.notice[lang] ?? REASSURANCE.notice.en },
+          { kind: 'noticecard' },
+        )
+      })
       return
     }
 
@@ -176,64 +249,81 @@ export default function ChatPage() {
 
     if (decision.tier === 'hard-stop') {
       // In-thread protective triage (audit Dimension 1): the stop lands in
-      // the conversation — no full-screen takeover. The composer stays live.
-      run('stop', () => {
-        push(
-          { kind: 'system', text: tr('tierHardStop') },
-          { kind: 'protective', decision },
-          { kind: 'handover', decision },
-        )
-      })
+      // the conversation — no full-screen takeover. The protective footer
+      // replaces the composer while the stop is active.
+      runProtective(decision)
       return
     }
     if (decision.tier === 'caution') {
-      startCautionFlow()
+      startCautionFlow(decision)
       return
     }
     startConsumerFlow(fail, text)
   }
 
-  const handleAnswer = (answer: AnswerId) => {
-    const label =
-      answer === '30' ? tr('ans30') : answer === '1to2' ? tr('ans1to2') : answer === '2plus' ? tr('ans2plus') : tr('ansNotSure')
-    // collapse the answered question chips — the thread reads as a conversation (Trap 3)
-    setItems((prev) => prev.map((i) => (i.kind === 'chips' ? { ...i, done: true } : i)))
-    push({ kind: 'user', text: label, role: 'answer' })
-
-    if (answer === '30' || answer === '1to2') {
-      setFactItems([
-        { key: 'item', label: 'Item', value: 'Mixer grinder' },
-        { key: 'seller', label: 'Seller', value: 'HomeKart' },
-        { key: 'issue', label: 'Issue', value: 'Arrived cracked' },
-        { key: 'ask', label: 'Refused', value: 'Refund and replacement' },
-        { key: 'when', label: 'Bought', value: label },
-      ])
-      // the verification gate: nothing generative until facts are signed (A2.7)
-      run('explain', () => {
-        push({ kind: 'factcheck' })
-      })
-    } else {
-      run('caution', () => {
-        push({ kind: 'caution' }, { kind: 'ladder', variant: 'free' })
-      })
+  /**
+   * The signed confirmation (deep-audit P0-3): the fact gate's values ARE
+   * the matter record now — the finding, the drafts and the demand notice
+   * are built from them. Correct a fact, confirm again, and the downstream
+   * cards update in place. The purchase-window row routes 2yr+/not-sure to
+   * the honest time-barred caution.
+   */
+  const confirmFacts = (values: Record<string, string>) => {
+    const next: FactRecord = {
+      item: values.item ?? '',
+      seller: values.seller ?? '',
+      amount: values.amount ?? '',
+      issue: (values.issue as FactRecord['issue']) ?? '',
+      ask: (values.ask as FactRecord['ask']) ?? '',
+      when: (values.when as FactRecord['when']) ?? '',
     }
+    setMatterFacts(next)
+    setStage('engaged')
+
+    if (next.when === '2plus' || next.when === 'ns') {
+      const rule = SCOPE_RULES.find((r) => r.id === 'possible-time-barred')!
+      const decision: ScopeDecision = {
+        tier: 'caution',
+        ruleId: rule.id,
+        label: rule.label,
+        why: rule.whyI18n[lang] ?? rule.whyI18n.en ?? '',
+        certainty: 'matched',
+      }
+      run('caution', () => {
+        push({ kind: 'caution', decision }, { kind: 'ladder', variant: 'free' })
+      })
+      return
+    }
+
+    run('progress', () => {
+      setFindingData(buildFinding(next, lang))
+      push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' }, { kind: 'closeout' })
+    })
   }
 
-  const confirmFacts = useCallback(() => {
-    run('progress', () => {
-      push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
-    })
-  }, [run])
-
-  /** user changes an earlier answer: downstream cards go stale, question re-opens */
-  const reopenQuestion = (userId: number) => {
-    setItems((prev) => {
-      const idx = prev.findIndex((i) => i.id === userId)
-      const downstream = prev.slice(idx + 1)
-      const staleDownstream = downstream.map((i) =>
-        i.kind === 'finding' || i.kind === 'ladder' || i.kind === 'caution' ? { ...i, stale: true } : i,
+  /* unclear-caution disambiguation doors (deep-audit P0-2) */
+  const reConsumer = () => {
+    run('explain', () => {
+      const facts = extractFacts(lastUserRef.current)
+      setMatterFacts(facts)
+      setFactItems(factRows(facts, lang))
+      push(
+        { kind: 'assistant', stream: true, text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en },
+        { kind: 'factcheck' },
       )
-      return [...prev.slice(0, idx + 1), ...staleDownstream, { id: nextId(), kind: 'chips', text: 'qWhen' }]
+    })
+  }
+  const reNotice = () => {
+    run('progress', () => {
+      push(
+        { kind: 'assistant', stream: true, text: REASSURANCE.notice[lang] ?? REASSURANCE.notice.en },
+        { kind: 'noticecard' },
+      )
+    })
+  }
+  const reOther = (decision?: ScopeDecision) => {
+    run('progress', () => {
+      push({ kind: 'handover', decision })
     })
   }
 
@@ -243,24 +333,53 @@ export default function ChatPage() {
   }
 
   const tellMore = () => {
+    setProtectDecision(null)
     setStopDecision(null)
+    setStage('engaged')
     const decision = reRouteAsCaution(lang)
     push({ kind: 'system', text: tr('tierCaution') })
     run('caution', () => {
       push(
         { kind: 'assistant', text: decision.why },
-        { kind: 'caution' },
         { kind: 'ladder', variant: 'free' },
       )
     })
   }
 
+  const copyHandover = async () => {
+    const d = protectDecision
+    if (!d) return
+    const note = [
+      tr('tierHardStop') + ' — ' + d.label,
+      '',
+      d.why,
+      '',
+      lastUserRef.current,
+      '',
+      tr('handoverWhat') + ':',
+      ...WHAT_TO_BRING.map((w) => `· ${w}`),
+    ].join('\n')
+    const ok = await copyText(note)
+    if (ok) toast.success(tr('copied'))
+  }
+
   const reset = () => {
     setItems([])
     setStopDecision(null)
+    setProtectDecision(null)
     setNoticeOpen(false)
-    setFindingData(FINDING)
+    setStage('intake')
+    setMatterFacts(EMPTY_FACTS)
+    setFindingData(buildFinding(EMPTY_FACTS, 'en'))
+    setFactItems([])
   }
+
+  /* the finding card re-speaks the signed facts in the current language */
+  useEffect(() => {
+    setFindingData(buildFinding(matterFacts, lang))
+    // matterFacts intentionally excluded: rebuild on language switch only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
 
   /* ---- handoff from the simulated voice flow (review & send).
      StrictMode-safe: the storage item is consumed only when the timer
@@ -305,10 +424,7 @@ export default function ChatPage() {
     const seed = SCENARIO_SEEDS.find((s) => s.id === seedId)
     if (!seed) return
     // launcher discipline: a fresh seed always starts a fresh conversation
-    setItems([])
-    setNoticeOpen(false)
-    setStopDecision(null)
-    setFindingData(FINDING)
+    reset()
     if (seed.forceOffline) {
       seededRef.current = seedId
       setOffline(true)
@@ -326,6 +442,15 @@ export default function ChatPage() {
 
   const empty = items.length === 0 && !stopDecision && !noticeOpen
 
+  /* scroll focus: the first card of the trailing card batch mounts with its
+     headline in view (deep-audit P2-10) instead of yanking to the bottom */
+  let focusSelector: string | null = null
+  for (let i = items.length - 1; i >= 0; i--) {
+    const it = items[i]!
+    if (!CARD_KINDS.has(it.kind)) break
+    focusSelector = `[data-chat-item="${it.id}"]`
+  }
+
   /* Duo spanning: the latest generative card docks in the right pane */
   const focusItem = spans
     ? [...items].reverse().find((i) => i.kind === 'finding' || i.kind === 'caution' || i.kind === 'ladder')
@@ -337,27 +462,51 @@ export default function ChatPage() {
     >
       {focusItem.kind === 'finding' && (
         <MessageBubble role="assistant">
-          <FindingCard data={findingData} stale={focusItem.stale} onUpdate={setFindingData} />
+          <FindingCard data={findingData} onUpdate={setFindingData} />
         </MessageBubble>
       )}
-      {focusItem.kind === 'caution' && <CautionCard />}
+      {focusItem.kind === 'caution' && <CautionCard decision={focusItem.decision} />}
       {focusItem.kind === 'ladder' && (
-        <ActionLadder mode={focusItem.variant ?? 'full'} onOpenNotice={() => setNoticeOpen(true)} />
+        <ActionLadder mode={focusItem.variant ?? 'full'} onOpenNotice={() => setNoticeOpen(true)} facts={matterFacts} />
       )}
     </aside>
   )
   const spanRow = spans ? 'flex min-h-0 flex-1 flex-row gap-2' : 'flex min-h-0 flex-1 flex-col'
 
-  const chipsForQuestion = (
-    <QuickReplies
-      options={[
-        { id: '30', label: tr('ans30'), onSelect: () => handleAnswer('30') },
-        { id: '1to2', label: tr('ans1to2'), onSelect: () => handleAnswer('1to2') },
-        { id: '2plus', label: tr('ans2plus'), onSelect: () => handleAnswer('2plus') },
-        { id: 'ns', label: tr('ansNotSure'), onSelect: () => handleAnswer('notsure') },
-      ]}
-    />
-  )
+  const whenOptions = [
+    { key: '30', label: tr('ans30') },
+    { key: '1to2', label: tr('ans1to2') },
+    { key: '2plus', label: tr('ans2plus') },
+    { key: 'ns', label: tr('ansNotSure') },
+  ]
+
+  const protectiveFooter = protectDecision ? (
+    <div
+      className="flex flex-col gap-2 rounded-[26px] bg-standout p-2.5 text-fg-on-inverted"
+      role="region"
+      aria-label={tr('protectGuide')}
+    >
+      {/* deep-audit §6(a): while a protective stop is active the composer
+          gives way to an action bar — no more scared follow-ups looping
+          duplicate protective cards */}
+      <Button variant="inverted" size="sm" block onClick={() => setStopDecision(protectDecision)}>
+        {tr('protectGuide')}
+      </Button>
+      <div className="flex gap-2">
+        <Button variant="inverted" size="sm" block onClick={copyHandover}>
+          {tr('copyHandoverNote')}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-fg-standout-secondary enabled:hover:bg-veil-standout"
+          onClick={tellMore}
+        >
+          {tr('tellMore')}
+        </Button>
+      </div>
+    </div>
+  ) : null
 
   return (
     <AppShell
@@ -367,23 +516,25 @@ export default function ChatPage() {
         </Button>
       }
       footer={
-        // Trap-3A fix: no chat composer on the voice-first empty state or the
-        // notice flows — one input model per screen. The stop flow keeps the
-        // composer live now (audit fix): only Send locks while beats run.
+        // one input model per screen: voice-first empty state and the notice
+        // flow show none; the active stop shows the protective action bar;
+        // everything else is the composer (typing stays live during beats).
         empty && !composerOpen ? undefined : noticeOpen || stopDecision ? undefined : (
-          <Composer
-            onSend={handleSend}
-            sendLocked={busy}
-            offline={offline}
-            attachments={attachments}
-            onAttach={(name) => setAttachments((a) => [...a, name])}
-            onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
-          />
+          (protectiveFooter ?? (
+            <Composer
+              onSend={handleSend}
+              sendLocked={busy}
+              offline={offline}
+              attachments={attachments}
+              onAttach={(name) => setAttachments((a) => [...a, name])}
+              onRemoveAttachment={(name) => setAttachments((a) => a.filter((x) => x !== name))}
+            />
+          ))
         )
       }
     >
       {noticeOpen ? (
-        <DemandNoticeReview onBack={() => setNoticeOpen(false)} />
+        <DemandNoticeReview key={`${lang}-${matterFacts.amount}-${matterFacts.item}`} facts={matterFacts} onBack={() => setNoticeOpen(false)} />
       ) : stopDecision ? (
         <StopScreen
           decision={stopDecision}
@@ -392,15 +543,18 @@ export default function ChatPage() {
         />
       ) : (
         <>
-          {offline && (
-            <div className="px-3.5 pt-3">
-              <Banner tone="offline">{tr('offlineBanner')}</Banner>
+          {(offline || LANGUAGES[lang].coverage !== 'full') && (
+            <div className="flex flex-col gap-2 px-3.5 pt-3">
+              {offline && <Banner tone="offline">{tr('offlineBanner')}</Banner>}
+              {/* honest coverage signpost (deep-audit §6(e), Tier 2) */}
+              {LANGUAGES[lang].coverage !== 'full' && <Banner tone="info">{tr('coverageNotice')}</Banner>}
             </div>
           )}
           <div className={spanRow}>
             <Thread
               scrollKey={`${items.length}-${busy}-${stageLabel ?? ''}`}
               autoScroll={items.length > 0}
+              focusSelector={focusSelector}
               className={spans ? 'min-w-0 flex-1 ps-[max(1rem,env(safe-area-inset-left))]' : undefined}
             >
             {(() => {
@@ -413,7 +567,12 @@ export default function ChatPage() {
             {empty && (
               <div className="flex flex-col items-center gap-6 px-5 pb-10 pt-14 text-center">
                 <div>
-                  <h1 className="font-serif text-[2.1rem] font-semibold leading-[1.12] tracking-[-0.02em] text-fg-primary">
+                  <h1
+                    className={
+                      'font-serif text-[2.1rem] font-semibold leading-[1.12] text-fg-primary' +
+                      (lang === 'en' ? ' tracking-[-0.02em]' : '')
+                    }
+                  >
                     {tr('greeting')}
                   </h1>
                   <p className="mx-auto mt-3 max-w-[320px] text-[0.95rem] leading-relaxed text-fg-secondary">
@@ -492,10 +651,7 @@ export default function ChatPage() {
                     <MessageBubble
                       key={item.id}
                       role="user"
-                      isAnswer={item.role === 'answer'}
-                      stale={item.stale}
-                      onStaleAction={item.role === 'answer' ? () => reopenQuestion(item.id) : undefined}
-                      staleActionLabel={tr('update')}
+                      dataId={item.id}
                     >
                       {item.text}
                     </MessageBubble>
@@ -505,6 +661,7 @@ export default function ChatPage() {
                     <MessageBubble
                       key={item.id}
                       role="assistant"
+                      dataId={item.id}
                       actions={
                         item.stream ? undefined : (
                           <Button
@@ -543,17 +700,9 @@ export default function ChatPage() {
                       {item.text}
                     </MessageBubble>
                   )
-                case 'chips':
-                  if (item.done) return null
-                  return (
-                    <div key={item.id} className="flex flex-col gap-2.5 ps-7">
-                      <p className="text-sm font-medium text-fg-primary">{tr('qWhen')}</p>
-                      {chipsForQuestion}
-                    </div>
-                  )
                 case 'noticecard':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
+                    <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <Card className="flex flex-col gap-2.5">
                         <h3 className="font-serif text-lg font-semibold text-fg-primary">
                           {tr('noticeCardTitle')}
@@ -569,10 +718,9 @@ export default function ChatPage() {
                   )
                 case 'finding':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
+                    <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <FindingCard
                         data={findingData}
-                        stale={item.stale}
                         onUpdate={setFindingData}
                         onDiscard={() => {
                           setItems((prev) => prev.filter((i) => i.id !== item.id))
@@ -583,14 +731,22 @@ export default function ChatPage() {
                   )
                 case 'ladder':
                   return (
-                    <div key={item.id} className="ps-7">
-                      <ActionLadder mode={item.variant ?? 'full'} onOpenNotice={() => setNoticeOpen(true)} />
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                      <ActionLadder
+                        mode={item.variant ?? 'full'}
+                        onOpenNotice={() => setNoticeOpen(true)}
+                        facts={matterFacts}
+                      />
                     </div>
                   )
                 case 'caution':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
+                    <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <CautionCard
+                        decision={item.decision}
+                        onConsumer={reConsumer}
+                        onNotice={reNotice}
+                        onOther={() => reOther(item.decision)}
                         onDiscard={() => {
                           setItems((prev) => prev.filter((i) => i.id !== item.id))
                           toast('Caution card discarded')
@@ -598,15 +754,25 @@ export default function ChatPage() {
                       />
                     </MessageBubble>
                   )
+                case 'closeout':
+                  return (
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                      <CloseOutCard findingTitle={findingData.title} />
+                    </div>
+                  )
                 case 'factcheck':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
-                      <FactCheckCard facts={factItems} onConfirm={confirmFacts} />
+                    <MessageBubble key={item.id} role="assistant" dataId={item.id}>
+                      <FactCheckCard
+                        facts={factItems}
+                        whenOptions={whenOptions}
+                        onConfirm={confirmFacts}
+                      />
                     </MessageBubble>
                   )
                 case 'protective':
                   return (
-                    <MessageBubble key={item.id} role="assistant">
+                    <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <ProtectiveCard
                         decision={item.decision!}
                         onOpenGuide={() => setStopDecision(item.decision ?? null)}
@@ -616,7 +782,7 @@ export default function ChatPage() {
                   )
                 case 'handover':
                   return (
-                    <div key={item.id} className="ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
                       <HandoverCard
                         tierLabel={item.decision?.tier === 'caution' ? tr('tierCaution') : tr('tierHardStop')}
                         why={item.decision?.why ?? ''}
@@ -625,7 +791,7 @@ export default function ChatPage() {
                   )
                 case 'error':
                   return (
-                    <div key={item.id} className="ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
                       <Banner
                         tone="danger"
                         action={
