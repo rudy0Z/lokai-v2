@@ -100,6 +100,10 @@ const CARD_KINDS = new Set<ItemKind>([
 const RE_PROMISE =
   /will i (?:really |actually )?(?:get|win|receive)|i will (?:get|win)|refund,?\s*right|pakka|मिलेगा|पक्का|मिलेल का|கிடைக்குமா|ملے گا|مل جائے گا|पैसे मिल/i
 const RE_ESCALATE = /ignore|no reply|not respon|जवाब नहीं|जवाब नही|பதில் இல்லை|جواب نہیں/i
+/* calm-authority M4: a resolution claim is celebrated, never met with the
+   "still on the same matter" policy line */
+const RE_RESOLVED =
+  /refund (?:received|processed|approved|mil gaya|aa gaya)|pickup (?:scheduled|ho gaya|done)|money (?:back|returned|refund ho gaya)|maan gaye?|सुलझ गया|हल हो गया|पैसे वापस मिल|परत मिळाले|திரும்பியது|حل ہو گیا|رقم واپس مل گئی|sorted!/i
 
 export default function ChatPage() {
   const { tr, lang, activeCaseId, setActiveCase } = useApp()
@@ -217,6 +221,15 @@ export default function ChatPage() {
     const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
     const text = lastUserRef.current
     const domainPackLive = domain ? domainPack(domain.id, domain.branch, lang) : null
+    if (RE_RESOLVED.test(text)) {
+      /* M4: a resolution is celebrated as process-win, then the closeout
+         mounts alone — never the "still on the same matter" line */
+      stageRef.current = 'awaitingFacts'
+      run('progress', () => {
+        push({ kind: 'assistant', stream: true, text: pack.resolved }, { kind: 'closeout' })
+      })
+      return
+    }
     const msg = RE_PROMISE.test(text)
       ? pack.outcome
       : RE_ESCALATE.test(text)
@@ -627,12 +640,12 @@ export default function ChatPage() {
         })
         return
       case 'resolved':
-        /* the matter is closing — drop the rail (stage with no options) so
-           the closeout card stands alone, not competing with a second menu */
+        /* M4: celebrate the process-win, then the closeout stands alone —
+           the rail drops (stage with no options) */
         stageRef.current = 'awaitingFacts'
         run('progress', () => {
           push(
-            { kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).general },
+            { kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).resolved },
             { kind: 'closeout' },
           )
         })
