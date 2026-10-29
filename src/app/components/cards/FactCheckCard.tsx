@@ -5,6 +5,7 @@ import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Chip } from '../ui/Chip'
 import { Input } from '../ui/Field'
+import { IconPencil } from '../ui/icons'
 
 export interface FactItem {
   key: string
@@ -105,7 +106,11 @@ export function FactCheckCard({
             key={f.key}
             className={cn('rounded-xl bg-sunken px-3 py-2', wideCell(values[f.key] ?? '') && 'col-span-2')}
           >
-            <p className="text-xs text-fg-tertiary">{f.label}</p>
+            <div className="flex items-center justify-between gap-1.5">
+              <p className="text-xs text-fg-tertiary">{f.label}</p>
+              {/* M5: the edit affordance is visible, not hidden behind a tap */}
+              <IconPencil className="size-3 shrink-0 text-fg-tertiary/70" />
+            </div>
             {editing === f.key ? (
               <Input
                 autoFocus
@@ -203,8 +208,8 @@ export function FactCheckCard({
 
       <Button
         variant="primary"
-        size="sm"
-        className="self-start"
+        size="md"
+        block
         disabled={whenOptions.length > 0 && !whenChosen}
         onClick={() => onConfirm(values)}
       >

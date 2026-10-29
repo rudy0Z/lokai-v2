@@ -7,7 +7,7 @@ import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Textarea } from '../ui/Field'
 import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
-import { IconSparkle } from '../ui/icons'
+import { IconDoc, IconSparkle } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
@@ -136,8 +136,15 @@ export function FindingCard({ data, stale, onUpdate, onDiscard, onShowLadder, la
       {/* the trust well — confidence, verification and reasoning tucked UNDER
           the answer (calm authority: headline & plain law first) */}
       <div className="mt-1 flex flex-col gap-2.5 rounded-2xl bg-sunken px-3.5 py-3">
+        {/* M5: the cited source as a quantified pill — trust shows work */}
         {legal && (
-          <span className="text-xs text-fg-secondary" lang="en">{legal.source}</span>
+          <span
+            className="inline-flex max-w-full items-center gap-1.5 self-start rounded-full bg-card px-2.5 py-1 text-2xs text-fg-secondary"
+            lang="en"
+          >
+            <IconDoc className="size-3.5 shrink-0 text-fg-tertiary" />
+            <span className="min-w-0 truncate">Cited source 1 of 1 · {legal.source}</span>
+          </span>
         )}
         <div className="flex flex-wrap items-center gap-2">
           <ConfidenceIndicator level={draft.confidence} />

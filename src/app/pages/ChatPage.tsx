@@ -200,6 +200,8 @@ export default function ChatPage() {
       push(
         { kind: 'system', text: tr('tierHardStop') },
         { kind: 'protective', decision },
+        /* M5: the handoff is a NAMED narrative event, not just paperwork */
+        { kind: 'system', text: tr('handoffNarrative') },
         { kind: 'handover', decision },
       )
     })
@@ -416,7 +418,7 @@ export default function ChatPage() {
   }
   const reOther = (decision?: ScopeDecision) => {
     run('progress', () => {
-      push({ kind: 'handover', decision })
+      push({ kind: 'system', text: tr('handoffNarrative') }, { kind: 'handover', decision })
     })
   }
 

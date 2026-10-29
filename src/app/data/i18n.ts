@@ -141,6 +141,7 @@ export interface UiStrings {
   factCheckSub: Pack
   factConfirm: Pack
   factCorrect: Pack
+  handoffNarrative: Pack
   handoverTitle: Pack
   handoverWhat: Pack
   exhibitsLabel: Pack
@@ -420,7 +421,8 @@ export const UI: UiStrings = {
     ta: 'மேலும் செல்வதற்கு முன் ஒவ்வொரு உண்மையையும் சரிபார்க்கவும் — எதையும் திருத்தலாம்.',
     ur: 'آگے بڑھنے سے پہلے ہر حقیقت جانچیں — آپ کوئی بھی درست کر سکتے ہیں۔',
   },
-  factConfirm: { en: 'Yes, that’s right', hi: 'हाँ, सही है', mr: 'हो, बरोबर', ta: 'ஆம், சரி', ur: 'ہاں، درست ہے' },
+  factConfirm: { en: '✓ Yes, that’s right — show my standing', hi: '✓ हाँ, सही है — मेरी कानूनी स्थिति दिखाएँ', mr: '✓ हो, बरोबर — माझी कायदेशीर स्थिती दाखवा', ta: '✓ ஆம், சரி — எனது சட்ட நிலையைக் காட்டு', ur: '✓ جی ہاں، درست ہے — میری قانونی حیثیت دکھائیں' },
+  handoffNarrative: { en: 'A legal-aid clerk at the District Legal Services Authority (DLSA) can take this from here — your case summary below travels with you.', hi: 'ज़िला कानूनी सेवा प्राधिकरण (DLSA) का एक कानूनी सहायक इसे यहीं से आगे ले सकता है — नीचे आपका केस सारांश आपके साथ जाएगा।', mr: 'जिल्हा कायदेशीर सेवा प्राधिकरणाच्या (DLSA) कायदेशीर मदतनीसाकडे ही बाब पुढे जाऊ शकते — खालील केस सारांश तुमच्यासोबत जाईल.', ta: 'மாவட்ட சட்ட சேவை ஆணையத்தின் (DLSA) சட்ட உதவியாளர் இதை இங்கிருந்து தொடர்கிறார் — கீழே உள்ள உங்கள் வழக்குச் சுருக்கம் உங்களுடன் செல்லும்.', ur: 'ضلع لیگل سروسز اتارٹی (DLSA) کا ایک قانونی مددگار یہیں سے آگے لے جا سکتا ہے — نیچے آپ کا کیس خلاصہ آپ کے ساتھ جائے گا۔' },
   factCorrect: { en: 'Correct it', hi: 'सुधारें', mr: 'दुरुस्त करा', ta: 'திருத்து', ur: 'درست کریں' },
   handoverTitle: { en: 'Your handover packet', hi: 'आपका हैंडओवर पैकेट', mr: 'तुमचे हँडओव्हर पॅकेट', ta: 'உங்கள் கையளிப்புத் தொகுப்பு', ur: 'آپ کا ہینڈ اوور پیکٹ' },
   handoverWhat: { en: 'What to bring', hi: 'क्या साथ लें', mr: 'काय घेऊन जावे', ta: 'என்ன எடுத்துச் செல்லவும்', ur: 'کیا ساتھ لیں' },
