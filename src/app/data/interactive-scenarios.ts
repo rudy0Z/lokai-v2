@@ -11,7 +11,7 @@ import type { LangCode } from './languages'
  */
 
 export type ScenarioRoute =
-  | 'proceed' | 'vague' | 'informal' | 'stop' | 'notice' | 'pushback' | 'resolved'
+  | 'proceed' | 'vague' | 'informal' | 'stop' | 'notice' | 'pushback' | 'resolved' | 'save'
 
 export interface TesterOption {
   text: string

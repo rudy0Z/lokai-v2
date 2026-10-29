@@ -206,6 +206,10 @@ export interface UiStrings {
   testerHint: Pack
   clarifyRailLabel: Pack
   postFindingLabel: Pack
+  railSaveLater: Pack
+  readFullDraft: Pack
+  hideFullDraft: Pack
+  metaSave: Pack
   metaEvidence: Pack
   metaVague: Pack
   metaInformal: Pack
@@ -554,16 +558,20 @@ export const UI: UiStrings = {
   testerHint: { en: 'Pick a tester prompt — free typing works too.', hi: 'कोई टेस्टर प्रॉम्प्ट चुनें — सीधे टाइप भी कर सकते हैं।', mr: 'चाचणी प्रॉम्प्ट निवडा — थेट टाइपपण करू शकता.', ta: 'சோதனை தூண்டுதலைத் தேர்ந்தெடுங்கள் — நேரடியாகவும் தட்டச்சு செய்யலாம்.', ur: 'ٹیسٹر پرامپٹ چنیں — براہ راست ٹائپ بھی کر سکتے ہیں۔' },
   clarifyRailLabel: { en: 'Clarification replies', hi: 'स्पष्टीकरण के जवाब', mr: 'स्पष्टीकरण पर्याय', ta: 'விளக்கப் பதில்கள்', ur: 'وضاحت کے جوابات' },
   postFindingLabel: { en: 'What happens next?', hi: 'आगे क्या होगा?', mr: 'पुढे काय होते?', ta: 'அடுத்து என்ன நடக்கும்?', ur: 'آگے کیا ہوگا؟' },
-  metaEvidence: { en: 'Path A · strong evidence, full ladder', hi: 'रास्ता A · पक्के सबूत, पूरी सीढ़ी', mr: 'मार्ग A · पक्के पुरावे, संपूर्ण जणू', ta: 'பாதை A · வலுவான ஆதாரம், முழு படிகள்', ur: 'راستہ A · مضبوط ثبوت، مکمل سیڑھی' },
-  metaVague: { en: 'Path B · missing facts, clarifying gate', hi: 'रास्ता B · अधूरे तथ्य, स्पष्टीकरण गेट', mr: 'मार्ग B · अपूर्ण वस्तुस्थिती, स्पष्टीकरण गेट', ta: 'பாதை B · விடுபட்ட உண்மைகள், விளக்க கதவு', ur: 'راستہ B · نامکمل حقائق، وضاحت گیٹ' },
-  metaInformal: { en: 'Path C · informal seller, caution', hi: 'रास्ता C · अनौपचारिक विक्रेता, सावधानी', mr: 'मार्ग C · अनौपचारिक विक्रेता, सावधानता', ta: 'பாதை C · முறைசாரா விற்பவர், எச்சரிக்கை', ur: 'راستہ C · غیر رسمی فروشنر، احتیاط' },
-  metaPushback: { en: 'Path · seller pushback, counter-draft', hi: 'रास्ता · विक्रेता की ज़िद, जवाबी मसौदा', mr: 'मार्ग · विक्रेत्याची जिद, प्रत्युत्तर मसुदा', ta: 'பாதை · விற்பவர் எதிர்ப்பு, எதிர் வரைவு', ur: 'راستہ · فروشنر کا اصرار، جوابی مسودہ' },
-  metaThreat: { en: 'Path · intimidation, protective stop', hi: 'रास्ता · धमकी, सुरक्षात्मक रुकना', mr: 'मार्ग · धमकी, संरक्षक थांबवणे', ta: 'பாதை · மிரட்டல், பாதுகாப்பு நிறுத்தம்', ur: 'راستہ · دھمکی، حفاظتی رکنے' },
-  metaResolved: { en: 'Path · resolution, close out', hi: 'रास्ता · समाधान, केस बंद', mr: 'मार्ग · निराकरण, बाब बंद', ta: 'பாதை · தீர்வு, வழக்கை மூடு', ur: 'راستہ · حل, کیس بند' },
-  metaNotice: { en: 'Path · notice, explain-only', hi: 'रास्ता · नोटिस, केवल समझाना', mr: 'मार्ग · जाहीरनामा, फक्त स्पष्टीकरण', ta: 'பாதை · அறிவிப்பு, விளக்கம் மட்டும்', ur: 'راستہ · نوٹس, صرف وضاحت' },
-  metaStop: { en: 'Path · hard stop', hi: 'रास्ता · पूर्ण रुकना', mr: 'मार्ग · पूर्ण थांबवणे', ta: 'பாதை · முழு நிறுத்தம்', ur: 'راستہ · مکمل رکنے' },
-  metaRails: { en: 'Path · payment rails, caution', hi: 'रास्ता · भुगतान मार्ग, सावधानी', mr: 'मार्ग · पेमेंट मार्ग, सावधानता', ta: 'பாதை · பணப் பாதை, எச்சரிக்கை', ur: 'راستہ · ادائیگی راستہ, احتیاط' },
-  metaWorkplace: { en: 'Path · workplace dues, caution', hi: 'रास्ता · कार्यस्थल बकाया, सावधानी', mr: 'मार्ग · कार्यस्थळ बाकी, सावधानता', ta: 'பாதை · பணியிட நிலுவை, எச்சரிக்கை', ur: 'راستہ · کاروبار باقیات, احتیاط' },
+  railSaveLater: { en: 'I sent the Step 1 message — log it and save this case', hi: 'मैंने चरण 1 का संदेश भेज दिया — दर्ज करें और केस सेव करें', mr: 'मी पायरी 1 चा संदेश पाठवला — नोंदवा आणि केस सेव्ह करा', ta: 'படி 1 செய்தியை அனுப்பிவிட்டேன் — பதிவு செய்து கேஸை சேமிக்கவும்', ur: 'میں نے مرحلہ 1 کا پیغام بھیج دیا — درج کریں اور کیس محفوظ کریں' },
+  readFullDraft: { en: 'Read full draft', hi: 'पूरा मसौदा पढ़ें', mr: 'संपूर्ण मसुदा वाचा', ta: 'முழு வரைவைப் படிக்க', ur: 'پورا مسودہ پڑھیں' },
+  hideFullDraft: { en: 'Show less', hi: 'कम दिखाएँ', mr: 'कमी दाखवा', ta: 'சுருக்கமாகக் காட்டு', ur: 'مختصر دکھائیں' },
+  metaSave: { en: 'Logged locally', hi: 'डिवाइस पर दर्ज', mr: 'डिव्हाइसवर नोंद', ta: 'சாதனத்தில் பதிவு', ur: 'ڈیوائس پر درج' },
+  metaEvidence: { en: 'Bills in hand', hi: 'बिल मौजूद', mr: 'बिले जवळ', ta: 'பில்கள் கையிருப்பு', ur: 'بل موجود' },
+  metaVague: { en: 'Missing details', hi: 'जानकारी अधूरी', mr: 'तपशील अपूर्ण', ta: 'விவரங்கள் இல்லை', ur: 'تفصیلات نامکمل' },
+  metaInformal: { en: 'No written agreement', hi: 'कोई लिखित समझौता नहीं', mr: 'लेखी करार नाही', ta: 'எழுத்து ஒப்பந்தம் இல்லை', ur: 'تحریری معاہدہ نہیں' },
+  metaPushback: { en: 'Seller refused', hi: 'विक्रेता ने मना किया', mr: 'विक्रेत्याने नकारले', ta: 'விற்பவர் மறுத்தார்', ur: 'فروشنر نے انکار کیا' },
+  metaThreat: { en: 'Feeling threatened', hi: 'धमकी महसूस हो रही है', mr: 'धमकी वाटतेय', ta: 'மிரட்டல் உணர்வு', ur: 'دھمکی محسوس ہو رہی ہے' },
+  metaResolved: { en: 'It worked', hi: 'काम बन गया', mr: 'काम झाले', ta: 'வெற்றி', ur: 'کام بن گیا' },
+  metaNotice: { en: 'Got an official notice', hi: 'सरकारी नोटिस आया', mr: 'शासकीय नोटीस आला', ta: 'அரசு அறிவிப்பு வந்தது', ur: 'سرکاری نوٹس آیا' },
+  metaStop: { en: 'Immediate safety', hi: 'तुरंत सुरक्षा', mr: 'तात्काळ सुरक्षा', ta: 'உடனடி பாதுகாப்பு', ur: 'فوری تحفظ' },
+  metaRails: { en: 'UPI payment dispute', hi: 'UPI भुगतान विवाद', mr: 'UPI पेमेंट वाद', ta: 'UPI பணப் பரிமாற்ற சிக்கல்', ur: 'UPI ادائیگی تنازعہ' },
+  metaWorkplace: { en: 'Salary held back', hi: 'वेतन रोका गया', mr: 'पगार धरला', ta: 'சம்பளம் பிடித்தட்டப்பட்டது', ur: 'تنخواہ روکی گئی' },
   scn1Title: { en: 'Defective appliance, stonewalling support', hi: 'खराब उपकरण, बहाना करती सपोर्ट', mr: 'खराब उपकरण, टाळाटाळ करणारी सेवा', ta: 'பழுதான சாதனம், தாமதிக்கும் ஆதரவு', ur: 'خراب آلہ، بہانے کرتی سپورٹ' },
   scn2Title: { en: 'Landlord holding the deposit', hi: 'मकान मालिक डिपॉज़िट रोके हुए', mr: 'मालक भरपगाडी धरून बसला', ta: 'முன்பணத்தை பிடித்துக்கொண்ட வீட்டு உரிமையாளர்', ur: 'محنتانہ روکے ہوئے مالک' },
   scn3Title: { en: 'Vernacular municipal notice', hi: 'मातृभाषा का नगर निगम नोटिस', mr: 'मातृभाषेतील महापालिका जाहीरनामा', ta: 'தாய்மொழி நகர அறிவிப்பு', ur: 'مادری زبان کا میونسپل نوٹس' },

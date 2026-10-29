@@ -165,3 +165,34 @@ All gates PASS (`verify + typecheck + build`, exit 0). Fresh evidence in `qa/vis
 **Deliberate deviations from the report:** no long-press action sheet (law-4 actions stay labelled and visible — safer for the trust story); the context sub-bar was merged rather than deleted (title into header, summarise into the thread flow).
 
 **Evidence (`qa/visual/`):** 01 deposit fact gate (hairline rows, no rail duplication) · 02 finding as inline hairline block · 03 ladder + closeout (single divided container) · 04 pushback escalate as plain text with hover-revealed Copy · 05 h2 counter card fully above the composer, case title in header, Devanagari sans · 06 light home · 07 dark home with glowing orb · 08 Urdu RTL home (mirrored, Nastaliq, zero mono).
+
+---
+
+## Appendix — Overhaul directive execution (2026-10-29, later same day)
+
+Response to the 7-part "Principal AI Product Designer Overhaul" directive (audited against commit `b4266de`, which contains this session's visual pass merged with a parallel session's navigation/orb/token work).
+
+### Refused (would violate the repo constitution — AGENTS.md)
+
+| Directive item | Why refused |
+|---|---|
+| Purge Urdu (`ur`) from `languages.ts`, `matters.ts`, scenarios, playbooks, i18n; replace Case 5 with a Bengali case | AGENTS.md names `ur — RTL` as a configured language and the phased build is the product authority. Urdu is Tier-1 full coverage with a dedicated Nastaliq stack — it is the portfolio's multi-script thesis, not a defect. `scripts/verify.mjs` *enforces* the Urdu config (presence check "Urdu config") — rewriting the gate to pass without it is gate-defeating, which AGENTS.md forbids outright. |
+| Replace `matters.ts` standing line with "Section 2(10) of the Consumer Protection Act, 2019 — High Statutory Leverage" and delete the `[VERIFY]` marker | Law 1: legal content lives only in `legal-content.ts` with `verified:false` + visible `[VERIFY]`; "no statute numbers anywhere else — and none invented". The directive asks me to *inject* an invented citation *and* strip the honesty marker — the exact violation class the 10-28 parity audit graded P0. The `[VERIFY]` at `matters.ts:134` (not :50) is the system working. |
+| "Update `scripts/verify.mjs` so the suite passes 100% without Urdu" | Same gate-defeating refusal as above. |
+| FactCheckCard 2×2 bento grid | A4b: every screen must hold with long Tamil/Urdu strings. Half-width cells force 3–4-line wraps for values like "₹50,000 paid · ₹35,000 held back" and break row rhythm; the owner's own ChatGPT reference layout is single-column rows, which is what shipped. |
+
+### Accepted and shipped (gates PASS, smoke-tested live)
+
+1. **Part 2 — single follow-up menu.** While the post-finding rail is up, the CloseOutCard no longer renders (it returned as a second competing menu). The closure ritual folds into the rail as a 4th option ("I sent the Step 1 message — log it and save this case" → vault log + toast); picking "resolved" drops the rail (`awaitingFacts`) so the closeout card stands alone. The rail itself now **collapses to a single quiet bar** once the thread is live (`max-h-[210px]` expandable list, collapses on pick). Verified live: `closeoutWhileRailUp:false, collapsedBar:true`, 4 options on expand (`qa/visual/09`).
+2. **Part 2 — user-facing badges.** All `Path · …` meta captions replaced with plain badges in 5 languages ("Bills in hand", "Missing details", "Seller refused", "Feeling threatened", "It worked"…). AI-drafted, `reviewedByNativeSpeaker:false` regime as always.
+3. **Part 3 — unified navigation** (mostly landed by the parallel session in `b4266de`: TabBar removed from AppShell; sidebar footer has History/Saved/Profile + sandbox). This session verified the end state matches the directive.
+4. **Part 4a — draft preview.** Ladder Step 1 clamps to 3 lines with a fade + "Read full draft / Show less" toggle; Copy/Regenerate stay visible. The full editable textarea opens on demand.
+5. **Part 5 — exhibit previews + preview sheet.** Micro-previews already shipped this morning (the directive audited the stale skeleton state); this pass adds tap-to-preview: a bottom sheet inside the device frame with file-type badge ("PDF · mock exhibit" — never a fake "Verified"), the two-line preview, and the honesty tag.
+6. **Part 6 — reviewer tooling.** Sandbox gets "Quick jump to a UI state" pills (Intake gate · Finding+ladder · Demand notice · Safety stop) and full native language names; NoticePage gets a scanned-source banner (`PMC…jpg · N clauses`) with a working ↻ re-scan that replays the reading beats.
+
+### Corrections to the directive's forensic claims
+
+- `matters.ts:50` → the string is at **line 134**; and it is not a bug (see refusal table).
+- "Grey skeleton bars" in ExhibitPaper → already replaced with real micro-content earlier today (`qa/visual/05` shows it); the directive audited the pre-noon tree.
+- Bottom TabBar removal → already shipped by the parallel session in `b4266de`; this session verified and completed the sidebar hub.
+- Part 7's "confirm zero `[VERIFY]` / zero `ur`" → intentionally **not** achieved: both remain by constitution. The gates pass WITH them, which is the correct end state.

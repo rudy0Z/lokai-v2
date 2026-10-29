@@ -20,6 +20,7 @@ import {
 } from '../lib/matter-facts'
 import { LANGUAGES } from '../data/languages'
 import { matterById } from '../data/matters'
+import { updateMatterLog } from '../lib/vault'
 import { CaseContinuityHeader } from '../components/cases/CaseContinuityHeader'
 import { ThreadSummaryCard } from '../components/cases/ThreadSummaryCard'
 import { AppShell } from '../components/ui/shell'
@@ -625,7 +626,9 @@ export default function ChatPage() {
         })
         return
       case 'resolved':
-        stageRef.current = 'engaged'
+        /* the matter is closing — drop the rail (stage with no options) so
+           the closeout card stands alone, not competing with a second menu */
+        stageRef.current = 'awaitingFacts'
         run('progress', () => {
           push(
             { kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).general },
@@ -633,9 +636,22 @@ export default function ChatPage() {
           )
         })
         return
+      case 'save':
+        /* Part 2 overhaul: the closure ritual folds into the rail while the
+           post-finding options are up — one menu, not two */
+        stageRef.current = 'awaitingFacts'
+        updateMatterLog({ step1SentAt: new Date().toISOString() })
+        run('progress', () => {
+          push({ kind: 'system', text: tr('matterLogStep1') })
+        })
+        toast.success(tr('matterLogStep1'))
+        return
     }
   }
 
+  const postFindingOptions = scenario
+    ? scenario.postFinding?.[lang] ?? scenario.postFinding?.en
+    : undefined
   const testerOptions: TesterOption[] | undefined = !scenario
     ? undefined
     : stageRef.current === 'intake'
@@ -643,7 +659,12 @@ export default function ChatPage() {
       : stageRef.current === 'clarifying'
         ? scenario.clarifyPrompts?.[lang] ?? scenario.clarifyPrompts?.en
         : stageRef.current === 'engaged'
-          ? scenario.postFinding?.[lang] ?? scenario.postFinding?.en
+          ? /* the closure ritual joins the rail — one follow-up menu, not two
+               (overhaul Part 2: the CloseOutCard stays out while this is up) */
+            [
+              ...(postFindingOptions ?? []),
+              { text: tr('railSaveLater'), meta: 'metaSave', route: 'save' as const },
+            ]
           : undefined /* awaitingFacts / stopped: no rail — nothing honest to offer yet */
 
   const reset = () => {
@@ -827,6 +848,7 @@ export default function ChatPage() {
                   }
                   options={testerOptions}
                   onPick={handleScenarioOption}
+                  active={items.length > 0}
                 />
               )}
               <Composer
@@ -1125,6 +1147,10 @@ export default function ChatPage() {
                     </MessageBubble>
                   )
                 case 'closeout':
+                  /* while the post-finding rail owns the follow-ups, the
+                     closeout card would be a second competing menu — it
+                     returns alone once a rail path resolves the matter */
+                  if (testerOptions) return null
                   return (
                     <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <CloseOutCard findingTitle={findingData.title} />

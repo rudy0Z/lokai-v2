@@ -55,6 +55,9 @@ function WhatsAppStep({ facts, drafts: draftsProp }: { facts?: FactRecord; draft
   const [text, setText] = useState('')
   const [idx, setIdx] = useState(0)
   const [copied, setCopied] = useState(false)
+  /* overhaul Part 4: the draft previews at 3 lines so Step 2 stays in view;
+     the full editable draft opens on demand — Copy is visible either way */
+  const [expanded, setExpanded] = useState(false)
 
   const drafts = useMemo<string[]>(
     () =>
@@ -72,13 +75,32 @@ function WhatsAppStep({ facts, drafts: draftsProp }: { facts?: FactRecord; draft
   return (
     <div className="flex flex-col gap-2.5">
       <p className="text-2xs text-fg-tertiary">{tr('whatsappHint')}</p>
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={9}
-        aria-label="WhatsApp draft"
-        className="scroll-calm w-full resize-y rounded-xl border border-line-default bg-sunken p-3 font-sans text-sm leading-relaxed text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
-      />
+      {expanded ? (
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={9}
+          aria-label="WhatsApp draft"
+          className="scroll-calm w-full resize-y rounded-xl border border-line-default bg-sunken p-3 font-sans text-sm leading-relaxed text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
+        />
+      ) : (
+        <div className="relative rounded-xl border border-line-default bg-sunken p-3">
+          <p className="line-clamp-3 whitespace-pre-line font-sans text-sm leading-relaxed text-fg-primary">
+            {text}
+          </p>
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-7 rounded-b-xl bg-gradient-to-t from-sunken to-transparent"
+            aria-hidden="true"
+          />
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="pressable -mt-1.5 self-start rounded-full px-1.5 py-1 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
+      >
+        {expanded ? tr('hideFullDraft') : tr('readFullDraft')}
+      </button>
       {copied && (
         <p className="rounded-xl bg-positive-subtle px-3 py-2 text-2xs text-on-positive-subtle">
           {tr('ladderCopied')}

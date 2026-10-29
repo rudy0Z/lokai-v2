@@ -32,6 +32,9 @@ type Phase = 'reading' | 'interpreting' | 'done'
 export default function NoticePage() {
   const { tr, lang } = useApp()
   const [phase, setPhase] = useState<Phase>('reading')
+  /* overhaul Part 6: Re-scan replays the optical pass — the effect re-runs
+     per scanKey so the beats walk again from a clean phase */
+  const [scanKey, setScanKey] = useState(0)
   const [openField, setOpenField] = useState<NoticeField | null>(null)
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(NOTICE_FIELDS.map((f) => [f.id, f.value])),
@@ -43,6 +46,7 @@ export default function NoticePage() {
   // re-running only re-walks the beats and re-sets phase)
   useEffect(() => {
     let cancelled = false
+    setPhase('reading')
     runBeats('disclose', (label) => {
       if (label === 'stageWriting' && !cancelled) setPhase('interpreting')
     }).then(() => {
@@ -51,7 +55,7 @@ export default function NoticePage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [scanKey])
 
   const tapField = (field: NoticeField) => {
     setOpenField(openField?.id === field.id ? null : field)
@@ -75,6 +79,23 @@ export default function NoticePage() {
     <AppShell showTabs={false} topBarExtra={<Button variant="ghost" size="sm" onClick={() => history.back()}>{tr('back')}</Button>}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
+          {/* scanned source banner (overhaul Part 6): the decode is anchored
+              to its document — one tap replays the scan */}
+          <div className="flex items-center justify-between gap-2 rounded-full bg-sunken px-3.5 py-2">
+            <span className="flex min-w-0 items-center gap-1.5 text-2xs text-fg-secondary" lang="en">
+              <IconDoc className="size-3.5 shrink-0 text-fg-tertiary" />
+              <span className="truncate">{NOTICE_DOC.fileName}</span>
+              <span className="shrink-0 text-fg-tertiary">· {NOTICE_FIELDS.length} clauses</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setScanKey((k) => k + 1)}
+              className="pressable shrink-0 rounded-full px-2 py-1 text-2xs font-medium text-brand-fg"
+            >
+              ↻ {tr('retry')}
+            </button>
+          </div>
+
           {/* what this means */}
           <section className="bg-card rounded-2xl p-4">
             <div className="flex items-start justify-between gap-2">

@@ -126,6 +126,7 @@ export function AppShell({ topBarExtra, title, children, footer }: AppShellProps
     <div className="flex h-dvh justify-center bg-page sm:items-center sm:py-6">
       <ReviewerTour onUrdu={() => { setLang('ur'); navigate('/') }} />
       <div
+        data-app-frame
         className={
           'relative flex h-dvh w-full flex-col overflow-hidden bg-shell ' +
           'sm:h-[min(844px,calc(100dvh-3rem))] sm:w-[390px] sm:rounded-[2.25rem] sm:border sm:border-line-strong/70 sm:shadow-xl ' +

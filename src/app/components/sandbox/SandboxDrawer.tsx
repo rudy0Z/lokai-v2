@@ -198,11 +198,38 @@ export function SandboxDrawer() {
                             {title}
                           </span>
                           <span className="mt-0.5 block text-2xs text-fg-tertiary">
-                            {meta?.law ?? s.outcome} · {LANGUAGES[testLang].english}
+                            {meta?.law ?? s.outcome} · {LANGUAGES[testLang].native}
                           </span>
                         </button>
                       )
                     })}
+                  </div>
+
+                  {/* overhaul Part 6: reviewer state jumper — the nearest
+                      1-click route to each UI state (finding/ladder asks for
+                      one Path pick; that flow is conversational by design) */}
+                  <div className="mt-1 border-t border-line-subtle pt-3">
+                    <p className="text-2xs font-semibold text-fg-tertiary">Quick jump to a UI state</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {[
+                        { label: '1 · Intake gate', to: '/?s=refund-golden' },
+                        { label: '2 · Finding + ladder', to: '/?s=scn2' },
+                        { label: '3 · Demand notice', to: '/notice' },
+                        { label: '4 · Safety stop', to: '/?s=stop-eviction' },
+                      ].map((q) => (
+                        <button
+                          key={q.label}
+                          type="button"
+                          onClick={() => {
+                            setOpen(false)
+                            navigate(q.to)
+                          }}
+                          className="pressable min-h-8 rounded-full border border-line-subtle bg-card px-2.5 text-2xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
+                        >
+                          {q.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -223,7 +250,7 @@ export function SandboxDrawer() {
                         {s.label}
                       </span>
                       <span className="mt-0.5 block text-2xs text-fg-tertiary" lang="en">
-                        {s.outcome} · {LANGUAGES[s.lang].english}
+                        {s.outcome} · {LANGUAGES[s.lang].native}
                       </span>
                     </button>
                   ))}
