@@ -90,9 +90,9 @@
   --c-disabled: oklch(93.5% 0.008 105);
 
   /* --- font stacks (Latin registers; script companions via :lang below) --- */
-  --stk-sans: "Inter Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --stk-sans: "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --stk-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --stk-serif: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+  --stk-serif: "Newsreader Variable", "Source Serif 4 Variable", ui-serif, Georgia, serif;
 }
 
 /* --- dark theme "night garden": pure re-pointing of role variables --- */
@@ -220,56 +220,56 @@
 :lang(gom),
 :lang(brx),
 :lang(doi) {
-  --stk-sans: "Noto Sans Devanagari", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Serif Devanagari", "Noto Sans Devanagari", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Devanagari", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Serif Devanagari", "Noto Sans Devanagari", "Newsreader Variable", "Source Serif 4 Variable", serif;
   --stk-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 }
 :lang(as),
 :lang(bn) {
-  --stk-sans: "Noto Sans Bengali", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Bengali", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Bengali", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Bengali", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(gu) {
-  --stk-sans: "Noto Sans Gujarati", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Gujarati", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Gujarati", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Gujarati", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(pa) {
-  --stk-sans: "Noto Sans Gurmukhi", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Gurmukhi", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Gurmukhi", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Gurmukhi", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(kn) {
-  --stk-sans: "Noto Sans Kannada", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Kannada", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Kannada", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Kannada", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(ml) {
-  --stk-sans: "Noto Sans Malayalam", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Malayalam", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Malayalam", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Malayalam", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(or) {
-  --stk-sans: "Noto Sans Oriya", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Oriya", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Oriya", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Oriya", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(ta) {
-  --stk-sans: "Noto Sans Tamil", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Serif Tamil", "Noto Sans Tamil", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Tamil", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Serif Tamil", "Noto Sans Tamil", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(te) {
-  --stk-sans: "Noto Sans Telugu", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Telugu", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Telugu", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Telugu", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(ur),
 :lang(ks),
 :lang(sd) {
-  --stk-sans: "Noto Nastaliq Urdu", "Noto Naskh Arabic", "Inter Variable", ui-sans-serif, sans-serif;
-  --stk-serif: "Noto Naskh Arabic", "Noto Nastaliq Urdu", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Nastaliq Urdu", "Noto Naskh Arabic", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, sans-serif;
+  --stk-serif: "Noto Naskh Arabic", "Noto Nastaliq Urdu", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(mni) {
-  --stk-sans: "Noto Sans Meetei Mayek", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Meetei Mayek", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Meetei Mayek", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Meetei Mayek", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 :lang(sat) {
-  --stk-sans: "Noto Sans Ol Chiki", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --stk-serif: "Noto Sans Ol Chiki", "Source Serif 4 Variable", serif;
+  --stk-sans: "Noto Sans Ol Chiki", "Plus Jakarta Sans Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --stk-serif: "Noto Sans Ol Chiki", "Newsreader Variable", "Source Serif 4 Variable", serif;
 }
 
 /* ============================================================================

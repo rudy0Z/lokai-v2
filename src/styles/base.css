@@ -21,6 +21,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
 }
 
 button,
@@ -76,6 +77,18 @@ a,
    NEVER applied to non-Latin text (A4b rule 4). */
 .latin-track {
   letter-spacing: 0.01em;
+}
+
+/* Latin display headline tracking for Newsreader / editorial headings (A4b compliant) */
+:lang(en) .display-title,
+:lang(en) h1.font-serif,
+:lang(en) h2.font-serif,
+:lang(en) h3.font-serif {
+  letter-spacing: -0.022em;
+}
+
+:lang(en) .latin-caps {
+  letter-spacing: 0.035em;
 }
 
 :focus-visible {

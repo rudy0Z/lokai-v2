@@ -4,6 +4,8 @@ import { createRoot } from 'react-dom/client'
 /* Self-hosted fonts (Fontsource) — no CDN, no network at runtime.
    Latin registers + per-script companions loaded as weights; only the
    active language renders with its companion stack (see tokens.css). */
+import '@fontsource-variable/plus-jakarta-sans'
+import '@fontsource-variable/newsreader'
 import '@fontsource-variable/inter'
 import '@fontsource-variable/jetbrains-mono'
 import '@fontsource-variable/source-serif-4'
