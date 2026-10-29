@@ -1144,6 +1144,8 @@ export default function ChatPage() {
                       <FindingCard
                         data={findingData}
                         onUpdate={setFindingData}
+                        onShowLadder={() => showLadder('full')}
+                        ladderShown={ladderMounted}
                         onDiscard={() => {
                           setItems((prev) => prev.filter((i) => i.id !== item.id))
                           toast('Finding discarded')
@@ -1186,6 +1188,8 @@ export default function ChatPage() {
                         onConsumer={reConsumer}
                         onNotice={reNotice}
                         onOther={() => reOther(item.decision)}
+                        onShowLadder={() => showLadder('free')}
+                        ladderShown={ladderMounted}
                         onDiscard={() => {
                           setItems((prev) => prev.filter((i) => i.id !== item.id))
                           toast('Caution card discarded')

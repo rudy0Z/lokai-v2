@@ -3,11 +3,12 @@ import { useState } from 'react'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { ALL_LANGS, LANGUAGES } from '../../data/languages'
+import { MATTERS } from '../../data/matters'
 import { navigate } from '../../lib/router'
 import { LogoMark } from './LogoMark'
 import { CaseSidebar } from './CaseSidebar'
 import { SandboxDrawer } from '../sandbox/SandboxDrawer'
-import { IconMoon, IconPanelLeft, IconSun } from './icons'
+import { IconFolder, IconMoon, IconSun } from './icons'
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, toggleTheme, tr } = useApp()
@@ -103,15 +104,19 @@ export function AppShell({ topBarExtra, title, children, footer }: AppShellProps
             band; the language select sits in a tonal pill */}
         <header className="pointer-events-none z-30 flex items-center gap-2 px-4 pb-2 pt-[calc(0.75rem+env(safe-area-inset-top))]">
           <div className="pointer-events-auto flex min-w-0 shrink-0 items-center gap-2">
-            {/* Hamburger menu for global nav (cases, sandbox, settings) */}
+            {/* M6: the nav trigger is a LABELED pill — no mystery hamburger;
+                the count answers "what's in there?" before the tap */}
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
               aria-label={tr('sidebarTitle')}
-              className="pressable inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg-secondary hover:bg-hover-veil"
-              style={{ minWidth: 'var(--touch-target)' }}
+              className="pressable inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-component px-3 text-xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
             >
-              <IconPanelLeft className="size-[18px]" />
+              <IconFolder className="size-4 text-brand-fg" />
+              <span>{tr('mattersLabel')}</span>
+              <span className="rounded-full bg-card px-1.5 py-0.5 text-2xs tabular-nums text-fg-tertiary">
+                {MATTERS.length}
+              </span>
             </button>
             {title ? (
               <span className="min-w-0 truncate font-serif text-base font-semibold text-fg-primary">
