@@ -5,7 +5,6 @@ import { matterById, docsUpTo, DOC_KIND_LABEL, type CaseDay } from '../data/matt
 import { AppShell } from '../components/ui/shell'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
-import { Card } from '../components/ui/Card'
 import { MessageBubble } from '../components/chat/MessageBubble'
 import { ExhibitPaper } from '../components/documents/ExhibitPaper'
 import { ThreadSummaryCard } from '../components/cases/ThreadSummaryCard'
@@ -112,7 +111,7 @@ function CaseBody({
           <div className="flex flex-col gap-4">
             {day.turns.map((t, i) => (
               <MessageBubble key={i} role={t.role} voiceMeta={t.voice ? { duration: '0:14', edited: true } : undefined}>
-                <p className="whitespace-pre-line text-sm leading-relaxed" lang={matter.lang}>
+                <p className="whitespace-pre-line text-reading" lang={matter.lang}>
                   {t.text}
                 </p>
               </MessageBubble>
@@ -181,7 +180,7 @@ function CaseBody({
           )}
 
           {/* interactive continuation bar (master spec Trap 2) */}
-          <div className="flex flex-col gap-2 rounded-2xl border border-line-default bg-card p-3.5">
+          <div className="flex flex-col gap-2 rounded-2xl bg-card shadow-tiny p-3.5">
             <p className="text-2xs font-semibold text-fg-secondary">Continue this case</p>
             <div className="flex flex-col gap-2">
               <Button
@@ -208,7 +207,6 @@ function CaseBody({
             </div>
           </div>
 
-          <p className="text-center text-2xs text-fg-tertiary">{tr('caseSampleNote')}</p>
         </div>
       </div>
     )
@@ -320,9 +318,6 @@ function CaseBody({
           </div>
         </section>
 
-        <Card className="flex flex-col gap-1">
-          <p className="text-2xs text-fg-tertiary">{tr('caseSampleNote')}</p>
-        </Card>
       </div>
     </div>
   )

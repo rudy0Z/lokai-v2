@@ -131,7 +131,7 @@ export const MATTERS: MatterRecord[] = [
         title: 'Initial complaint & Step 1 draft',
         summary: {
           grievance: 'A ₹8,999 mixer grinder arrived with a cracked jar and customer care refused a refund.',
-          standing: 'Defect-in-goods under the Consumer Protection Act, 2019 — leverage High [VERIFY].',
+          standing: 'Defect-in-goods under the Consumer Protection Act, 2019 — strong statutory leverage [VERIFY].',
           next: 'Step 1 draft copied to WhatsApp; written reply requested within 7 days.',
         },
         cards: ['factcheck', 'finding', 'ladder'],

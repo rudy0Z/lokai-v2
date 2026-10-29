@@ -48,6 +48,15 @@ export function SandboxTrigger() {
   )
 }
 
+/* Phase 7: zero raw debug enums — outcomes get human labels */
+const OUTCOME_LABEL: Record<string, string> = {
+  proceed: 'Refund journey',
+  notice: 'Notice read',
+  caution: 'Caution path',
+  stop: 'Safety stop',
+  mixed: 'Mixed paths',
+}
+
 export function SandboxDrawer() {
   const { tr, setLang } = useApp()
   const { path } = useHashRoute()
@@ -147,8 +156,7 @@ export function SandboxDrawer() {
                           )}
                           lang={c}
                         >
-                          {LANGUAGES[c].short}
-                          {c === 'en' ? ' · EN' : ''}
+                          {LANGUAGES[c].native}
                         </button>
                       ))}
                     </div>
@@ -169,7 +177,7 @@ export function SandboxDrawer() {
                           )}
                           lang={c}
                         >
-                          {LANGUAGES[c].short}
+                          {LANGUAGES[c].native}
                         </button>
                       ))}
                     </div>
@@ -198,7 +206,7 @@ export function SandboxDrawer() {
                             {title}
                           </span>
                           <span className="mt-0.5 block text-2xs text-fg-tertiary">
-                            {meta?.law ?? s.outcome} · {LANGUAGES[testLang].native}
+                            {meta?.law ?? OUTCOME_LABEL[s.outcome] ?? s.outcome} · {LANGUAGES[testLang].native}
                           </span>
                         </button>
                       )
@@ -250,7 +258,7 @@ export function SandboxDrawer() {
                         {s.label}
                       </span>
                       <span className="mt-0.5 block text-2xs text-fg-tertiary" lang="en">
-                        {s.outcome} · {LANGUAGES[s.lang].native}
+                        {OUTCOME_LABEL[s.outcome] ?? s.outcome} · {LANGUAGES[s.lang].native}
                       </span>
                     </button>
                   ))}

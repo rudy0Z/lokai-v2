@@ -95,9 +95,14 @@ export function ExhibitPaper({ name, className }: { name: string; className?: st
         )}
       >
         <span className="absolute inset-y-0 start-0 w-1 bg-brand-solid" aria-hidden="true" />
-        <p className="truncate ps-1.5 font-mono text-2xs text-fg-secondary" lang="en">
-          {name}
-        </p>
+        <div className="flex items-center gap-1.5 ps-1.5">
+          <p className="min-w-0 flex-1 truncate font-mono text-2xs text-fg-secondary" lang="en">
+            {name}
+          </p>
+          <span className="shrink-0 rounded-full bg-card px-1.5 py-0.5 text-2xs font-medium text-fg-secondary" lang="en">
+            {kindOf(name)} · mock
+          </span>
+        </div>
         <div className="mt-1.5 flex flex-col gap-0.5 ps-1.5">
           {lines ? (
             <>

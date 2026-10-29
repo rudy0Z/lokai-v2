@@ -33,7 +33,7 @@ export function LanguageSelect({ className }: { className?: string }) {
   const full = ALL_LANGS.filter((c) => LANGUAGES[c].coverage === 'full')
   const preview = ALL_LANGS.filter((c) => LANGUAGES[c].coverage !== 'full')
   return (
-    <label className={cn('inline-flex items-center', className)}>
+    <label className={cn('inline-flex items-center rounded-full bg-component px-2 py-0.5', className)}>
       <span className="sr-only">{tr('langLabel')}</span>
       <select
         value={lang}
@@ -99,8 +99,9 @@ export function AppShell({ topBarExtra, title, children, footer }: AppShellProps
           '[@media(horizontal-viewport-segments:2)]:!rounded-none [@media(horizontal-viewport-segments:2)]:!border-0'
         }
       >
-        {/* HEADER — Hamburger menu replaces bottom tabs */}
-        <header className="pointer-events-none z-30 flex items-center gap-2 bg-gradient-to-b from-shell via-shell/90 to-transparent px-4 pb-4 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+        {/* HEADER — weightless slim bar (calm-authority Phase 7): no gradient
+            band; the language select sits in a tonal pill */}
+        <header className="pointer-events-none z-30 flex items-center gap-2 px-4 pb-2 pt-[calc(0.75rem+env(safe-area-inset-top))]">
           <div className="pointer-events-auto flex min-w-0 shrink-0 items-center gap-2">
             {/* Hamburger menu for global nav (cases, sandbox, settings) */}
             <button

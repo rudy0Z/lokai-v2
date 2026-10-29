@@ -959,11 +959,10 @@ export default function ChatPage() {
                  the case's own language leads with memory + follow-up + chips */
               <div className="flex flex-1 flex-col justify-center gap-5 px-3.5 pb-8 pt-6">
                 <CaseContinuityHeader onChip={handleContinuityChip} />
-                <p className="text-center text-2xs text-fg-tertiary">{tr('caseSampleNote')}</p>
               </div>
             )}
             {empty && !activeCase && (
-              <div className="flex flex-col items-center gap-6 px-20 pb-12 pt-16 text-center">
+              <div className="flex flex-col items-center gap-8 px-12 pb-16 pt-20 text-center">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1070,7 +1069,7 @@ export default function ChatPage() {
                       }
                     >
                       {item.stream ? (
-                        <p className="whitespace-pre-line text-sm leading-relaxed">
+                        <p className="whitespace-pre-line text-reading">
                           <StreamText
                             text={item.text ?? ''}
                             onDone={() =>
@@ -1081,7 +1080,7 @@ export default function ChatPage() {
                           />
                         </p>
                       ) : (
-                        <p className="whitespace-pre-line text-sm leading-relaxed">{item.text}</p>
+                        <p className="whitespace-pre-line text-reading">{item.text}</p>
                       )}
                     </MessageBubble>
                   )
@@ -1098,7 +1097,7 @@ export default function ChatPage() {
                         <h3 className="font-serif text-lg font-semibold text-fg-primary">
                           {tr('noticeCardTitle')}
                         </h3>
-                        <p className="text-sm leading-relaxed text-fg-secondary">
+                        <p className="text-sm-plus leading-relaxed text-fg-secondary">
                           {tr('noticeCardBody')}
                         </p>
                         <Button variant="primary" size="sm" className="self-start" onClick={() => navigate('/notice')}>

@@ -73,7 +73,7 @@ function WhatsAppStep({ facts, drafts: draftsProp }: { facts?: FactRecord; draft
 
   return (
     <div className="flex flex-col gap-2.5">
-      <p className="text-2xs text-fg-tertiary">{tr('whatsappHint')}</p>
+      <p className="text-xs text-fg-tertiary">{tr('whatsappHint')}</p>
       {expanded ? (
         <textarea
           value={text}
@@ -150,12 +150,12 @@ function ChannelStep({ prep, channel }: { prep?: string[]; channel?: DomainChann
           <Badge tone="positive" variant="subtle">{tr('badgeFree')}</Badge>
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <span className="text-2xs text-on-brand-subtle">{legal?.source}</span>
+          <span className="text-xs text-on-brand-subtle">{legal?.source}</span>
           <VerificationBadge verified={legal?.verified ?? false} />
         </div>
       </div>
       <div>
-        <p className="text-2xs font-semibold text-fg-secondary">{tr('haveReady')}</p>
+        <p className="text-xs font-semibold text-fg-secondary">{tr('haveReady')}</p>
         <ul className="mt-1.5 flex flex-col gap-1.5">
           {prepItems.map((item) => (
             <li key={item} className="flex items-start gap-2 text-sm text-fg-primary">
