@@ -177,17 +177,14 @@ export default function ChatPage() {
         setMatterFacts(facts)
         setFactItems(factRows(facts, lang))
         // Anti-fatigue (audit Dimension 2): NO verbatim echo — the emotion-
-        // matched acknowledgment only. The FactCheckCard is the single
-        // structured confirmation (purchase window included), later in the
-        // thread.
-        push(
-          {
-            kind: 'assistant',
-            stream: true,
-            text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en,
-          },
-          { kind: 'factcheck' },
-        )
+        // matched acknowledgment only. Calm-authority Phase 4, beat 1: the
+        // gate arrives as its own beat, never in the same frame as the prose.
+        push({
+          kind: 'assistant',
+          stream: true,
+          text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en,
+        })
+        window.setTimeout(() => push({ kind: 'factcheck' }), 600)
       },
       fail,
     )
@@ -319,7 +316,7 @@ export default function ChatPage() {
           domain,
         }
         run('caution', () => {
-          push({ kind: 'caution', decision }, { kind: 'ladder', variant: 'full' })
+          push({ kind: 'caution', decision })
         })
         return
       }
@@ -337,7 +334,10 @@ export default function ChatPage() {
           confidence: 'clear',
           reasoningSteps: f.reasoning,
         })
-        push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' }, { kind: 'closeout' })
+        /* Calm-authority Phase 4, beat 2: the finding mounts ALONE — the
+           ladder arrives via the "Show my action plan" chip, the closeout
+           only via a resolution chip (never stacked on confirmation). */
+        push({ kind: 'finding' })
       })
       return
     }
@@ -370,7 +370,7 @@ export default function ChatPage() {
         certainty: 'matched',
       }
       run('caution', () => {
-        push({ kind: 'caution', decision }, { kind: 'ladder', variant: 'free' })
+        push({ kind: 'caution', decision })
       })
       return
     }
@@ -567,7 +567,8 @@ export default function ChatPage() {
           : pack.facts,
       )
       setFactSigned(false)
-      push({ kind: 'assistant', stream: true, text: pack.empathy }, { kind: 'factcheck' })
+      push({ kind: 'assistant', stream: true, text: pack.empathy })
+      window.setTimeout(() => push({ kind: 'factcheck' }), 600)
     })
   }
 
@@ -666,6 +667,23 @@ export default function ChatPage() {
               { text: tr('railSaveLater'), meta: 'metaSave', route: 'save' as const },
             ]
           : undefined /* awaitingFacts / stopped: no rail — nothing honest to offer yet */
+
+  /* Calm-authority Phase 4 + guardrail 1: the ladder is NEVER auto-mounted.
+     One primary chip invites it while only a finding/caution is on the table;
+     outcome chips appear only after the ladder itself has mounted. The
+     guardrail's 'caution' variant maps to the ladder's existing 'free' face
+     (steps 1–2 + human help). */
+  const ladderMounted = items.some((i) => i.kind === 'ladder')
+  const showPlanCta =
+    !busy && !ladderMounted && items.some((i) => i.kind === 'finding' || i.kind === 'caution')
+  const showLadder = () => {
+    const latestAssessment = [...items].reverse().find((i) => i.kind === 'finding' || i.kind === 'caution')
+    push({ kind: 'ladder', variant: latestAssessment?.kind === 'caution' ? 'free' : 'full' })
+  }
+  const inlineChips =
+    !busy && testerOptions && (stageRef.current === 'clarifying' || (stageRef.current === 'engaged' && ladderMounted))
+      ? testerOptions
+      : undefined
 
   const reset = () => {
     setItems([])
@@ -837,19 +855,11 @@ export default function ChatPage() {
         noticeOpen || stopDecision ? undefined : (
           protectiveFooter ?? (
             <div className="flex flex-col gap-2">
-              {testerOptions && testerOptions.length > 0 && (
-                <TesterPrompts
-                  label={
-                    stageRef.current === 'intake'
-                      ? tr('testerHint')
-                      : stageRef.current === 'clarifying'
-                        ? tr('clarifyRailLabel')
-                        : tr('postFindingLabel')
-                  }
-                  options={testerOptions}
-                  onPick={handleScenarioOption}
-                  active={items.length > 0}
-                />
+              {/* Phase 4: the footer rail exists ONLY as the scenario
+                  launcher on an empty thread; once the conversation is live,
+                  follow-ups are inline chips in the thread flow */}
+              {testerOptions && testerOptions.length > 0 && items.length === 0 && (
+                <TesterPrompts label={tr('testerHint')} options={testerOptions} onPick={handleScenarioOption} />
               )}
               <Composer
                 onSend={handleSend}
@@ -1147,10 +1157,8 @@ export default function ChatPage() {
                     </MessageBubble>
                   )
                 case 'closeout':
-                  /* while the post-finding rail owns the follow-ups, the
-                     closeout card would be a second competing menu — it
-                     returns alone once a rail path resolves the matter */
-                  if (testerOptions) return null
+                  /* closeout never co-mounts with a menu anymore (Phase 4):
+                     it arrives only via a resolution chip while no rail is up */
                   return (
                     <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <CloseOutCard findingTitle={findingData.title} />
@@ -1207,6 +1215,25 @@ export default function ChatPage() {
                   return null
               }
             })}
+
+            {/* Calm-authority Phase 4: one thought per beat — the plan CTA and
+                the outcome chips live IN the thread flow, ChatGPT-style */}
+            {showPlanCta && (
+              <div className="flex px-1 pt-1">
+                <Chip onClick={showLadder} className="text-start">
+                  {tr('showPlanCta')}
+                </Chip>
+              </div>
+            )}
+            {inlineChips && (
+              <div className="flex flex-wrap gap-2 px-1 pb-1 pt-1">
+                {inlineChips.map((o, i) => (
+                  <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
+                    {o.text}
+                  </Chip>
+                ))}
+              </div>
+            )}
 
             {busy && (
               <div className="flex items-center gap-1.5">

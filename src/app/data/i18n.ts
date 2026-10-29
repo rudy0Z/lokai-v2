@@ -206,6 +206,7 @@ export interface UiStrings {
   testerHint: Pack
   clarifyRailLabel: Pack
   postFindingLabel: Pack
+  showPlanCta: Pack
   railSaveLater: Pack
   readFullDraft: Pack
   hideFullDraft: Pack
@@ -558,6 +559,7 @@ export const UI: UiStrings = {
   testerHint: { en: 'Pick a tester prompt — free typing works too.', hi: 'कोई टेस्टर प्रॉम्प्ट चुनें — सीधे टाइप भी कर सकते हैं।', mr: 'चाचणी प्रॉम्प्ट निवडा — थेट टाइपपण करू शकता.', ta: 'சோதனை தூண்டுதலைத் தேர்ந்தெடுங்கள் — நேரடியாகவும் தட்டச்சு செய்யலாம்.', ur: 'ٹیسٹر پرامپٹ چنیں — براہ راست ٹائپ بھی کر سکتے ہیں۔' },
   clarifyRailLabel: { en: 'Clarification replies', hi: 'स्पष्टीकरण के जवाब', mr: 'स्पष्टीकरण पर्याय', ta: 'விளக்கப் பதில்கள்', ur: 'وضاحت کے جوابات' },
   postFindingLabel: { en: 'What happens next?', hi: 'आगे क्या होगा?', mr: 'पुढे काय होते?', ta: 'அடுத்து என்ன நடக்கும்?', ur: 'آگے کیا ہوگا؟' },
+  showPlanCta: { en: 'Show my 3-step action plan & WhatsApp draft →', hi: 'मेरा 3-चरण एक्शन प्लान और WhatsApp ड्राफ्ट दिखाएँ →', mr: 'माझा 3-पायरी कृती नकाशा आणि WhatsApp मसुदा दाखवा →', ta: 'எனது 3-படி செயல் திட்டம் & WhatsApp வரைவைக் காட்டு →', ur: 'میرا 3 مرحلہ کا ایکشن پلان اور WhatsApp مسودہ دکھائیں →' },
   railSaveLater: { en: 'I sent the Step 1 message — log it and save this case', hi: 'मैंने चरण 1 का संदेश भेज दिया — दर्ज करें और केस सेव करें', mr: 'मी पायरी 1 चा संदेश पाठवला — नोंदवा आणि केस सेव्ह करा', ta: 'படி 1 செய்தியை அனுப்பிவிட்டேன் — பதிவு செய்து கேஸை சேமிக்கவும்', ur: 'میں نے مرحلہ 1 کا پیغام بھیج دیا — درج کریں اور کیس محفوظ کریں' },
   readFullDraft: { en: 'Read full draft', hi: 'पूरा मसौदा पढ़ें', mr: 'संपूर्ण मसुदा वाचा', ta: 'முழு வரைவைப் படிக்க', ur: 'پورا مسودہ پڑھیں' },
   hideFullDraft: { en: 'Show less', hi: 'कम दिखाएँ', mr: 'कमी दाखवा', ta: 'சுருக்கமாகக் காட்டு', ur: 'مختصر دکھائیں' },
