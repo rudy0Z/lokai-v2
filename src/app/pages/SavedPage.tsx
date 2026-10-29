@@ -24,7 +24,7 @@ export default function SavedPage() {
   const saved = cleared ? [] : SAVED
   const userSaved = getMatterLog().saved ?? []
   return (
-    <AppShell activeTab="saved">
+    <AppShell showTabs={false}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 pt-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4 pb-4">
           <h1 className="font-serif text-xl font-semibold text-fg-primary">{tr('savedTitle')}</h1>
@@ -53,7 +53,7 @@ export default function SavedPage() {
                   <div key={s.id} className="rounded-2xl bg-card p-4">
                     <Badge tone="neutral" variant="outline" lang="en">{s.kind}</Badge>
                     <p className="mt-2 text-sm font-medium text-fg-primary" lang="en">{s.title}</p>
-                    <p className="mt-0.5 font-mono text-2xs text-fg-tertiary" lang="en">{s.meta}</p>
+                    <p className="mt-0.5 text-2xs text-fg-tertiary" lang="en">{s.meta}</p>
                   </div>
                 ))}
               </section>
@@ -68,7 +68,7 @@ export default function SavedPage() {
               {userSaved.map((s, i) => (
                 <div key={`${s.savedAt}-${i}`} className="rounded-2xl bg-card p-4">
                   <p className="text-sm font-medium text-fg-primary">{s.title}</p>
-                  <p className="mt-0.5 font-mono text-2xs text-fg-tertiary">{formatDate(s.savedAt)}</p>
+                  <p className="mt-0.5 text-2xs tabular-nums text-fg-tertiary">{formatDate(s.savedAt)}</p>
                 </div>
               ))}
             </section>

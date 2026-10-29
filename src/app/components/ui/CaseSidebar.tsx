@@ -4,7 +4,8 @@ import { useApp } from '../../lib/app-context'
 import { navigate } from '../../lib/router'
 import { MATTERS } from '../../data/matters'
 import { cn } from '../../lib/cn'
-import { IconFolder, IconPanelLeft, IconPlus, IconX } from './icons'
+import { SandboxTrigger } from '../sandbox/SandboxDrawer'
+import { IconBookmark, IconClock, IconFolder, IconPlus, IconUser, IconX } from './icons'
 
 /**
  * The Case-Folder drawer (ChatGPT-Projects model) — rendered INSIDE the
@@ -60,7 +61,20 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
               </button>
             </div>
 
-            <div className="scroll-calm flex-1 overflow-y-auto overscroll-contain px-3 pb-6 pt-1">
+            <div className="scroll-calm flex-1 overflow-y-auto overscroll-contain px-3 pb-4 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveCase(null)
+                  navigate('/')
+                  onClose()
+                }}
+                className="pressable mb-3 flex min-h-11 w-full items-center gap-2.5 rounded-full border border-line-default bg-card px-3.5 text-start text-xs font-medium text-fg-primary shadow-tiny transition-colors hover:bg-component-hover"
+              >
+                <IconPlus className="size-4 text-brand-fg" />
+                <span>{tr('tabHome')} · New Chat</span>
+              </button>
+
               <div className="flex flex-col gap-1.5">
                 {MATTERS.map((m) => {
                   const isActive = activeCaseId === m.id
@@ -96,8 +110,8 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
                             {m.titleNative}
                             {m.resolved && <span className="ms-1.5 text-fg-tertiary">✓</span>}
                           </span>
-                          {/* quiet mono docket line with tabular-nums (craft.gustavofior.com/tabular-numbers) */}
-                          <span className="mt-0.5 block truncate font-mono text-2xs tabular-nums text-fg-tertiary" lang="en">
+                          {/* quiet docket line with tabular-nums (craft.gustavofior.com/tabular-numbers) */}
+                          <span className="mt-0.5 block truncate text-2xs tabular-nums text-fg-tertiary" lang="en">
                             {m.amount} · {m.statusLine}
                           </span>
                         </span>
@@ -116,7 +130,7 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
                                   navigate(`/case/${m.id}/d/${i}`)
                                   onClose()
                                 }}
-                                className="rounded-full bg-card px-2.5 py-1 font-mono text-2xs tabular-nums text-fg-secondary transition-colors hover:bg-component-hover"
+                                className="rounded-full bg-card px-2.5 py-1 text-2xs tabular-nums text-fg-secondary transition-colors hover:bg-component-hover"
                                 lang={m.lang}
                               >
                                 {d.dateLabel}
@@ -139,18 +153,43 @@ export function CaseSidebar({ open, onClose }: { open: boolean; onClose: () => v
               </div>
             </div>
 
-            <div className="border-t border-line-subtle px-4 py-3">
+            <div className="border-t border-line-subtle px-3 py-3 flex flex-col gap-1">
               <button
                 type="button"
                 onClick={() => {
-                  setActiveCase(null)
+                  navigate('/history')
                   onClose()
                 }}
-                className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-full text-2xs text-fg-tertiary hover:text-fg-secondary"
+                className="pressable flex min-h-10 items-center gap-2.5 rounded-xl px-2.5 text-start text-xs font-medium text-fg-secondary hover:bg-hover-veil hover:text-fg-primary"
               >
-                <IconPanelLeft className="size-3.5" />
-                {tr('tabHome')} — {tr('chipOther')}
+                <IconClock className="size-4 text-fg-tertiary" />
+                <span>{tr('tabHistory')}</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate('/saved')
+                  onClose()
+                }}
+                className="pressable flex min-h-10 items-center gap-2.5 rounded-xl px-2.5 text-start text-xs font-medium text-fg-secondary hover:bg-hover-veil hover:text-fg-primary"
+              >
+                <IconBookmark className="size-4 text-fg-tertiary" />
+                <span>{tr('tabSaved')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate('/profile')
+                  onClose()
+                }}
+                className="pressable flex min-h-10 items-center gap-2.5 rounded-xl px-2.5 text-start text-xs font-medium text-fg-secondary hover:bg-hover-veil hover:text-fg-primary"
+              >
+                <IconUser className="size-4 text-fg-tertiary" />
+                <span>{tr('tabProfile')}</span>
+              </button>
+              <div className="mt-1 pt-2 border-t border-line-subtle/50">
+                <SandboxTrigger />
+              </div>
             </div>
           </motion.aside>
         </>

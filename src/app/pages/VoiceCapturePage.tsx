@@ -146,7 +146,7 @@ export default function VoiceCapturePage() {
                 value={detected}
                 onChange={(e) => setDetected(e.target.value as LangCode | 'auto')}
                 aria-label={tr('detectedLang')}
-                className="min-h-11 flex-1 rounded-xl border border-line-default bg-container px-3 text-sm text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
+                className="min-h-11 flex-1 rounded-xl border border-line-default bg-card px-3 text-sm text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
               >
                 <option value="auto">{`${LANGUAGES[lang].english} (${tr('autoDetect')})`}</option>
                 {LANG_ORDER.map((c) => (

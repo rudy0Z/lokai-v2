@@ -354,7 +354,7 @@ export function ReplayPlayer({ script }: { script: ReplayScript }) {
             {speed}×
           </Button>
           <div className="ms-auto flex min-w-8 items-center gap-1.5">
-            <div className="h-1 w-16 overflow-hidden rounded-full bg-container" aria-hidden="true">
+            <div className="h-1 w-16 overflow-hidden rounded-full bg-sunken" aria-hidden="true">
               {/* transform-only: scaleX instead of animated width (DESIGN-AUDIT P3) */}
               <div
                 className="h-full w-full origin-left rounded-full bg-brand-solid transition-transform duration-300"
@@ -543,7 +543,7 @@ function NoticeSummaryCard() {
           <li key={field.id}>
             <div className="flex items-center gap-3 rounded-xl bg-sunken px-3 py-2.5">
               <span
-                className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle font-mono text-2xs font-semibold text-on-brand-subtle"
+                className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-2xs font-semibold tabular-nums text-on-brand-subtle"
                 aria-hidden="true"
               >
                 {i + 1}

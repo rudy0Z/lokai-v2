@@ -10,6 +10,7 @@ import type { DomainChannel } from '../../data/domain-playbooks'
 import { Badge } from '../ui/Badge'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
+import { Card } from '../ui/Card'
 import { Disclosure } from '../ui/Disclosure'
 import { IconCheck, IconPhone } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
@@ -35,7 +36,7 @@ function StepNumber({ n, tone = 'brand' }: { n: number; tone?: 'brand' | 'positi
   return (
     <span
       className={cn(
-        'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-2xs font-semibold',
+        'flex size-7 shrink-0 items-center justify-center rounded-full text-2xs font-semibold tabular-nums',
         tone === 'brand' && 'bg-brand-subtle text-on-brand-subtle',
         tone === 'positive' && 'bg-positive-subtle text-on-positive-subtle',
         tone === 'warning' && 'bg-warning-subtle text-on-warning-subtle',
@@ -76,7 +77,7 @@ function WhatsAppStep({ facts, drafts: draftsProp }: { facts?: FactRecord; draft
         onChange={(e) => setText(e.target.value)}
         rows={9}
         aria-label="WhatsApp draft"
-        className="scroll-calm w-full resize-y rounded-xl border border-line-default bg-container p-3 font-sans text-sm leading-relaxed text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
+        className="scroll-calm w-full resize-y rounded-xl border border-line-default bg-sunken p-3 font-sans text-sm leading-relaxed text-fg-primary focus-visible:border-brand-line focus-visible:outline-none"
       />
       {copied && (
         <p className="rounded-xl bg-positive-subtle px-3 py-2 text-2xs text-on-positive-subtle">
@@ -160,39 +161,46 @@ export function ActionLadder({
 }: ActionLadderProps) {
   const { tr } = useApp()
   return (
-    <section className={cn('flex flex-col gap-2.5', className)} aria-label={tr('ladderTitle')}>
-      <p className="text-2xs font-medium text-fg-tertiary">{tr('ladderTitle')}</p>
-      <Disclosure
-        leading={<StepNumber n={1} tone="positive" />}
-        title={stepTitles?.[0] ?? tr('step1Title')}
-        subtitle={tr('step1Sub')}
-        defaultOpen={initialExpandedStep === 1 || initialExpandedStep === undefined}
-      >
-        <WhatsAppStep facts={facts} drafts={drafts} />
-      </Disclosure>
-      <Disclosure
-        leading={<StepNumber n={2} />}
-        title={stepTitles?.[1] ?? tr('step2Title')}
-        subtitle={tr('step2Sub')}
-        defaultOpen={initialExpandedStep === 2}
-      >
-        <ChannelStep prep={prep} channel={channel} />
-      </Disclosure>
-      {mode === 'full' && (
+    <section className={cn('flex flex-col gap-2', className)} aria-label={tr('ladderTitle')}>
+      <p className="px-1 text-2xs font-medium text-fg-tertiary">{tr('ladderTitle')}</p>
+      {/* ONE container, hairline-divided rows (the ChatGPT priorities-list
+          pattern) — not three stacked bordered cards */}
+      <Card className="divide-y divide-line-subtle overflow-hidden p-0">
         <Disclosure
-          leading={<StepNumber n={3} tone="warning" />}
-          title={stepTitles?.[2] ?? tr('step3Title')}
-          subtitle={tr('step3Sub')}
-          defaultOpen={initialExpandedStep === 3}
+          bare
+          leading={<StepNumber n={1} tone="positive" />}
+          title={stepTitles?.[0] ?? tr('step1Title')}
+          subtitle={tr('step1Sub')}
+          defaultOpen={initialExpandedStep === 1 || initialExpandedStep === undefined}
         >
-          <div className="flex flex-col gap-2.5">
-            <Banner tone="warning">{tr('ladderBanner')}</Banner>
-            <Button variant="secondary" size="sm" onClick={onOpenNotice}>
-              {tr('openNotice')}
-            </Button>
-          </div>
+          <WhatsAppStep facts={facts} drafts={drafts} />
         </Disclosure>
-      )}
+        <Disclosure
+          bare
+          leading={<StepNumber n={2} />}
+          title={stepTitles?.[1] ?? tr('step2Title')}
+          subtitle={tr('step2Sub')}
+          defaultOpen={initialExpandedStep === 2}
+        >
+          <ChannelStep prep={prep} channel={channel} />
+        </Disclosure>
+        {mode === 'full' && (
+          <Disclosure
+            bare
+            leading={<StepNumber n={3} tone="warning" />}
+            title={stepTitles?.[2] ?? tr('step3Title')}
+            subtitle={tr('step3Sub')}
+            defaultOpen={initialExpandedStep === 3}
+          >
+            <div className="flex flex-col gap-2.5">
+              <Banner tone="warning">{tr('ladderBanner')}</Banner>
+              <Button variant="secondary" size="sm" onClick={onOpenNotice}>
+                {tr('openNotice')}
+              </Button>
+            </div>
+          </Disclosure>
+        )}
+      </Card>
       {mode === 'free' && (
         <p className="px-1 text-2xs text-fg-tertiary">{tr('ladderPausedNote')}</p>
       )}

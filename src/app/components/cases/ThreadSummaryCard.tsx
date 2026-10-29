@@ -19,7 +19,7 @@ export function ThreadSummaryCard({ summary, lang }: { summary: DaySummary; lang
         {rows.map((r, i) => (
           <div key={r.label} className="flex flex-col gap-0.5">
             <dt className="flex items-center gap-1.5 text-2xs text-fg-tertiary">
-              <span className="font-mono tabular-nums" lang="en">
+              <span className="tabular-nums" lang="en">
                 {String(i + 1).padStart(2, '0')}
               </span>
               {r.label}

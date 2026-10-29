@@ -12,7 +12,7 @@ import { markVaultCleared } from '../lib/vault'
 export default function ProfilePage() {
   const { tr, lang, setLang } = useApp()
   return (
-    <AppShell activeTab="profile">
+    <AppShell showTabs={false}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
           <div className="flex items-center gap-3">
@@ -40,7 +40,7 @@ export default function ProfilePage() {
                       'pressable min-h-11 rounded-full px-4 text-sm font-medium transition-colors ' +
                       (active
                         ? 'bg-brand-solid text-on-brand-solid'
-                        : 'bg-container text-fg-primary')
+                        : 'border border-line-default bg-card text-fg-primary')
                     }
                   >
                     {cfg.native}

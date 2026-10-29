@@ -26,7 +26,7 @@ export function Field({ label, hint, inverted = false, children }: FieldProps) {
 }
 
 const controlClass =
-  'w-full rounded-lg border border-line-default bg-container px-3 py-2.5 text-sm text-fg-primary placeholder:text-fg-tertiary focus-visible:border-brand-line focus-visible:outline-none min-h-11'
+  'w-full rounded-lg border border-line-default bg-card px-3 py-2.5 text-sm text-fg-primary placeholder:text-fg-tertiary focus-visible:border-brand-line focus-visible:outline-none min-h-11'
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(controlClass, className)} {...rest} />

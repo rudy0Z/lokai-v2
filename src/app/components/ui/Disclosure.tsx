@@ -12,6 +12,9 @@ export interface DisclosureProps {
   onOpenChange?: (open: boolean) => void
   children: ReactNode
   className?: string
+  /** no box of its own — a hairline row inside a parent list (ui-skills:
+      group with spacing/dividers, not stacked bordered cards) */
+  bare?: boolean
 }
 
 /** Accessible expand/collapse (button + region), height-animated. */
@@ -24,6 +27,7 @@ export function Disclosure({
   onOpenChange,
   children,
   className,
+  bare = false,
 }: DisclosureProps) {
   const id = useId()
   const [uncontrolled, setUncontrolled] = useState(defaultOpen)
@@ -35,7 +39,13 @@ export function Disclosure({
   }
 
   return (
-    <div className={cn('rounded-2xl border border-line-default bg-card', className)}>
+    <div
+      className={cn(
+        'rounded-2xl border border-line-default bg-card',
+        bare && 'rounded-none border-0 bg-transparent',
+        className,
+      )}
+    >
       <button
         type="button"
         aria-expanded={open}

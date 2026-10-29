@@ -24,7 +24,7 @@ export default function HistoryPage() {
   const { tr } = useApp()
   const entries = isVaultCleared() ? [] : HISTORY
   return (
-    <AppShell activeTab="history">
+    <AppShell showTabs={false}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 py-5">
         <div className="mx-auto flex max-w-[340px] flex-col gap-3">
           <h1 className="font-serif text-xl font-semibold text-fg-primary">{tr('historyTitle')}</h1>

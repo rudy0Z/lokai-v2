@@ -31,12 +31,14 @@ export function StreamText({
           setResting(false)
           setLeft(true)
           doneRef.current?.()
-        }, 1400)
+        }, 900)
         return () => window.clearTimeout(t)
       }
       return
     }
-    const t = window.setTimeout(() => setShown((n) => Math.min(n + 2, tokens.length)), 34)
+    // speed pass (visual report P2): ~90 wpm effective — substance arrives
+    // well inside the 2.5s turn budget even with the beat engine ahead of it
+    const t = window.setTimeout(() => setShown((n) => Math.min(n + 3, tokens.length)), 22)
     return () => window.clearTimeout(t)
   }, [shown, tokens.length, resting, left])
 

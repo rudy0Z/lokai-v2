@@ -47,12 +47,12 @@ export function HandoverCard({ tierLabel, why }: { tierLabel: string; why: strin
       </div>
 
       <div className="rounded-xl bg-sunken px-3.5 py-3">
-        <p className="font-mono text-2xs font-semibold text-fg-secondary" lang="en">
-          GATE TRAIL
+        <p className="text-2xs font-semibold text-fg-secondary" lang="en">
+          Gate trail
         </p>
         <ol className="mt-1.5 flex flex-col gap-1" lang="en">
           {GATE_TRAIL.map((g) => (
-            <li key={g} className="font-mono text-2xs text-fg-secondary">
+            <li key={g} className="text-2xs text-fg-secondary">
               · {g}
             </li>
           ))}

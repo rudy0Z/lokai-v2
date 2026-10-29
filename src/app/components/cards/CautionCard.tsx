@@ -5,7 +5,6 @@ import { domainPack } from '../../data/domain-playbooks'
 import { legalById } from '../../data/legal-content'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Badge } from '../ui/Badge'
-import { Card } from '../ui/Card'
 import { Chip } from '../ui/Chip'
 import { ConfidenceIndicator } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
@@ -49,7 +48,9 @@ export function CautionCard({
   ]
 
   return (
-    <Card className="flex flex-col gap-3.5 border-warning-line">
+    /* Inline assessment block (same family as FindingCard): left hairline
+       with a warning accent, not a boxed card */
+    <div className="flex flex-col gap-3.5 border-s-2 border-warning-line py-0.5 ps-4">
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
           {timeBarred ? tr('cautionTitle') : domainCaution ? domainCaution.title : informal ? informalPack.title : unclear.title}
@@ -98,6 +99,6 @@ export function CautionCard({
         <ReasoningPill steps={domainCaution ? domainCaution.steps : informal ? informalPack.steps : reasoning} />
       </div>
       <CardActions onDiscard={onDiscard} />
-    </Card>
+    </div>
   )
 }

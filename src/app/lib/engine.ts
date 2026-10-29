@@ -7,13 +7,14 @@
  */
 export type BeatClass = 'stop' | 'caution' | 'explain' | 'disclose' | 'progress'
 
-/** retuned 2026-10-26: acknowledgment lands fast; narration stays honest */
+/** retuned 2026-10-26 + speed pass 2026-10-29 (visual report P2): the first
+ *  sentence of substance must beat the choreography — turn-to-substance < 2.5s */
 export const STAGE_MS_BY_CLASS: Record<BeatClass, number> = {
-  stop: 210,
-  caution: 330,
-  explain: 430,
-  disclose: 390,
-  progress: 310,
+  stop: 180,
+  caution: 260,
+  explain: 320,
+  disclose: 300,
+  progress: 240,
 }
 
 export interface Beat {

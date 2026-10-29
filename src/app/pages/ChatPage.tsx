@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import { useApp } from '../lib/app-context'
 import { navigate, useHashRoute } from '../lib/router'
@@ -38,7 +39,7 @@ import { StopScreen } from '../components/stop/StopScreen'
 import { ProtectiveCard } from '../components/stop/ProtectiveCard'
 import { HandoverCard, WHAT_TO_BRING } from '../components/cards/HandoverCard'
 import { VoiceOrb } from '../components/voice/VoiceOrb'
-import { IconCamera, IconFolder, IconKeyboard, IconCopy, IconPlay } from '../components/ui/icons'
+import { IconFolder, IconCopy } from '../components/ui/icons'
 import { useSpans } from '../lib/useSpans'
 import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
@@ -90,7 +91,7 @@ interface ChatItem {
  * engaged = a finding/ladder/caution is on the table; stopped = a protective
  * stop landed. Safety patterns (strongStop) always win over the stage.
  */
-type ThreadStage = 'intake' | 'clarifying' | 'engaged' | 'stopped'
+type ThreadStage = 'intake' | 'awaitingFacts' | 'clarifying' | 'engaged' | 'stopped'
 
 const CARD_KINDS = new Set<ItemKind>([
   'finding', 'ladder', 'caution', 'factcheck', 'protective', 'handover', 'noticecard', 'closeout', 'counter', 'error',
@@ -124,7 +125,6 @@ export default function ChatPage() {
   const [findingData, setFindingData] = useState<FindingCardData>(() => buildFinding(EMPTY_FACTS, 'en'))
   const [factItems, setFactItems] = useState<FactItem[]>([])
   const [factSigned, setFactSigned] = useState(false)
-  const [composerOpen, setComposerOpen] = useState(false)
   const [domain, setDomain] = useState<{ id: DomainId; branch: DomainBranch } | null>(null)
   const [subSummaryOpen, setSubSummaryOpen] = useState(false)
 
@@ -487,14 +487,14 @@ export default function ChatPage() {
             stream: true,
             text:
               cLang === 'hi'
-                ? 'कंपनी या मकान मालिक की आंतरिक पॉलिसी कानूनी अधिकारों को नहीं काट सकती। यहाँ आपके लिए लक्षित कानूनी जवाबी संदेश तैयार है:'
+                ? 'कंपनी या मकान मालिक की आंतरिक पॉलिसी कानूनी अधिकारों को नहीं काट सकती। यह जवाबी संदेश आपके दर्ज तथ्यों से तैयार है — कॉपी करके WhatsApp पर भेजें:'
                 : cLang === 'mr'
-                  ? 'कंपनी किंवा मालकाचे अंतर्गत नियम कायदेशीर तरतुदींना डावलू शकत नाहीत. आपल्यासाठी कायदेशीर प्रतिवाद संदेश खाली तयार आहे:'
+                  ? 'कंपनी किंवा मालकाचे अंतर्गत नियम कायदेशीर तरतुदींना डावलू शकत नाहीत. हा प्रतिवाद संदेश आपल्या नोंदवलेल्या तथ्यांवरून तयार आहे — कॉपी करून WhatsApp वर पाठवा:'
                   : cLang === 'ta'
-                    ? 'கம்பெனி அல்லது ஓனரின் உள் பாலிசி சட்ட உரிமைகளை குறைக்க முடியாது. வாட்ஸ்அப் அனுப்ப சட்டபூர்வ பதில் கீழே தயாராக உள்ளது:'
+                    ? 'கம்பெனி அல்லது ஓனரின் உள் பாலிசி சட்ட உரிமைகளை குறைக்க முடியாது. இந்த பதில் உங்கள் பதிவுசெய்த உண்மைகளிலிருந்து தயாராகவுள்ளது — நகலெடுத்து WhatsApp-இல் அனுப்பவும்:'
                     : cLang === 'ur'
-                      ? 'کمپنی یا مالک کی اندرونی پالیسی قانونی حقوق کو کم نہیں کر سکتی۔ آپ کے لیے قانونی جوابی پیغام نیچے تیار ہے:'
-                      : 'A seller or landlord’s internal policy cannot shorten statutory remedies. Here is a targeted statutory counter-reply with your locked facts ready for WhatsApp:',
+                      ? 'کمپنی یا مالک کی اندرونی پالیسی قانونی حقوق کو کم نہیں کر سکتی۔ یہ جوابی پیغام آپ کے درج شدہ حقائق سے تیار ہے — کاپی کر کے WhatsApp پر بھیجیں:'
+                      : 'Their internal policy cannot shorten your statutory remedies. This reply is built from your locked facts — copy and send it on WhatsApp:',
           },
           {
             kind: 'counter',
@@ -553,6 +553,10 @@ export default function ChatPage() {
   const startDomainFlow = (o: TesterOption) => {
     const id = o.domain!
     const branch = o.branch ?? 'standard'
+    /* B1 (visual report): once an option is picked its text is IN the thread —
+       the turn-1 rail must not keep offering the same words below it. The rail
+       returns only when the stage earns options again (clarify / post-finding). */
+    stageRef.current = 'awaitingFacts'
     run('explain', () => {
       const pack = domainPack(id, branch, lang)
       setDomain({ id, branch })
@@ -575,6 +579,7 @@ export default function ChatPage() {
     }
     switch (o.route) {
       case 'proceed':
+        stageRef.current = 'awaitingFacts'
         startConsumerFlow(false, o.text)
         return
       case 'vague': {
@@ -631,13 +636,15 @@ export default function ChatPage() {
     }
   }
 
-  const testerOptions: TesterOption[] | undefined = scenario
-    ? (stageRef.current === 'intake'
-        ? scenario.turn1[lang] ?? scenario.turn1.en
-        : stageRef.current === 'clarifying'
-          ? scenario.clarifyPrompts?.[lang] ?? scenario.clarifyPrompts?.en
-          : scenario.postFinding?.[lang] ?? scenario.postFinding?.en)
-    : undefined
+  const testerOptions: TesterOption[] | undefined = !scenario
+    ? undefined
+    : stageRef.current === 'intake'
+      ? scenario.turn1[lang] ?? scenario.turn1.en
+      : stageRef.current === 'clarifying'
+        ? scenario.clarifyPrompts?.[lang] ?? scenario.clarifyPrompts?.en
+        : stageRef.current === 'engaged'
+          ? scenario.postFinding?.[lang] ?? scenario.postFinding?.en
+          : undefined /* awaitingFacts / stopped: no rail — nothing honest to offer yet */
 
   const reset = () => {
     setItems([])
@@ -707,7 +714,6 @@ export default function ChatPage() {
     if (!seedId) return
     if (scenario) {
       reset()
-      setComposerOpen(true)
       return
     }
     const seed = SCENARIO_SEEDS.find((s) => s.id === seedId)
@@ -796,19 +802,18 @@ export default function ChatPage() {
 
   return (
     <AppShell
+      title={activeCase && !noticeOpen && !stopDecision ? activeCase.titleNative : undefined}
       topBarExtra={
         <Button variant="ghost" size="sm" onClick={reset} className="hidden sm:inline-flex">
           {tr('newChat')}
         </Button>
       }
       footer={
-        // one input model per screen: the caseless voice-first empty state and
-        // the notice flow show none (the continuity empty state KEEPS the
-        // composer — the chips and the composer are one input family); the
-        // active stop shows the protective action bar; everything else is the
-        // composer (typing stays live during beats). Tester prompt cards sit
-        // right above the composer during a branching scenario.
-        empty && !activeCase && !composerOpen && !scenario ? undefined : noticeOpen || stopDecision ? undefined : (
+        // one input model per screen: the composer is always present (ChatGPT
+        // parity — the home never hides the input); the active stop shows the
+        // protective action bar. Tester prompt cards sit right above the
+        // composer during a branching scenario.
+        noticeOpen || stopDecision ? undefined : (
           protectiveFooter ?? (
             <div className="flex flex-col gap-2">
               {testerOptions && testerOptions.length > 0 && (
@@ -817,7 +822,7 @@ export default function ChatPage() {
                     stageRef.current === 'intake'
                       ? tr('testerHint')
                       : stageRef.current === 'clarifying'
-                        ? 'Clarification replies · 1-tap test'
+                        ? tr('clarifyRailLabel')
                         : tr('postFindingLabel')
                   }
                   options={testerOptions}
@@ -853,51 +858,9 @@ export default function ChatPage() {
         />
       ) : (
         <>
-          {/* Context Sub-Bar (master spec Part 4): the 390px header stays
-              [sidebar | logo | lang | theme]; the case context + live-summary
-              affordance live on their own slim strip below it */}
-          {activeCase && !noticeOpen && !stopDecision && (
-            <>
-              <div className="flex h-[34px] shrink-0 items-center justify-between border-b border-line-subtle bg-sunken/70 px-4">
-                <div className="flex min-w-0 items-center gap-1.5">
-                  <IconFolder className="size-3.5 shrink-0 text-brand-fg" />
-                  <span className="truncate text-2xs font-medium text-fg-primary" lang={activeCase.lang}>
-                    {activeCase.titleNative}
-                  </span>
-                  <span className="ms-1 shrink-0 font-mono text-2xs text-fg-tertiary" lang={activeCase.lang}>
-                    {activeCase.memory.find((m) => /step|चरण|ಹಂತ|निलை|مرحلہ/i.test(m.label))?.value ?? activeCase.statusLine}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSubSummaryOpen((v) => !v)}
-                  aria-expanded={subSummaryOpen}
-                  className="pressable shrink-0 rounded-full px-2 py-0.5 text-2xs font-medium text-brand-fg"
-                >
-                  {tr('quickSummarise')}
-                </button>
-              </div>
-              {subSummaryOpen && (
-                <div className="border-b border-line-subtle bg-sunken/40 px-4 py-3">
-                  <ThreadSummaryCard
-                    lang={activeCase.lang}
-                    summary={{
-                      grievance:
-                        [matterFacts.item, matterFacts.amount].filter(Boolean).join(' · ') ||
-                        activeCase.continuity.memoryLine,
-                      standing:
-                        stageRef.current === 'engaged'
-                          ? (lang === 'en' ? 'Finding on the table — see the card above' : tr('confClearDesc'))
-                          : tr('factCheckSub'),
-                      next:
-                        activeCase.memory.find((m) => /step|चरण|ಹಂತ|निलை|مرحلہ/i.test(m.label))?.value ??
-                        activeCase.statusLine,
-                    }}
-                  />
-                </div>
-              )}
-            </>
-          )}
+          {/* Case context (visual report chrome-economy): the case title moves
+              INTO the header (AppShell title); the live summary becomes a quiet
+              chip at the top of the thread — no second chrome band */}
           {(offline || LANGUAGES[lang].coverage !== 'full') && (
             <div className="flex flex-col gap-2 px-3.5 pt-3">
               {offline && <Banner tone="offline">{tr('offlineBanner')}</Banner>}
@@ -919,6 +882,40 @@ export default function ChatPage() {
               const threadItems = focus ? items.filter((i) => i.id !== focus.id) : items
               return (
                 <>
+            {activeCase && !empty && (
+              /* live case summary — a quiet chip in the content flow, not a
+                 chrome band (visual report: chrome economy) */
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSubSummaryOpen((v) => !v)}
+                  aria-expanded={subSummaryOpen}
+                  className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-2xs font-medium text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-secondary"
+                >
+                  <IconFolder className="size-3.5 shrink-0 text-brand-fg" />
+                  {tr('quickSummarise')}
+                </button>
+                {subSummaryOpen && (
+                  <div className="w-full px-1">
+                    <ThreadSummaryCard
+                      lang={activeCase.lang}
+                      summary={{
+                        grievance:
+                          [matterFacts.item, matterFacts.amount].filter(Boolean).join(' · ') ||
+                          activeCase.continuity.memoryLine,
+                        standing:
+                          stageRef.current === 'engaged'
+                            ? (lang === 'en' ? 'Finding on the table — see the card above' : tr('confClearDesc'))
+                            : tr('factCheckSub'),
+                        next:
+                          activeCase.memory.find((m) => /step|चरण|ಹಂತ|निलೈ|निलை|مرحلہ/i.test(m.label))?.value ??
+                          activeCase.statusLine,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
             {empty && activeCase && (
               /* Case-Folder continuity: a new day chat NEVER opens blank —
                  the case's own language leads with memory + follow-up + chips */
@@ -928,82 +925,74 @@ export default function ChatPage() {
               </div>
             )}
             {empty && !activeCase && (
-              <div className="flex flex-col items-center gap-6 px-5 pb-10 pt-14 text-center">
-                <div>
-                  <h1
+              <div className="flex flex-col items-center gap-6 px-20 pb-12 pt-16 text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                     className={
-                      'font-serif text-[2.1rem] font-semibold leading-[1.12] text-fg-primary' +
+                      'font-serif text-title font-semibold leading-[1.25] text-fg-primary' +
                       (lang === 'en' ? ' tracking-[-0.02em]' : '')
                     }
                   >
                     {tr('greeting')}
-                  </h1>
-                  <p className="mx-auto mt-3 max-w-[320px] text-sm-plus leading-relaxed text-fg-secondary">
+                  </motion.h1>
+                  <motion.p 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="mx-auto mt-4 max-w-[320px] text-body leading-relaxed text-fg-secondary"
+                  >
                     {tr('greetingSub')}
-                  </p>
-                </div>
+                  </motion.p>
+                </motion.div>
 
-                <button
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => navigate('/voice')}
                   aria-label={tr('speakCta')}
                   className="pressable rounded-full outline-offset-8"
                 >
                   <VoiceOrb state="idle" size="lg" />
-                </button>
-                <div className="-mt-2">
+                </motion.button>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="-mt-2"
+                >
                   <p className="text-base font-semibold text-fg-primary">{tr('speakCta')}</p>
                   <p className="mt-1 text-sm text-fg-tertiary">{tr('langHint')}</p>
-                </div>
+                </motion.div>
 
-                <div className="grid w-full max-w-[350px] grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/notice')}
-                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card px-3 py-5 transition-colors"
-                  >
-                    <IconCamera className="size-6 text-brand-fg" />
-                    <span className="text-base font-medium text-fg-primary">{tr('addNotice')}</span>
-                    <span className="text-2xs text-fg-tertiary">{tr('addNoticeSub')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setComposerOpen(true)
-                      window.setTimeout(
-                        () => document.querySelector<HTMLTextAreaElement>('textarea')?.focus(),
-                        60,
-                      )
-                    }}
-                    className="pressable flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card px-3 py-5 transition-colors"
-                  >
-                    <IconKeyboard className="size-6 text-brand-fg" />
-                    <span className="text-base font-medium text-fg-primary">{tr('typeInstead')}</span>
-                    <span className="text-2xs text-fg-tertiary">{tr('typeInsteadSub')}</span>
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-2">
+                {/* Home de-chrome (visual report): no tile grid, no dev row —
+                    the composer below is the type path, suggestions are chips,
+                    dev/replay live in the sidebar and #/dev */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  className="flex flex-wrap justify-center gap-3"
+                >
                   <Chip onClick={() => handleSend(SCENARIO_SEEDS[0]!.userMessage, [])}>{tr('chipDefective')}</Chip>
                   <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
-                  <Chip onClick={() => handleSend('I received an official notice about property tax', [])}>
-                    {tr('chipNotice')}
-                  </Chip>
-                </div>
-                <p className="text-2xs text-fg-tertiary">{tr('protoTag')}</p>
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => navigate('/dev')}>
-                    Scenario launcher (dev)
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    leadingIcon={<IconPlay className="size-3.5" />}
-                    onClick={() => navigate('/replay')}
-                  >
-                    {tr('replayWatch')}
-                  </Button>
-                </div>
+                  <Chip onClick={() => navigate('/notice')}>{tr('addNotice')}</Chip>
+                </motion.div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                  className="text-xs text-fg-tertiary mt-4 uppercase tracking-widest"
+                >{tr('protoTag')}</motion.p>
               </div>
             )}
 
@@ -1096,7 +1085,7 @@ export default function ChatPage() {
                 case 'ladder': {
                   const dp = domain ? domainPack(domain.id, domain.branch, lang) : null
                   return (
-                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <ActionLadder
                         mode={item.variant ?? 'full'}
                         onOpenNotice={() => setNoticeOpen(true)}
@@ -1112,7 +1101,7 @@ export default function ChatPage() {
                 }
                 case 'counter':
                   return (
-                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <StatutoryCounterCard
                         title={item.counterData?.title}
                         statutoryBasis={item.counterData?.statutoryBasis}
@@ -1137,7 +1126,7 @@ export default function ChatPage() {
                   )
                 case 'closeout':
                   return (
-                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <CloseOutCard findingTitle={findingData.title} />
                     </div>
                   )
@@ -1165,7 +1154,7 @@ export default function ChatPage() {
                   )
                 case 'handover':
                   return (
-                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <HandoverCard
                         tierLabel={item.decision?.tier === 'caution' ? tr('tierCaution') : tr('tierHardStop')}
                         why={item.decision?.why ?? ''}
@@ -1174,7 +1163,7 @@ export default function ChatPage() {
                   )
                 case 'error':
                   return (
-                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20 ps-7">
+                    <div key={item.id} data-chat-item={item.id} className="scroll-mt-20">
                       <Banner
                         tone="danger"
                         action={
@@ -1194,7 +1183,7 @@ export default function ChatPage() {
             })}
 
             {busy && (
-              <div className="flex items-center gap-1.5 ps-7">
+              <div className="flex items-center gap-1.5">
                 <TypingIndicator stageLabel={stageLabel} />
                 <Button variant="ghost" size="sm" onClick={skipBeats}>
                   {tr('skip')}

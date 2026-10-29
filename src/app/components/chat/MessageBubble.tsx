@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { motion } from 'motion/react'
 import { cn } from '../../lib/cn'
 import { useApp } from '../../lib/app-context'
-import { LogoMark } from '../ui/LogoMark'
 import { IconPlay } from '../ui/icons'
 
 export type MessageRole = 'user' | 'assistant' | 'system'
@@ -61,36 +61,47 @@ function VoiceNoteHeader({ meta }: { meta: VoiceMeta }) {
   return (
     <div className="mb-2 flex flex-col gap-1.5 border-b border-dashed border-line-subtle pb-2">
       <div className="flex items-center gap-2">
-        <button
+        <motion.button
           type="button"
           onClick={() => setPlaying((v) => !v)}
           aria-pressed={playing}
           aria-label={playing ? tr('replayPause') : tr('replayPlay')}
-          className="pressable flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-solid text-on-brand-solid"
+          whileTap={{ scale: 0.95 }}
+          className="pressable flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-solid text-on-brand-solid shadow-sm"
+          style={{ minWidth: 'var(--touch-target)' }}
         >
           {playing ? (
             <span className="flex gap-[3px]" aria-hidden="true">
-              <span className="h-2.5 w-[3px] bg-current" />
-              <span className="h-2.5 w-[3px] bg-current" />
+              <span className="h-2.5 w-[3px] bg-current animate-pulse" />
+              <span className="h-2.5 w-[3px] bg-current animate-pulse delay-75" />
             </span>
           ) : (
-            <IconPlay className="size-3.5" />
+            <IconPlay className="size-4" />
           )}
-        </button>
-        <div className="flex h-7 min-w-0 flex-1 items-end gap-[2px]" aria-hidden="true">
+        </motion.button>
+        <motion.div 
+          className="flex h-7 min-w-0 flex-1 items-end gap-[2px]" 
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          aria-hidden="true"
+        >
           {BAR_HEIGHTS.map((h, i) => (
-            <span
+            <motion.span
               key={i}
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: i < filled ? 1 : 0.3 }}
+              transition={{ duration: 0.2, delay: i * 0.01 }}
               className={cn('w-full max-w-[6px] flex-1 rounded-full transition-colors', i < filled ? 'bg-brand-solid' : 'bg-fg-tertiary/30')}
               style={{ height: `${h}%` }}
             />
           ))}
-        </div>
-        <span className="shrink-0 rounded-full bg-sunken px-2 py-0.5 font-mono text-2xs text-fg-secondary" lang="en">
+        </motion.div>
+        <span className="shrink-0 rounded-full bg-sunken px-2.5 py-1 font-mono text-xs text-fg-secondary">
           {meta.duration}
         </span>
       </div>
-      <p className="text-2xs text-fg-tertiary">{tr('voiceMetaCaption')}{meta.edited ? ' · ✓' : ''}</p>
+      <p className="text-xs text-fg-tertiary">{tr('voiceMetaCaption')}{meta.edited ? ' · ✓' : ''}</p>
     </div>
   )
 }
@@ -109,47 +120,80 @@ export function MessageBubble({
 }: MessageBubbleProps) {
   if (role === 'system') {
     return (
-      <div className={cn('flex justify-center px-2 py-1', className)}>
-        <p className="rounded-full bg-sunken px-3 py-1 text-2xs text-fg-tertiary">{children}</p>
+      <div className={cn('flex justify-center px-2 py-1', className)} data-chat-item={dataId}>
+        <motion.p 
+          className="rounded-full bg-sunken px-3.5 py-1 text-xs text-fg-tertiary"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
+        >{children}</motion.p>
       </div>
     )
   }
 
   if (role === 'assistant') {
     return (
-      <div className={cn('flex flex-col gap-1.5 scroll-mt-20', className)} data-chat-item={dataId}>
-        <div className="flex items-center gap-2" aria-hidden="true">
-          <LogoMark size="sm" />
-          <span className="text-2xs font-medium text-fg-tertiary">LokAI</span>
-        </div>
+      /* ChatGPT parity: the assistant never signs its own turns — the voice
+         IS the identity. Actions reveal on hover (desktop); on touch they
+         stay visible (no hover to reveal them). */
+      <motion.div 
+        className={cn('group/turn flex flex-col gap-2 scroll-mt-20', className)}
+        data-chat-item={dataId}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="min-w-0 text-fg-primary">{children}</div>
-        {actions && <div className="-mt-0.5 flex items-center gap-1">{actions}</div>}
-      </div>
+        {actions && (
+          <motion.div 
+            className="-mt-0.5 flex items-center gap-2 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within/turn:opacity-100 [@media(hover:hover)]:group-hover/turn:opacity-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ opacity: 1 }} // Always visible on mobile
+          >
+            {actions}
+          </motion.div>
+        )}
+      </motion.div>
     )
   }
 
   return (
-    <div className={cn('flex flex-col items-end scroll-mt-20', className)} data-chat-item={dataId}>
-      <div
+    <motion.div 
+      className={cn('flex flex-col items-end scroll-mt-20', className)}
+      data-chat-item={dataId}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
         className={cn(
-          'max-w-[85%] rounded-[18px] border px-3.5 py-2.5 text-sm ltr:rounded-br-[4px] rtl:rounded-bl-[4px]',
+          'max-w-[85%] rounded-lg border px-4 py-3 text-sm ltr:rounded-br-lg rtl:rounded-bl-lg shadow-sm',
           stale
             ? 'border-warning-line bg-warning-subtle text-on-warning-subtle'
             : 'border-line-default bg-component text-fg-primary',
         )}
+        whileHover={!stale ? { 
+          boxShadow: 'var(--shadow-sm)',
+          borderColor: 'var(--c-brand-line-subtle)'
+        } : {}}
+        transition={{ duration: 0.2 }}
       >
         {voiceMeta && <VoiceNoteHeader meta={voiceMeta} />}
         {children}
-      </div>
+      </motion.div>
       {onStaleAction && (stale || isAnswer) && (
-        <button
+        <motion.button
           type="button"
           onClick={onStaleAction}
-          className="pressable mt-1 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="pressable mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-brand-fg underline-offset-4 hover:underline"
+          style={{ minWidth: 'var(--touch-target)' }}
         >
           {staleActionLabel}
-        </button>
+        </motion.button>
       )}
-    </div>
+    </motion.div>
   )
 }

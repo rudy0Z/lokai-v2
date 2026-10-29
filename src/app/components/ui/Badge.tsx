@@ -13,7 +13,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 const toneVariant: Record<BadgeTone, Record<BadgeVariant, string>> = {
   neutral: {
     subtle: 'bg-sunken text-fg-secondary',
-    solid: 'bg-component text-fg-primary',
+    solid: 'border border-line-default bg-card text-fg-primary',
     outline: 'border border-line-default text-fg-secondary',
   },
   brand: {

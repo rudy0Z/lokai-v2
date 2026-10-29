@@ -33,7 +33,7 @@ export default function MatterDetailPage({ id }: { id: string }) {
 
   if (!matter) {
     return (
-      <AppShell activeTab="history" showTabs={false}>
+      <AppShell showTabs={false}>
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="text-sm text-fg-secondary">This matter could not be found.</p>
           <Button variant="secondary" size="sm" onClick={() => navigate('/history')}>
@@ -45,7 +45,7 @@ export default function MatterDetailPage({ id }: { id: string }) {
   }
 
   return (
-    <AppShell activeTab="history" showTabs={false}>
+    <AppShell showTabs={false}>
       <div className="scroll-calm flex-1 overflow-y-auto px-4 pb-6 pt-4">
         <div className="mx-auto flex max-w-[340px] flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -84,7 +84,7 @@ export default function MatterDetailPage({ id }: { id: string }) {
                 >
                   <span
                     className={
-                      'flex size-6 shrink-0 items-center justify-center rounded-full font-mono text-2xs font-semibold ' +
+                      'flex size-6 shrink-0 items-center justify-center rounded-full text-2xs font-semibold tabular-nums ' +
                       (s.status === 'done'
                         ? 'bg-positive-subtle text-on-positive-subtle'
                         : s.status === 'current'

@@ -66,7 +66,7 @@ export function FactCheckCard({
       <div className="flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-positive-line bg-positive-subtle px-3.5 py-2.5">
         <span className="text-2xs font-medium text-on-positive-subtle">
           {tr('factSigned').replace('{n}', String(facts.length))}
-          {glance && <span className="ms-1.5 font-mono tabular-nums">({glance})</span>}
+          {glance && <span className="ms-1.5 tabular-nums">({glance})</span>}
         </span>
         <button
           type="button"
@@ -88,11 +88,13 @@ export function FactCheckCard({
         <h3 className="font-serif text-lg font-semibold text-fg-primary">{tr('factCheckTitle')}</h3>
         <p className="mt-1 text-2xs text-fg-tertiary">{tr('factCheckSub')}</p>
       </div>
-      <div className="flex flex-col gap-1">
+      {/* hairline-divided fact rows (the ChatGPT list pattern) — a
+          confirmation moment, not a form table */}
+      <div className="divide-y divide-line-subtle">
         {facts.map((f) => {
           if (f.key === 'when' && whenOptions.length > 0) {
             return (
-              <div key={f.key} className="flex min-h-11 flex-col justify-center gap-1.5 rounded-xl px-1 py-1">
+              <div key={f.key} className="flex min-h-11 flex-col justify-center gap-1.5 py-2.5">
                 <span className="text-2xs text-fg-tertiary">{f.label}</span>
                 {whenChosen ? (
                   <div className="flex items-center gap-2">
@@ -121,7 +123,7 @@ export function FactCheckCard({
             )
           }
           return (
-            <div key={f.key} className="flex min-h-11 items-center gap-2 rounded-xl px-1">
+            <div key={f.key} className="flex min-h-11 items-center gap-3 py-2.5">
               <span className="w-24 shrink-0 text-2xs text-fg-tertiary">
                 {f.label}
               </span>

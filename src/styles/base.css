@@ -153,15 +153,15 @@ a,
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black 16px,
-    black calc(100% - 16px),
+    black 24px,
+    black calc(100% - 24px),
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black 16px,
-    black calc(100% - 16px),
+    black 24px,
+    black calc(100% - 24px),
     transparent 100%
   );
 }
@@ -257,10 +257,11 @@ a,
   height: 132px;
 }
 [data-theme="dark"] .voice-orb {
-  /* deep-audit P3-14: the signature must survive the night garden — lift the
-     halo off the near-black shell */
-  --orb-outer: oklch(66% 0.08 150 / 0.42);
-  --orb-mid: oklch(52% 0.09 155 / 0.62);
+  /* deep-audit P3-14 + visual report P3: the signature must survive the
+     night garden — luminous, not muddy; the halo should glow against the
+     near-black shell (delight budget: one moment, done well) */
+  --orb-outer: oklch(74% 0.095 148 / 0.6);
+  --orb-mid: oklch(60% 0.11 152 / 0.78);
 }
 .orb-layer {
   position: absolute;
@@ -290,8 +291,37 @@ a,
   width: 40%;
   height: 40%;
   border-radius: 9999px;
-  background: var(--orb-core);
-  box-shadow: 0 12px 36px rgb(20 34 26 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  background: radial-gradient(
+    circle at 35% 35%,
+    oklch(97% 0 0 / 0.9) 0%,
+    var(--orb-core) 45%,
+    oklch(24% 0.03 165 / 0.95) 100%
+  );
+  box-shadow: 
+    /* Outer ambient shadow */
+    0 20px 60px rgba(20, 34, 26, 0.4),
+    /* Mid-tone glow */
+    0 12px 36px rgba(20, 34, 26, 0.3),
+    /* Inner highlight for 3D effect */
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 0 20px rgba(255, 255, 255, 0.08),
+    /* Subsurface scattering rim light */
+    inset 0 -8px 24px rgba(110, 180, 160, 0.15);
+}
+
+/* Add glossy overlay to core */
+.orb-core::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.25) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  mix-blend-mode: hard-light;
 }
 
 /* idle: a slow breathe */
@@ -338,16 +368,29 @@ a,
   pointer-events: none;
 }
 .orb-ring--b {
-  animation-delay: 0.9s;
+  animation-delay: 0.6s;
+  opacity: 0.85;
+}
+.orb-ring--c {
+  animation-delay: 1.2s;
+  border-width: 1px;
+  opacity: 0.7;
 }
 @keyframes orb-ring {
   0% {
-    transform: scale(0.85);
-    opacity: 0.7;
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.9;
+    border-color: var(--orb-mid);
+  }
+  50% {
+    transform: scale(1.15) rotate(180deg);
+    opacity: 0.5;
+    border-color: oklch(80% 0.03 150);
   }
   100% {
-    transform: scale(1.45);
+    transform: scale(1.6) rotate(360deg);
     opacity: 0;
+    border-color: transparent;
   }
 }
 
@@ -355,6 +398,32 @@ a,
 .voice-orb--thinking .orb-mid {
   transform: scale(0.94);
   opacity: 0.8;
+}
+
+/* Enhanced thinking pulse on core */
+.voice-orb--thinking .orb-core {
+  animation: thinking-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  0%, 100% {
+    transform: scale(0.94);
+    box-shadow: 
+      0 20px 60px rgba(20, 34, 26, 0.4),
+      0 12px 36px rgba(20, 34, 26, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 0 20px rgba(255, 255, 255, 0.08),
+      inset 0 -8px 24px rgba(110, 180, 160, 0.1);
+  }
+  50% {
+    transform: scale(0.96);
+    box-shadow: 
+      0 24px 70px rgba(20, 34, 26, 0.5),
+      0 16px 40px rgba(20, 34, 26, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 0 30px rgba(255, 255, 255, 0.12),
+      inset 0 -8px 24px rgba(110, 180, 160, 0.18);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

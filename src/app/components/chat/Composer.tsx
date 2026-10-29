@@ -60,17 +60,21 @@ export function Composer({
       <AnimatePresence>
         {trayOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.98 }}
-            transition={{ duration: 0.16 }}
+            exit={{ opacity: 0, y: 10, scale: 0.97 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 450,
+              damping: 30,
+            }}
             style={{ transformOrigin: 'bottom center' }}
-            className="absolute inset-x-0 bottom-full mb-2 rounded-2xl border border-line-default bg-modal p-3 shadow-large"
+            className="absolute inset-x-0 bottom-full mb-2 rounded-xl border border-line-default bg-modal p-3 shadow-lg"
             role="dialog"
             aria-label={tr('attachTitle')}
           >
-            <p className="text-2xs font-semibold text-fg-primary">{tr('attachTitle')}</p>
-            <p className="mt-0.5 text-2xs text-fg-tertiary">{tr('attachHint')}</p>
+            <p className="text-xs font-semibold text-fg-primary">{tr('attachTitle')}</p>
+            <p className="mt-0.5 text-xs text-fg-tertiary">{tr('attachHint')}</p>
             <div className="mt-2 flex flex-col gap-1">
               {MOCK_DOCS.map((doc) => (
                 <button
@@ -80,11 +84,11 @@ export function Composer({
                     onAttach(doc)
                     setTrayOpen(false)
                   }}
-                  className="flex min-h-11 items-center gap-2.5 rounded-lg px-2 text-start hover:bg-hover-veil"
+                  className="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-start hover:bg-hover-veil active:bg-hover-veil/70"
                 >
                   <IconDoc className="size-4 shrink-0 text-fg-tertiary" />
                   <span className="text-sm text-fg-primary">{doc}</span>
-                  <span className="text-2xs text-fg-tertiary">(mock)</span>
+                  <span className="text-xs text-fg-tertiary">(mock)</span>
                 </button>
               ))}
             </div>
@@ -92,44 +96,48 @@ export function Composer({
         )}
       </AnimatePresence>
 
-      <div
+      <motion.div
         className={cn(
-          'rounded-3xl bg-sunken transition-shadow duration-200',
-          offline ? 'opacity-60' : 'focus-within:shadow-[0_0_0_1.5px_var(--c-brand-line)]',
+          'rounded-xl bg-sunken transition-all duration-200',
+          offline ? 'opacity-60' : 'focus-within:shadow-md focus-within:border-brand-line-subtle',
         )}
+        whileHover={{ boxShadow: offline ? 'none' : 'var(--shadow-sm)' }}
+        whileTap={{ scale: 0.998 }}
       >
         {attachments.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 px-1 pt-1">
+          <div className="flex flex-wrap gap-2 px-3 py-2">
             {attachments.map((a) => (
               <span
                 key={a}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-sunken px-2.5 text-2xs text-fg-secondary"
+                className="inline-flex items-center gap-2 rounded-lg bg-sunken px-3 py-1.5 text-xs text-fg-secondary"
               >
-                <IconDoc className="size-3.5" />
-                {a}
+                <IconDoc className="size-4" />
+                <span className="max-w-[120px] truncate">{a}</span>
                 <button
                   type="button"
                   aria-label={`${tr('discard')} ${a}`}
                   onClick={() => onRemoveAttachment(a)}
-                  className="rounded-full p-0.5 text-fg-tertiary hover:text-fg-primary"
+                  className="rounded-full p-0.5 text-fg-tertiary hover:text-fg-primary active:bg-hover-veil"
                 >
-                  <IconX className="size-3.5" />
+                  <IconX className="size-4" />
                 </button>
               </span>
             ))}
           </div>
         )}
 
-        <div className="flex items-end gap-1 p-1.5">
-          <button
+        <div className="flex items-end gap-2 px-3 py-2">
+          <motion.button
             type="button"
             aria-label={tr('composerAttach')}
             disabled={disabled || offline}
             onClick={() => setTrayOpen((v) => !v)}
-            className="pressable mb-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-primary disabled:opacity-40"
+            whileTap={{ scale: 0.9 }}
+            className="pressable mb-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-primary disabled:opacity-40"
+            style={{ minWidth: 'var(--touch-target)' }}
           >
             <IconPaperclip className="size-5" />
-          </button>
+          </motion.button>
 
           <textarea
             ref={areaRef}
@@ -148,22 +156,24 @@ export function Composer({
             className="max-h-[140px] min-h-11 flex-1 resize-none bg-transparent py-2.5 text-base text-fg-primary placeholder:text-fg-tertiary focus:outline-none"
           />
 
-          <button
+          <motion.button
             type="button"
             aria-label={tr('composerSend')}
             disabled={sendDisabled || offline || text.trim() === ''}
             onClick={submit}
+            whileTap={{ scale: 0.9 }}
             className={cn(
-              'pressable mb-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full transition-colors',
+              'pressable mb-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-colors',
               text.trim() === '' || sendDisabled || offline
-                ? 'bg-container text-fg-disabled'
-                : 'bg-brand-solid text-on-brand-solid shadow-default',
+                ? 'bg-sunken text-fg-disabled'
+                : 'bg-brand-solid text-on-brand-solid shadow-sm',
             )}
+            style={{ minWidth: 'var(--touch-target)' }}
           >
             <IconSend className="size-5" />
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
       {sendLocked && !disabled && (
         <p className="mt-1.5 px-2 text-2xs text-fg-tertiary" role="status">
           <TypingHint />

@@ -32,6 +32,7 @@ export function VoiceOrb({ state = 'idle', size = 'lg', className }: VoiceOrbPro
         <>
           <span className="orb-ring orb-ring--a" aria-hidden="true" />
           <span className="orb-ring orb-ring--b" aria-hidden="true" />
+          <span className="orb-ring orb-ring--c" aria-hidden="true" />
         </>
       )}
       {state === 'thinking' && <span className="orb-activity" aria-hidden="true" />}

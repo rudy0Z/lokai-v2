@@ -1,51 +1,50 @@
-import { navigate } from '../../lib/router'
 import { cn } from '../../lib/cn'
-import { useApp } from '../../lib/app-context'
-import { IconBookmark, IconClock, IconHome, IconUser } from './icons'
+import { IconFolder, IconHome, IconSparkle } from './icons'
 
-const TABS = [
-  { id: 'home', path: '/', icon: IconHome, labelKey: 'tabHome' },
-  { id: 'history', path: '/history', icon: IconClock, labelKey: 'tabHistory' },
-  { id: 'saved', path: '/saved', icon: IconBookmark, labelKey: 'tabSaved' },
-  { id: 'profile', path: '/profile', icon: IconUser, labelKey: 'tabProfile' },
-] as const
+export type TabId = 'home' | 'cases' | 'sandbox'
 
-export type TabId = (typeof TABS)[number]['id']
+interface TabBarProps {
+  active: TabId
+}
 
 /**
- * Floating glass tab bar (apple-design material §12) — anchored inside the
- * device frame (absolute, not fixed), so it stays within the prototype
- * presentation on desktop and full-bleed on phones.
+ * MODERNIZED UI COMPONENT — DEPRECATED IN MAIN FLOW
+ * 
+ * Kept for reference. Modern conversational apps (ChatGPT, Claude, Gemini)
+ * use a clean full-height canvas with hamburger menu rather than fixed bottom tabs.
  */
-export function TabBar({ active }: { active: TabId }) {
-  const { tr } = useApp()
+export function TabBar({ active }: TabBarProps) {
+  const tabs = [
+    { id: 'home', label: 'Chat', icon: IconHome },
+    { id: 'cases', label: 'Cases', icon: IconFolder },
+    { id: 'sandbox', label: 'Sandbox', icon: IconSparkle },
+  ]
+
   return (
-    <nav
-      aria-label={tr('navLabel')}
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center pb-[calc(0.875rem+env(safe-area-inset-bottom))]"
-    >
-      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-white/30 bg-shell/70 p-1.5 shadow-large backdrop-blur-2xl">
-        {TABS.map(({ id, path, icon: Icon, labelKey }) => {
-          const isActive = id === active
+    <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line-default bg-shell/95 backdrop-blur-sm sm:hidden">
+      <nav className="flex items-center justify-around" aria-label="Bottom navigation">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
           return (
             <button
-              key={id}
-              type="button"
-              aria-current={isActive ? 'page' : undefined}
-              onClick={() => navigate(path)}
+              key={tab.id}
               className={cn(
-                'pressable flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-full px-3 transition-colors duration-150',
-                isActive
-                  ? 'bg-brand-solid text-on-brand-solid'
-                  : 'text-fg-tertiary',
+                'flex flex-col items-center gap-1 py-2.5 px-4 transition-colors',
+                active === tab.id ? 'text-brand-fg' : 'text-fg-secondary hover:text-fg-primary',
               )}
+              aria-current={active === tab.id ? 'page' : undefined}
             >
-              <Icon className="size-5" strokeWidth={isActive ? 2 : 1.75} />
-              <span className="text-2xs font-medium">{tr(labelKey)}</span>
+              <Icon className="size-5" />
+              <span className="text-2xs font-medium">{tab.label}</span>
             </button>
           )
         })}
-      </div>
-    </nav>
+      </nav>
+      {/* iOS home indicator area */}
+      <div className="h-[env(safe-area-inset-bottom)] bg-shell" />
+    </div>
   )
 }
+
+// Note: This component is intentionally not used in AppShell
+// See shell.tsx for modernized navigation pattern

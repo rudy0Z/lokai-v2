@@ -57,9 +57,9 @@ export function Thread({ children, scrollKey, autoScroll = true, focusSelector, 
       <div
         ref={ref}
         onScroll={onScroll}
-        className="scroll-calm scroll-fade-y flex-1 overflow-y-auto overscroll-contain px-4 py-4"
+        className="scroll-calm scroll-fade-y flex-1 overflow-y-auto overscroll-contain px-4 pb-8 pt-3"
       >
-        <div className="flex flex-col gap-5">{children}</div>
+        <div className="flex flex-col gap-4">{children}</div>
       </div>
       {away && (
         <button
@@ -67,7 +67,7 @@ export function Thread({ children, scrollKey, autoScroll = true, focusSelector, 
           onClick={() =>
             ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
           }
-          className="pressable absolute bottom-4 left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/20 bg-standout/95 px-3.5 py-1.5 font-mono text-2xs font-medium text-fg-on-inverted shadow-large backdrop-blur-md transition-transform active:scale-95"
+          className="pressable absolute bottom-4 left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/20 bg-standout/95 px-3.5 py-1.5 text-2xs font-medium text-fg-on-inverted shadow-large backdrop-blur-md transition-transform active:scale-95"
         >
           <IconArrowLeft className="size-3.5 -rotate-90" />
           {tr('jumpToLatest')}

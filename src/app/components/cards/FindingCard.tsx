@@ -4,7 +4,6 @@ import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { legalById } from '../../data/legal-content'
 import { Badge } from '../ui/Badge'
-import { Card } from '../ui/Card'
 import { Textarea } from '../ui/Field'
 import { type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
@@ -74,7 +73,15 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
     draft.confidence === 'clear' ? tr('confClear') : draft.confidence === 'likely' ? tr('confLikely') : tr('confUnsure')
 
   return (
-    <Card className={cn('flex flex-col gap-3.5', stale && 'opacity-70')}>
+    /* Inline assessment block: a left hairline, not a boxed card — the
+       finding is the assistant's own voice, inset into the conversation
+       (visual report: cards become exceptions, not the default). */
+    <div
+      className={cn(
+        'flex flex-col gap-3.5 border-s-2 border-line-default py-0.5 ps-4',
+        stale && 'opacity-70',
+      )}
+    >
       {/* top meta row — PASSIVE trust, quiet borderless labels (master prompt
           Part 6: a strict two-tier hierarchy; interactive pills live below) */}
       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -156,6 +163,6 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
         onRegenerate={regenerate}
         onDiscard={onDiscard}
       />
-    </Card>
+    </div>
   )
 }

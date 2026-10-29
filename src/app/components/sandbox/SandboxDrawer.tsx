@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
@@ -30,12 +30,36 @@ const SCENARIO_META: Record<string, { domain: string; law: string; tag: string }
   scn5: { domain: 'Domestic Safety Stop', law: 'Immediate Stop · 181 / 112 / DLSA', tag: 'Safety Stop' },
 }
 
+export const SANDBOX_OPEN_EVENT = 'lokai:sandbox-open'
+
+/** The sidebar row that opens the drawer (visual report B2: the floating
+    pill occluded product buttons — the sandbox lives in the meta surface). */
+export function SandboxTrigger() {
+  const { tr } = useApp()
+  return (
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new CustomEvent(SANDBOX_OPEN_EVENT))}
+      className="pressable flex min-h-11 w-full items-center gap-2 rounded-xl px-2 text-start text-2xs font-medium text-fg-secondary transition-colors hover:bg-hover-veil"
+    >
+      <IconSparkle className="size-4 shrink-0 text-fg-tertiary" />
+      {tr('sandboxTitle')}
+    </button>
+  )
+}
+
 export function SandboxDrawer() {
   const { tr, setLang } = useApp()
   const { path } = useHashRoute()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('scenarios')
   const [testLang, setTestLang] = useState<LangCode>('en')
+
+  useEffect(() => {
+    const onOpen = () => setOpen(true)
+    window.addEventListener(SANDBOX_OPEN_EVENT, onOpen)
+    return () => window.removeEventListener(SANDBOX_OPEN_EVENT, onOpen)
+  }, [])
 
   // during a replay takeover the drawer steps aside — the player owns chrome
   if (path.startsWith('/replay')) return null
@@ -65,16 +89,6 @@ export function SandboxDrawer() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="pressable absolute bottom-[calc(5.25rem+env(safe-area-inset-bottom))] end-3.5 z-40 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/20 bg-standout/95 px-3.5 py-2 font-mono text-2xs font-medium text-fg-on-inverted shadow-large backdrop-blur-md"
-      >
-        <IconSparkle className="size-3.5" />
-        {tr('sandboxTitle')}
-      </button>
-
       <AnimatePresence>
         {open && (
           <motion.div
@@ -87,7 +101,7 @@ export function SandboxDrawer() {
             aria-label={tr('sandboxTitle')}
           >
             <div className="flex items-center justify-between border-b border-line-subtle px-3 py-2">
-              <span className="font-mono text-2xs font-semibold text-fg-secondary">{tr('sandboxTitle')}</span>
+              <span className="text-2xs font-semibold text-fg-secondary">{tr('sandboxTitle')}</span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -175,7 +189,7 @@ export function SandboxDrawer() {
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium text-fg-primary">{meta?.domain ?? title}</span>
                             {meta?.tag && (
-                              <span className="shrink-0 rounded-full bg-sunken px-2 py-0.5 font-mono text-2xs text-fg-secondary">
+                              <span className="shrink-0 rounded-full bg-sunken px-2 py-0.5 text-2xs tabular-nums text-fg-secondary">
                                 {meta.tag}
                               </span>
                             )}
@@ -183,7 +197,7 @@ export function SandboxDrawer() {
                           <span className="mt-1 block text-2xs text-fg-secondary">
                             {title}
                           </span>
-                          <span className="mt-0.5 block font-mono text-2xs text-brand-fg">
+                          <span className="mt-0.5 block text-2xs text-fg-tertiary">
                             {meta?.law ?? s.outcome} · {LANGUAGES[testLang].english}
                           </span>
                         </button>
@@ -208,7 +222,7 @@ export function SandboxDrawer() {
                       <span className="block text-sm font-medium text-fg-primary" lang={s.lang}>
                         {s.label}
                       </span>
-                      <span className="mt-0.5 block font-mono text-2xs text-fg-tertiary" lang="en">
+                      <span className="mt-0.5 block text-2xs text-fg-tertiary" lang="en">
                         {s.outcome} · {LANGUAGES[s.lang].english}
                       </span>
                     </button>

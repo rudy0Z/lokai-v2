@@ -31,7 +31,7 @@ export default function CaseWorkspacePage({ id, dayParam }: { id: string; dayPar
 
   if (!matter) {
     return (
-      <AppShell activeTab="history" showTabs={false}>
+      <AppShell showTabs={false}>
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="text-sm text-fg-secondary">This case could not be found.</p>
           <Button variant="secondary" size="sm" onClick={() => navigate('/history')}>
@@ -46,7 +46,7 @@ export default function CaseWorkspacePage({ id, dayParam }: { id: string; dayPar
   const day = dayIndex !== null ? matter.days[dayIndex] : undefined
 
   return (
-    <AppShell activeTab="history" showTabs={false}>
+    <AppShell showTabs={false}>
       <CaseBody matterId={matter.id} dayIndex={dayIndex} day={day} />
     </AppShell>
   )
@@ -81,7 +81,7 @@ function CaseBody({
             <Button variant="ghost" size="sm" leadingIcon={<IconArrowLeft className="size-4" />} onClick={backToCase}>
               {tr('back')}
             </Button>
-            <span className="font-mono text-2xs text-fg-tertiary" lang={matter.lang}>
+            <span className="text-2xs tabular-nums text-fg-tertiary" lang={matter.lang}>
               {day.dateLabel}
             </span>
           </div>
@@ -101,7 +101,7 @@ function CaseBody({
                 type="button"
                 onClick={() => setSummaryOpen((v) => !v)}
                 aria-expanded={summaryOpen}
-                className="pressable self-start rounded-full border border-line-default bg-component px-3 py-1.5 text-2xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
+                className="pressable self-start rounded-full border border-line-default bg-card px-3 py-1.5 text-2xs font-medium text-fg-secondary transition-colors hover:bg-component-hover"
               >
                 {tr('quickSummarise')}
               </button>
@@ -181,7 +181,7 @@ function CaseBody({
           )}
 
           {/* interactive continuation bar (master spec Trap 2) */}
-          <div className="flex flex-col gap-2 rounded-2xl border border-line-subtle bg-component p-3.5">
+          <div className="flex flex-col gap-2 rounded-2xl border border-line-default bg-card p-3.5">
             <p className="text-2xs font-semibold text-fg-secondary">Continue this case</p>
             <div className="flex flex-col gap-2">
               <Button
@@ -245,7 +245,7 @@ function CaseBody({
           <h1 className="font-serif text-xl font-semibold leading-snug text-fg-primary" lang={matter.lang}>
             {matter.titleNative}
           </h1>
-          <p className="mt-1 font-mono text-2xs text-fg-tertiary" lang="en">
+          <p className="mt-1 text-2xs tabular-nums text-fg-tertiary" lang="en">
             {matter.amount} · {matter.statusLine}
           </p>
         </div>
@@ -280,7 +280,7 @@ function CaseBody({
                 i === lastDay ? 'bg-brand-subtle' : 'bg-card hover:bg-component-hover',
               )}
             >
-              <span className="w-16 shrink-0 font-mono text-2xs text-fg-tertiary" lang={matter.lang}>
+              <span className="w-16 shrink-0 text-2xs tabular-nums text-fg-tertiary" lang={matter.lang}>
                 {d.dateLabel}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm text-fg-primary" lang={matter.lang}>
@@ -312,7 +312,7 @@ function CaseBody({
             {matter.docs.map((d) => (
               <div key={d.id} className="flex flex-col gap-1">
                 <ExhibitPaper name={d.name} />
-                <span className="font-mono text-2xs text-fg-tertiary" lang={matter.lang}>
+                <span className="text-2xs tabular-nums text-fg-tertiary" lang={matter.lang}>
                   {matter.days[d.dayIndex]?.dateLabel} · {DOC_KIND_LABEL[d.kind]}
                 </span>
               </div>

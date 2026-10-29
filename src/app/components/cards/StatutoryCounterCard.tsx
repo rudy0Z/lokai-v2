@@ -33,23 +33,23 @@ export function StatutoryCounterCard({
   }
 
   return (
-    <div className={cn('rounded-2xl border border-line-default bg-card p-4 shadow-sm flex flex-col gap-3', className)}>
+    <div className={cn('flex flex-col gap-3 rounded-2xl border border-line-default bg-card p-4', className)}>
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="font-serif text-sm font-semibold text-fg-primary">{title}</h3>
-          <p className="mt-0.5 font-mono text-2xs text-brand-fg">{statutoryBasis}</p>
+          <p className="mt-0.5 text-2xs text-fg-tertiary">{statutoryBasis}</p>
         </div>
         <Badge tone="brand" variant="subtle">Targeted Counter</Badge>
       </div>
 
-      <div className="rounded-xl border border-line-subtle bg-sunken p-3">
+      <div className="rounded-xl bg-sunken p-3">
         <p className="whitespace-pre-line text-sm leading-relaxed text-fg-primary">
           {replyText}
         </p>
       </div>
 
       <div className="flex items-center justify-between gap-2 pt-1">
-        <span className="text-2xs text-fg-tertiary">1-tap copy for WhatsApp or Email</span>
+        <span className="text-2xs text-fg-tertiary">Copy for WhatsApp or email</span>
         <Button
           variant="primary"
           size="sm"
