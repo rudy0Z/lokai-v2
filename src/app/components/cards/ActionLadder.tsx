@@ -10,7 +10,6 @@ import type { DomainChannel } from '../../data/domain-playbooks'
 import { Badge } from '../ui/Badge'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
-import { Card } from '../ui/Card'
 import { Disclosure } from '../ui/Disclosure'
 import { IconCheck, IconPhone } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
@@ -182,32 +181,31 @@ export function ActionLadder({
   initialExpandedStep,
 }: ActionLadderProps) {
   const { tr } = useApp()
-  return (
-    <section className={cn('flex flex-col gap-2', className)} aria-label={tr('ladderTitle')}>
-      <p className="px-1 text-2xs font-medium text-fg-tertiary">{tr('ladderTitle')}</p>
-      {/* ONE container, hairline-divided rows (the ChatGPT priorities-list
-          pattern) — not three stacked bordered cards */}
-      <Card className="divide-y divide-line-subtle overflow-hidden p-0">
-        <Disclosure
-          bare
-          leading={<StepNumber n={1} tone="positive" />}
-          title={stepTitles?.[0] ?? tr('step1Title')}
-          subtitle={tr('step1Sub')}
-          defaultOpen={initialExpandedStep === 1 || initialExpandedStep === undefined}
-        >
-          <WhatsAppStep facts={facts} drafts={drafts} />
-        </Disclosure>
-        <Disclosure
-          bare
-          leading={<StepNumber n={2} />}
-          title={stepTitles?.[1] ?? tr('step2Title')}
-          subtitle={tr('step2Sub')}
-          defaultOpen={initialExpandedStep === 2}
-        >
-          <ChannelStep prep={prep} channel={channel} />
-        </Disclosure>
-        {mode === 'full' && (
+  const steps = [
+    <Disclosure
+      key="s1"
+      bare
+      leading={<StepNumber n={1} tone="positive" />}
+      title={stepTitles?.[0] ?? tr('step1Title')}
+      subtitle={tr('step1Sub')}
+      defaultOpen={initialExpandedStep === 1 || initialExpandedStep === undefined}
+    >
+      <WhatsAppStep facts={facts} drafts={drafts} />
+    </Disclosure>,
+    <Disclosure
+      key="s2"
+      bare
+      leading={<StepNumber n={2} />}
+      title={stepTitles?.[1] ?? tr('step2Title')}
+      subtitle={tr('step2Sub')}
+      defaultOpen={initialExpandedStep === 2}
+    >
+      <ChannelStep prep={prep} channel={channel} />
+    </Disclosure>,
+    ...(mode === 'full'
+      ? [
           <Disclosure
+            key="s3"
             bare
             leading={<StepNumber n={3} tone="warning" />}
             title={stepTitles?.[2] ?? tr('step3Title')}
@@ -220,9 +218,22 @@ export function ActionLadder({
                 {tr('openNotice')}
               </Button>
             </div>
-          </Disclosure>
-        )}
-      </Card>
+          </Disclosure>,
+        ]
+      : []),
+  ]
+  return (
+    <section className={cn('flex flex-col gap-2', className)} aria-label={tr('ladderTitle')}>
+      <p className="px-1 text-2xs font-medium text-fg-tertiary">{tr('ladderTitle')}</p>
+      {/* calm-authority 5c: each step is its own tonal card — separation by
+          surface tone, not dividers */}
+      <div className="flex flex-col gap-2">
+        {steps.map((step, i) => (
+          <div key={i} className="rounded-2xl bg-sunken/70">
+            {step}
+          </div>
+        ))}
+      </div>
       {mode === 'free' && (
         <p className="px-1 text-2xs text-fg-tertiary">{tr('ladderPausedNote')}</p>
       )}

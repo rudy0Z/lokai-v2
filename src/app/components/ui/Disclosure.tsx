@@ -56,7 +56,7 @@ export function Disclosure({
         {leading}
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-fg-primary">{title}</span>
-          {subtitle && <span className="mt-0.5 block text-2xs text-fg-tertiary">{subtitle}</span>}
+          {subtitle && <span className="mt-0.5 block text-xs text-fg-tertiary">{subtitle}</span>}
         </span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
