@@ -5,7 +5,7 @@ import { cn } from '../../lib/cn'
 import { legalById } from '../../data/legal-content'
 import { Badge } from '../ui/Badge'
 import { Textarea } from '../ui/Field'
-import { type ConfidenceLevel } from '../trust/ConfidenceIndicator'
+import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
@@ -45,7 +45,7 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
   const [variantIdx, setVariantIdx] = useState(0)
   /** A4b: uppercase + tracking are Latin-only niceties */
   const labelClass = cn(
-    'text-2xs font-semibold text-fg-tertiary',
+    'text-xs font-semibold text-fg-tertiary',
     lang === 'en' && 'uppercase tracking-wide',
   )
 
@@ -69,38 +69,24 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
     toast.success(tr('saveChanges'))
   }
 
-  const confLabel =
-    draft.confidence === 'clear' ? tr('confClear') : draft.confidence === 'likely' ? tr('confLikely') : tr('confUnsure')
-
   return (
-    /* Inline assessment block: a left hairline, not a boxed card — the
-       finding is the assistant's own voice, inset into the conversation
-       (visual report: cards become exceptions, not the default). */
+    /* Calm-authority Phase 5a: editorial headline first, trust details tucked
+       in the bottom well. Inline assessment block (left hairline), not a box. */
     <div
       className={cn(
-        'flex flex-col gap-3.5 border-s-2 border-line-default py-0.5 ps-4',
+        'flex flex-col gap-3 border-s-2 border-line-default py-0.5 ps-4',
         stale && 'opacity-70',
       )}
     >
-      {/* top meta row — PASSIVE trust, quiet borderless labels (master prompt
-          Part 6: a strict two-tier hierarchy; interactive pills live below) */}
-      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-        {stale && <Badge tone="warning" variant="subtle">{tr('stale')}</Badge>}
+      {/* top row — provenance + listen; trust chrome lives below */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          {stale && <Badge tone="warning" variant="subtle">{tr('stale')}</Badge>}
+          {legal && <SectionRef sectionRef={legal.sectionRef} />}
+        </div>
         {!editing && (
-          <span className="flex items-center gap-1.5 text-2xs font-medium text-fg-secondary">
-            <span
-              className={cn(
-                'size-2 shrink-0 rounded-full',
-                draft.confidence === 'clear' && 'bg-positive-solid',
-                draft.confidence === 'likely' && 'bg-warning-solid',
-                draft.confidence === 'unsure' && 'bg-danger-solid',
-              )}
-              aria-hidden="true"
-            />
-            {confLabel}
-          </span>
+          <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
         )}
-        {legal && <VerificationBadge verified={legal.verified} />}
       </div>
 
       {editing ? (
@@ -122,13 +108,13 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
                 {tr('findingWhatHappened')}
               </dt>
-              <dd className="mt-1 text-sm text-fg-primary">{draft.whatHappened}</dd>
+              <dd className="mt-1 text-sm-plus text-fg-primary">{draft.whatHappened}</dd>
             </div>
             <div>
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
                 {tr('findingLawSays')}
               </dt>
-              <dd className="mt-1 text-sm text-fg-primary">
+              <dd className="mt-1 text-sm-plus text-fg-primary">
                 <LegalText text={draft.lawSays} />
               </dd>
             </div>
@@ -136,33 +122,33 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
               <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
                 {tr('findingMeans')}
               </dt>
-              <dd className="mt-1 text-sm text-fg-primary">{draft.means}</dd>
+              <dd className="mt-1 text-sm-plus text-fg-primary">{draft.means}</dd>
             </div>
           </dl>
         </>
       )}
 
-      {/* the evidence well — concentric nested radius (craft.gustavofior.com/nested-border-radius):
-          outer 24px - padding 16px = inner 8px (rounded-lg) */}
-      <div className="flex flex-col gap-2.5 rounded-lg bg-sunken px-3.5 py-3">
+      {/* the trust well — confidence, verification and reasoning tucked UNDER
+          the answer (calm authority: headline & plain law first) */}
+      <div className="mt-1 flex flex-col gap-2.5 rounded-2xl bg-sunken px-3.5 py-3">
         {legal && (
-          <div className="flex flex-wrap items-center gap-2" lang="en">
-            <span className="text-2xs text-fg-secondary">{legal.source}</span>
-            <SectionRef sectionRef={legal.sectionRef} />
-          </div>
+          <span className="text-xs text-fg-secondary" lang="en">{legal.source}</span>
         )}
         <div className="flex flex-wrap items-center gap-2">
-          <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
+          <ConfidenceIndicator level={draft.confidence} />
+          {legal && <VerificationBadge verified={legal.verified} />}
           <ReasoningPill steps={draft.reasoningSteps} />
         </div>
+        {/* Law 4 (A2 rule 7): edit / regenerate / discard stay on every
+            generative card — tucked here as quiet text, not a chrome row */}
+        <CardActions
+          editing={editing}
+          onEdit={() => (editing ? save() : setEditing(true))}
+          onRegenerate={regenerate}
+          onDiscard={onDiscard}
+          className="-ms-1"
+        />
       </div>
-
-      <CardActions
-        editing={editing}
-        onEdit={() => (editing ? save() : setEditing(true))}
-        onRegenerate={regenerate}
-        onDiscard={onDiscard}
-      />
     </div>
   )
 }

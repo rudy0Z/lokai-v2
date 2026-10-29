@@ -19,12 +19,21 @@ type Pack<T> = Partial<Record<LangCode, T>> & { en: T }
 
 /* ---------- fact-gate row labels + normalized value words ---------- */
 
-export const ROW_LABELS: Pack<{ item: string; seller: string; amount: string; issue: string; ask: string; when: string }> = {
-  en: { item: 'Item', seller: 'Seller', amount: 'Amount paid', issue: 'Issue', ask: 'What was refused', when: 'Bought' },
-  hi: { item: 'वस्तु', seller: 'विक्रेता', amount: 'राशि', issue: 'समस्या', ask: 'जो मना किया', when: 'खरीद' },
-  mr: { item: 'वस्तू', seller: 'विक्रेता', amount: 'रक्कम', issue: 'समस्या', ask: 'नकारले', when: 'खरेदी' },
-  ta: { item: 'பொருள்', seller: 'விற்பவர்', amount: 'தொகை', issue: 'பிரச்சனை', ask: 'மறுத்தது', when: 'வாங்கியது' },
-  ur: { item: 'چیز', seller: 'فروشنر', amount: 'رقم', issue: 'مسئلہ', ask: 'جس سے انکار ہوا', when: 'خریداری' },
+export const ROW_LABELS: Pack<{ item: string; seller: string; amount: string; issue: string; ask: string; proof: string; when: string }> = {
+  en: { item: 'Item', seller: 'Seller', amount: 'Amount paid', issue: 'Issue', ask: 'What was refused', proof: 'Proof', when: 'Bought' },
+  hi: { item: 'वस्तु', seller: 'विक्रेता', amount: 'राशि', issue: 'समस्या', ask: 'जो मना किया', proof: 'सबूत', when: 'खरीद' },
+  mr: { item: 'वस्तू', seller: 'विक्रेता', amount: 'रक्कम', issue: 'समस्या', ask: 'नकारले', proof: 'पुरावा', when: 'खरेदी' },
+  ta: { item: 'பொருள்', seller: 'விற்பவர்', amount: 'தொகை', issue: 'பிரச்சனை', ask: 'மறுத்தது', proof: 'ஆதாரம்', when: 'வாங்கியது' },
+  ur: { item: 'چیز', seller: 'فروشنر', amount: 'رقم', issue: 'مسئلہ', ask: 'جس سے انکار ہوا', proof: 'ثبوت', when: 'خریداری' },
+}
+
+/** 1-tap proof chips in the fact gate (calm-authority Phase 5b) */
+export const PROOF_LABELS: Pack<Record<Exclude<NonNullable<FactRecord['proof']>, ''>, string>> = {
+  en: { gst: 'GST invoice', none: 'No invoice' },
+  hi: { gst: 'GST बिल', none: 'कोई बिल नहीं' },
+  mr: { gst: 'GST बिल', none: 'बिल नाही' },
+  ta: { gst: 'GST பில்', none: 'பில் இல்லை' },
+  ur: { gst: 'GST بل', none: 'کوئی بل نہیں' },
 }
 
 export const ISSUE_LABELS: Pack<Record<Exclude<FactRecord['issue'], ''> | 'damaged', string>> = {

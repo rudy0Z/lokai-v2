@@ -4,6 +4,7 @@ import type { FindingCardData } from '../components/cards/FindingCard'
 import {
   ISSUE_LABELS,
   ASK_LABELS,
+  PROOF_LABELS,
   ROW_LABELS,
   buildDraftsFor,
   buildNoticeFor,
@@ -28,6 +29,8 @@ export interface FactRecord {
   ask: 'refund' | 'replacement' | 'both' | ''
   /** purchase-window key chosen in the fact gate: 30 | 1to2 | 2plus | ns */
   when: '30' | '1to2' | '2plus' | 'ns' | ''
+  /** proof chip chosen in the fact gate (calm-authority 5b): gst | none | '' */
+  proof?: 'gst' | 'none' | ''
   /**
    * The user's SIGNED wording when they corrected the issue/ask row in the
    * fact gate — templates prefer this over the normalized phrase so the
@@ -112,6 +115,7 @@ export function factRows(facts: FactRecord, lang: LangCode): { key: string; labe
     { key: 'amount', label: L.amount!, value: facts.amount },
     { key: 'issue', label: L.issue!, value: facts.issue ? (ISSUE_LABELS[lang] ?? ISSUE_LABELS.en!)[facts.issue]! : '' },
     { key: 'ask', label: L.ask!, value: facts.ask ? (ASK_LABELS[lang] ?? ASK_LABELS.en!)[facts.ask]! : '' },
+    { key: 'proof', label: L.proof!, value: facts.proof ? (PROOF_LABELS[lang] ?? PROOF_LABELS.en!)[facts.proof]! : '' },
     { key: 'when', label: L.when!, value: '' },
   ]
 }

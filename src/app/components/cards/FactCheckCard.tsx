@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../../lib/app-context'
+import { cn } from '../../lib/cn'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Chip } from '../ui/Chip'
@@ -16,31 +17,35 @@ export interface WhenOption {
   label: string
 }
 
+/** A4b guard: long or non-Latin (Indic/Nastaliq) values take the full row —
+    half-width cells would wrap Devanagari/Tamil into ragged towers. */
+function wideCell(value: string) {
+  return value.length > 24 || /[\u0590-\u08FF\u0900-\u097F\u0980-\u09FF\u0B80-\u0BFF]/.test(value)
+}
+
 /**
  * The verification gate inside the conversation (ported from v1's
  * InlineFactCheck): before any generative card, the user confirms or
  * corrects each fact. A2.7 made tangible — nothing is built on facts the
  * user hasn't signed.
  *
- * Deep-audit merge (PRODUCT.md Law #2): the purchase-window question is a
- * row INSIDE this gate — one consolidated confirmation, not two gates.
- * Empty slots render honestly as '—' and wait for the user to fill them;
- * the gate never asserts a fact the message did not supply.
- *
- * Craft law (master prompt Part 6): once signed, the gate collapses into a
- * one-line docket bar (`✓ n facts confirmed — item · seller · amount [Edit]`)
- * so the thread never becomes a wall of cards. [Edit] re-opens it inline.
+ * Calm-authority Phase 5b: the facts read as a compact 2×2 tonal grid
+ * (tap any cell to edit inline); the Proof chip (guardrail 2) and the When
+ * chip stay 1-tap toggleable so reviewers can drive the live downgrade.
+ * Once signed, the gate collapses to a quiet one-line confirmation.
  */
 export function FactCheckCard({
   facts,
   onConfirm,
   whenOptions = [],
+  proofOptions = [],
   signed = false,
   onEdit,
 }: {
   facts: FactItem[]
   onConfirm: (values: Record<string, string>) => void
   whenOptions?: WhenOption[]
+  proofOptions?: WhenOption[]
   signed?: boolean
   onEdit?: () => void
 }) {
@@ -58,23 +63,23 @@ export function FactCheckCard({
   const whenChosen = whenOptions.find((o) => o.key === values.when)
 
   if (signed && !expanded) {
-    const glance = ['item', 'seller', 'amount']
+    const glance = ['item', 'amount']
       .map((k) => values[k])
       .filter(Boolean)
       .join(' · ')
     return (
-      <div className="flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-positive-line bg-positive-subtle px-3.5 py-2.5">
-        <span className="text-2xs font-medium text-on-positive-subtle">
-          {tr('factSigned').replace('{n}', String(facts.length))}
-          {glance && <span className="ms-1.5 tabular-nums">({glance})</span>}
+      <div className="flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1 px-1 py-1.5 text-xs text-fg-secondary">
+        <span className="font-medium text-positive-fg">
+          ✓ {tr('factSigned').replace('{n}', String(facts.length))}
         </span>
+        {glance && <span className="min-w-0 truncate">{glance}</span>}
         <button
           type="button"
           onClick={() => {
             setExpanded(true)
             onEdit?.()
           }}
-          className="ms-auto inline-flex min-h-9 items-center rounded-full px-2 text-2xs font-medium text-brand-fg underline-offset-4 hover:underline"
+          className="ms-auto inline-flex min-h-9 items-center rounded-full px-2 text-xs font-medium text-fg-tertiary underline-offset-4 hover:text-fg-primary hover:underline"
         >
           {tr('edit')}
         </button>
@@ -82,84 +87,120 @@ export function FactCheckCard({
     )
   }
 
+  const gridKeys = ['item', 'amount', 'seller', 'issue']
+  const gridFacts = facts.filter((f) => gridKeys.includes(f.key))
+  const extraRows = facts.filter((f) => !gridKeys.includes(f.key) && f.key !== 'proof' && f.key !== 'when')
+
   return (
     <Card className="flex flex-col gap-3">
       <div>
         <h3 className="font-serif text-lg font-semibold text-fg-primary">{tr('factCheckTitle')}</h3>
-        <p className="mt-1 text-2xs text-fg-tertiary">{tr('factCheckSub')}</p>
+        <p className="mt-1 text-xs text-fg-tertiary">{tr('factCheckSub')}</p>
       </div>
-      {/* hairline-divided fact rows (the ChatGPT list pattern) — a
-          confirmation moment, not a form table */}
-      <div className="divide-y divide-line-subtle">
-        {facts.map((f) => {
-          if (f.key === 'when' && whenOptions.length > 0) {
-            return (
-              <div key={f.key} className="flex min-h-11 flex-col justify-center gap-1.5 py-2.5">
-                <span className="text-2xs text-fg-tertiary">{f.label}</span>
-                {whenChosen ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-fg-primary">{whenChosen.label}</span>
-                    <button
-                      type="button"
-                      onClick={() => setValues((v) => ({ ...v, when: '' }))}
-                      className="min-h-9 rounded-full px-2.5 text-2xs font-medium text-brand-fg"
-                    >
-                      {tr('factCorrect')}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {whenOptions.map((o) => (
-                      <Chip
-                        key={o.key}
-                        onClick={() => setValues((v) => ({ ...v, when: o.key }))}
-                      >
-                        {o.label}
-                      </Chip>
-                    ))}
-                  </div>
+
+      {/* 2×2 tonal grid — tap a cell to edit inline */}
+      <div className="grid grid-cols-2 gap-2">
+        {gridFacts.map((f) => (
+          <div
+            key={f.key}
+            className={cn('rounded-xl bg-sunken px-3 py-2', wideCell(values[f.key] ?? '') && 'col-span-2')}
+          >
+            <p className="text-xs text-fg-tertiary">{f.label}</p>
+            {editing === f.key ? (
+              <Input
+                autoFocus
+                value={values[f.key] ?? ''}
+                onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                onBlur={() => setEditing(null)}
+                onKeyDown={(e) => e.key === 'Enter' && setEditing(null)}
+                className="mt-1 min-h-9 py-1"
+                aria-label={f.label}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditing(f.key)}
+                className="mt-0.5 block w-full truncate rounded text-start text-sm font-medium text-fg-primary"
+              >
+                {values[f.key] || '—'}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* remaining text rows (full width, tap-edit) */}
+      {extraRows.map((f) => (
+        <div key={f.key} className="flex min-h-9 items-center gap-3 py-0.5">
+          <span className="w-24 shrink-0 text-xs text-fg-tertiary">{f.label}</span>
+          {editing === f.key ? (
+            <Input
+              autoFocus
+              value={values[f.key] ?? ''}
+              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+              onBlur={() => setEditing(null)}
+              onKeyDown={(e) => e.key === 'Enter' && setEditing(null)}
+              className="min-h-9 py-1"
+              aria-label={f.label}
+            />
+          ) : (
+            <>
+              <span
+                className={cn(
+                  'min-w-0 flex-1 text-sm font-medium',
+                  values[f.key] ? 'text-fg-primary' : 'text-fg-tertiary',
                 )}
-              </div>
-            )
-          }
-          return (
-            <div key={f.key} className="flex min-h-11 items-center gap-3 py-2.5">
-              <span className="w-24 shrink-0 text-2xs text-fg-tertiary">
-                {f.label}
+              >
+                {values[f.key] || '—'}
               </span>
-              {editing === f.key ? (
-                <Input
-                  autoFocus
-                  value={values[f.key] ?? ''}
-                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                  onBlur={() => setEditing(null)}
-                  onKeyDown={(e) => e.key === 'Enter' && setEditing(null)}
-                  className="min-h-9 py-1.5"
-                  aria-label={f.label}
-                />
-              ) : (
-                <>
-                  <span
-                    className={
-                      'min-w-0 flex-1 text-sm font-medium ' +
-                      (values[f.key] ? 'text-fg-primary' : 'text-fg-tertiary')
-                    }
-                  >
-                    {values[f.key] || '—'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setEditing(f.key)}
-                    className="min-h-9 shrink-0 rounded-full px-2.5 text-2xs font-medium text-brand-fg"
-                  >
-                    {tr('factCorrect')}
-                  </button>
-                </>
-              )}
-            </div>
-          )
-        })}
-      </div>
+              <button
+                type="button"
+                onClick={() => setEditing(f.key)}
+                className="min-h-9 shrink-0 rounded-full px-2.5 text-xs font-medium text-brand-fg"
+              >
+                {tr('factCorrect')}
+              </button>
+            </>
+          )}
+        </div>
+      ))}
+
+      {/* 1-tap Proof chips (guardrail 2) */}
+      {facts.some((f) => f.key === 'proof') && proofOptions.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs text-fg-tertiary">{facts.find((f) => f.key === 'proof')?.label}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {proofOptions.map((o) => (
+              <Chip
+                key={o.key}
+                selected={values.proof === o.key}
+                onClick={() => setValues((v) => ({ ...v, proof: v.proof === o.key ? '' : o.key }))}
+              >
+                {o.label}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 1-tap When chips — the live downgrade lever (2yr+/not-sure → caution) */}
+      {facts.some((f) => f.key === 'when') && whenOptions.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs text-fg-tertiary">{facts.find((f) => f.key === 'when')?.label}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {whenOptions.map((o) => (
+              <Chip
+                key={o.key}
+                selected={values.when === o.key}
+                onClick={() => setValues((v) => ({ ...v, when: v.when === o.key ? '' : o.key }))}
+              >
+                {o.label}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Button
         variant="primary"
         size="sm"

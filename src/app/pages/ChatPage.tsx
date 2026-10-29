@@ -353,6 +353,7 @@ export default function ChatPage() {
       issue: issueKeyFromDisplay(values.issue ?? '', lang),
       ask: askKeyFromDisplay(values.ask ?? '', lang),
       when: (values.when as FactRecord['when']) ?? '',
+      proof: (values.proof as FactRecord['proof']) ?? '',
       issueRaw: values.issue !== rowInitial('issue') ? values.issue : undefined,
       askRaw: values.ask !== rowInitial('ask') ? values.ask : undefined,
     }
@@ -810,6 +811,11 @@ export default function ChatPage() {
     { key: '2plus', label: tr('ans2plus') },
     { key: 'ns', label: tr('ansNotSure') },
   ]
+  /* guardrail 2: the 1-tap Proof chips (behavior-neutral for now) */
+  const proofOptions = [
+    { key: 'gst', label: tr('proofGst') },
+    { key: 'none', label: tr('proofNone') },
+  ]
 
   const protectiveFooter = protectDecision ? (
     <div
@@ -1170,6 +1176,7 @@ export default function ChatPage() {
                       <FactCheckCard
                         facts={factItems}
                         whenOptions={factItems.some((f) => f.key === 'when') ? whenOptions : []}
+                        proofOptions={factItems.some((f) => f.key === 'proof') ? proofOptions : []}
                         signed={factSigned}
                         onEdit={() => setFactSigned(false)}
                         onConfirm={confirmFacts}
