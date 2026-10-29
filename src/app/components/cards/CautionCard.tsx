@@ -5,7 +5,9 @@ import { domainPack } from '../../data/domain-playbooks'
 import { legalById } from '../../data/legal-content'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
 import { Chip } from '../ui/Chip'
+import { IconSparkle } from '../ui/icons'
 import { ConfidenceIndicator } from '../trust/ConfidenceIndicator'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { ReasoningPill } from '../trust/ReasoningPill'
@@ -26,12 +28,17 @@ export function CautionCard({
   onNotice,
   onOther,
   onDiscard,
+  onShowLadder,
+  ladderShown,
 }: {
   decision?: ScopeDecision
   onConsumer?: () => void
   onNotice?: () => void
   onOther?: () => void
   onDiscard?: () => void
+  /** calm-authority M2: the plan CTA docks INSIDE the artifact */
+  onShowLadder?: () => void
+  ladderShown?: boolean
 }) {
   const { tr, lang } = useApp()
   const timeBarred = decision?.ruleId === 'possible-time-barred'
@@ -98,6 +105,16 @@ export function CautionCard({
       <div className="rounded-xl bg-sunken px-3.5 py-3">
         <ReasoningPill steps={domainCaution ? domainCaution.steps : informal ? informalPack.steps : reasoning} />
       </div>
+
+      {/* M2: the caution's own plan docks INSIDE the artifact */}
+      {onShowLadder && !ladderShown && (
+        <div className="mt-3.5 border-t border-line-subtle pt-3.5">
+          <Button variant="primary" size="md" block leadingIcon={<IconSparkle className="size-4" />} onClick={onShowLadder}>
+            {tr('showPlanCta')}
+          </Button>
+        </div>
+      )}
+
       <CardActions onDiscard={onDiscard} />
     </div>
   )

@@ -4,8 +4,10 @@ import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { legalById } from '../../data/legal-content'
 import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
 import { Textarea } from '../ui/Field'
 import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
+import { IconSparkle } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
@@ -30,6 +32,9 @@ export interface FindingCardProps {
   stale?: boolean
   onUpdate?: (data: FindingCardData) => void
   onDiscard?: () => void
+  /** calm-authority M2: the plan CTA docks INSIDE the artifact */
+  onShowLadder?: () => void
+  ladderShown?: boolean
 }
 
 /**
@@ -37,7 +42,7 @@ export interface FindingCardProps {
  * surface, allowed), three zones, verified-or-not citation, confidence in
  * plain words, reasoning pill, and full user control.
  */
-export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardProps) {
+export function FindingCard({ data, stale, onUpdate, onDiscard, onShowLadder, ladderShown }: FindingCardProps) {
   const { tr, lang } = useApp()
   const legal = legalById(data.legalId)
   const [editing, setEditing] = useState(false)
@@ -149,6 +154,16 @@ export function FindingCard({ data, stale, onUpdate, onDiscard }: FindingCardPro
           className="-ms-1"
         />
       </div>
+
+      {/* M2: the action plan docks INSIDE the artifact — the finding is an
+          actionable document, not a report with a floating tag */}
+      {onShowLadder && !ladderShown && (
+        <div className="mt-3.5 border-t border-line-subtle pt-3.5">
+          <Button variant="primary" size="md" block leadingIcon={<IconSparkle className="size-4" />} onClick={onShowLadder}>
+            {tr('showPlanCta')}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

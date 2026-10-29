@@ -46,7 +46,6 @@ import { StreamText } from '../components/chat/StreamText'
 import { copyText } from '../lib/format'
 import { FactCheckCard, type FactItem } from '../components/cards/FactCheckCard'
 import { StatutoryCounterCard } from '../components/cards/StatutoryCounterCard'
-import { TesterPrompts } from '../components/chat/TesterPrompts'
 import { Card } from '../components/ui/Card'
 
 type ItemKind =
@@ -670,16 +669,12 @@ export default function ChatPage() {
           : undefined /* awaitingFacts / stopped: no rail — nothing honest to offer yet */
 
   /* Calm-authority Phase 4 + guardrail 1: the ladder is NEVER auto-mounted.
-     One primary chip invites it while only a finding/caution is on the table;
-     outcome chips appear only after the ladder itself has mounted. The
-     guardrail's 'caution' variant maps to the ladder's existing 'free' face
-     (steps 1–2 + human help). */
+     The plan CTA lives docked INSIDE the finding/caution card (kombai #59:
+     the artifact carries its own action); outcome chips appear only after
+     the ladder itself has mounted. */
   const ladderMounted = items.some((i) => i.kind === 'ladder')
-  const showPlanCta =
-    !busy && !ladderMounted && items.some((i) => i.kind === 'finding' || i.kind === 'caution')
-  const showLadder = () => {
-    const latestAssessment = [...items].reverse().find((i) => i.kind === 'finding' || i.kind === 'caution')
-    push({ kind: 'ladder', variant: latestAssessment?.kind === 'caution' ? 'free' : 'full' })
+  const showLadder = (variant: 'full' | 'free' = 'full') => {
+    push({ kind: 'ladder', variant })
   }
   const inlineChips =
     !busy && testerOptions && (stageRef.current === 'clarifying' || (stageRef.current === 'engaged' && ladderMounted))
@@ -794,10 +789,21 @@ export default function ChatPage() {
     >
       {focusItem.kind === 'finding' && (
         <MessageBubble role="assistant">
-          <FindingCard data={findingData} onUpdate={setFindingData} />
+          <FindingCard
+            data={findingData}
+            onUpdate={setFindingData}
+            onShowLadder={() => showLadder('full')}
+            ladderShown={ladderMounted}
+          />
         </MessageBubble>
       )}
-      {focusItem.kind === 'caution' && <CautionCard decision={focusItem.decision} />}
+      {focusItem.kind === 'caution' && (
+        <CautionCard
+          decision={focusItem.decision}
+          onShowLadder={() => showLadder('free')}
+          ladderShown={ladderMounted}
+        />
+      )}
       {focusItem.kind === 'ladder' && (
         <ActionLadder mode={focusItem.variant ?? 'full'} onOpenNotice={() => setNoticeOpen(true)} facts={matterFacts} />
       )}
@@ -861,12 +867,10 @@ export default function ChatPage() {
         noticeOpen || stopDecision ? undefined : (
           protectiveFooter ?? (
             <div className="flex flex-col gap-2">
-              {/* Phase 4: the footer rail exists ONLY as the scenario
-                  launcher on an empty thread; once the conversation is live,
-                  follow-ups are inline chips in the thread flow */}
-              {testerOptions && testerOptions.length > 0 && items.length === 0 && (
-                <TesterPrompts label={tr('testerHint')} options={testerOptions} onPick={handleScenarioOption} />
-              )}
+              {/* M1: the launcher box is gone — on a seeded home the three
+                  starter options render as single-line pills under the
+                  greeting; the full script still pushes as the user's own
+                  message on tap */}
               <Composer
                 onSend={handleSend}
                 sendLocked={busy}
@@ -1020,9 +1024,22 @@ export default function ChatPage() {
                   transition={{ duration: 0.3, delay: 0.2 }}
                   className="flex flex-wrap justify-center gap-3"
                 >
-                  <Chip onClick={() => handleSend(SCENARIO_SEEDS[0]!.userMessage, [])}>{tr('chipDefective')}</Chip>
-                  <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
-                  <Chip onClick={() => navigate('/notice')}>{tr('addNotice')}</Chip>
+                  {/* M1: on a seeded scenario the three starter options render
+                      as single-line intent pills; the full script still pushes
+                      as the user's own message on tap */}
+                  {scenario && testerOptions
+                    ? testerOptions.map((o, i) => (
+                        <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
+                          {tr(o.meta as never)}
+                        </Chip>
+                      ))
+                    : (
+                        <>
+                          <Chip onClick={() => handleSend(SCENARIO_SEEDS[0]!.userMessage, [])}>{tr('chipDefective')}</Chip>
+                          <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
+                          <Chip onClick={() => navigate('/notice')}>{tr('addNotice')}</Chip>
+                        </>
+                      )}
                 </motion.div>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -1222,20 +1239,14 @@ export default function ChatPage() {
               }
             })}
 
-            {/* Calm-authority Phase 4: one thought per beat — the plan CTA and
-                the outcome chips live IN the thread flow, ChatGPT-style */}
-            {showPlanCta && (
-              <div className="flex px-1 pt-1">
-                <Chip onClick={showLadder} className="text-start">
-                  {tr('showPlanCta')}
-                </Chip>
-              </div>
-            )}
+            {/* Calm-authority Phase 4: outcome chips live IN the thread flow —
+                labeled with the user-facing intent (M1: never the raw 40-word
+                script; the full text pushes as the user's own message) */}
             {inlineChips && (
               <div className="flex flex-wrap gap-2 px-1 pb-1 pt-1">
                 {inlineChips.map((o, i) => (
                   <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
-                    {o.text}
+                    {tr(o.meta as never)}
                   </Chip>
                 ))}
               </div>
