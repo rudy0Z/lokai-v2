@@ -19,7 +19,7 @@ export function Chip({ selected = false, leadingIcon, className, children, ...re
         'pressable inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-colors duration-150',
         selected
           ? 'bg-brand-solid text-on-brand-solid shadow-sm'
-          : 'border border-line-default bg-card text-fg-primary hover:bg-hover-veil',
+          : 'bg-component text-fg-primary hover:bg-component-hover',
         className,
       )}
       style={{ minWidth: 'var(--touch-target)' }}

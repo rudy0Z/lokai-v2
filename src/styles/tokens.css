@@ -10,12 +10,13 @@
    ========================================================================= */
 
 :root {
-  /* --- surfaces --- */
+  /* --- surfaces (calm-authority tonal materiality: card lifts off shell
+     by luminance, not borders) --- */
   --c-page: oklch(93.5% 0.015 110); /* backdrop around the 390px frame */
-  --c-shell: oklch(95.6% 0.013 105); /* ivory app canvas */
-  --c-container: oklch(98.2% 0.008 100); /* raised cream surfaces */
-  --c-card: oklch(98.2% 0.008 100);
-  --c-sunken: oklch(92.2% 0.015 105); /* wells: composer inset, stage rail */
+  --c-shell: oklch(96.8% 0.007 95); /* warm editorial cream */
+  --c-container: oklch(99.6% 0.002 95); /* raised cream surfaces */
+  --c-card: oklch(99.6% 0.002 95); /* pure crisp white lift */
+  --c-sunken: oklch(94.2% 0.009 95); /* soft stone well */
   --c-modal: oklch(98.6% 0.007 100);
   --c-standout: oklch(21.5% 0.028 165); /* deep green-ink inverted panel (stop screen) */
   --c-scrim: rgb(20 28 22 / 0.45);
@@ -30,9 +31,9 @@
   --c-fg-standout-secondary: oklch(80% 0.015 150);
 
   /* --- neutral component fill --- */
-  --c-component: oklch(97.6% 0.01 105);
-  --c-component-hover: oklch(95.2% 0.013 105);
-  --c-component-active: oklch(92.6% 0.016 105);
+  --c-component: oklch(93.8% 0.01 95);
+  --c-component-hover: oklch(91.5% 0.012 95);
+  --c-component-active: oklch(89.5% 0.014 95);
   --c-hover-veil: rgb(27 42 33 / 0.05);
   --c-veil-standout: rgb(255 255 255 / 0.09); /* hover veil ON the standout panel (always dark) */
 
@@ -72,9 +73,9 @@
   --c-on-danger-solid: oklch(99% 0 0);
   --c-on-danger-subtle: oklch(37% 0.12 30);
 
-  /* --- borders / lines (border-first elevation) --- */
-  --c-line-default: oklch(87.5% 0.012 110);
-  --c-line-subtle: oklch(91% 0.01 108);
+  /* --- borders / lines (whisper-quiet; only structural dividers) --- */
+  --c-line-default: oklch(91.5% 0.008 100);
+  --c-line-subtle: oklch(93.5% 0.006 100);
   --c-line-strong: oklch(83.5% 0.014 112);
   --c-line-inverted: oklch(34% 0.03 165);
   --c-brand-line: oklch(66% 0.06 160);
@@ -97,10 +98,10 @@
 /* --- dark theme "night garden": pure re-pointing of role variables --- */
 [data-theme="dark"] {
   --c-page: oklch(12.8% 0.012 165);
-  --c-shell: oklch(16% 0.014 165);
-  --c-container: oklch(20% 0.015 165);
-  --c-card: oklch(20% 0.015 165);
-  --c-sunken: oklch(13.2% 0.01 165);
+  --c-shell: oklch(15.5% 0.012 165);
+  --c-container: oklch(21.5% 0.016 165);
+  --c-card: oklch(21.5% 0.016 165); /* visibly lifted off the 15.5% shell */
+  --c-sunken: oklch(13% 0.01 165);
   --c-modal: oklch(21% 0.016 165);
   --c-standout: oklch(24% 0.03 165); /* still darker-and-distinct vs shell in use */
   --c-scrim: rgb(0 0 0 / 0.62);
@@ -150,8 +151,8 @@
   --c-on-danger-solid: oklch(13% 0.04 28);
   --c-on-danger-subtle: oklch(71% 0.11 28);
 
-  --c-line-default: oklch(28% 0.014 165);
-  --c-line-subtle: oklch(23% 0.012 165);
+  --c-line-default: oklch(22% 0.01 165);
+  --c-line-subtle: oklch(20% 0.01 165);
   --c-line-strong: oklch(35% 0.016 165);
   --c-line-inverted: oklch(80% 0.02 130);
   --c-brand-line: oklch(46% 0.06 160);
@@ -350,18 +351,19 @@
 }
 
 @theme {
-  /* Interfere radius scale: 2-24 + pill */
+  /* Interfere radius scale: 2-26 + pill (2026 squircle-aligned) */
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 10px;
-  --radius-2xl: 12px;
-  --radius-3xl: 16px;
-  --radius-4xl: 20px;
-  --radius-5xl: 24px;
+  --radius-2xl: 14px;
+  --radius-3xl: 18px;
+  --radius-4xl: 22px;
+  --radius-5xl: 26px;
 
-  /* border-first elevation; shadows are rare and soft */
+  /* tonal elevation (calm authority): cards float via luminance + a whisper
+     of ambient shadow; borders remain only for explicit structure */
   --shadow-border: 0 0 0 1px var(--c-line-default);
   --shadow-default: 0 1px 2px rgb(27 42 33 / 0.05), 0 2px 8px rgb(27 42 33 / 0.05);
   --shadow-large: 0 2px 6px rgb(27 42 33 / 0.06), 0 8px 24px rgb(27 42 33 / 0.08);
@@ -372,6 +374,9 @@
   /* promoted from arbitrary values (DESIGN-AUDIT P3 text-scale sweep) */
   --text-sm-plus: 0.9375rem;
   --text-sm-plus--line-height: 1.5rem;
+  /* calm legal reading register (Phase 2): 15px body at 1.65 leading */
+  --text-reading: 0.9375rem;
+  --text-reading--line-height: 1.65rem;
   --text-docket: 0.8125rem;
   --text-docket--line-height: 1.125rem;
 
@@ -394,7 +399,7 @@
   --radius-bleed: 20px;      /* full-width sections */
 
   /* Enhanced shadow system for depth */
-  --shadow-tiny: 0 1px 2px rgba(27, 42, 33, 0.06), 0 1px 3px rgba(27, 42, 33, 0.04);
+  --shadow-tiny: 0 2px 12px -2px rgba(27, 42, 33, 0.05), 0 1px 3px -1px rgba(27, 42, 33, 0.03);
   --shadow-sm: 0 1px 3px rgba(27, 42, 33, 0.08), 0 1px 2px rgba(27, 42, 33, 0.06);
   --shadow-md: 0 4px 6px rgba(27, 42, 33, 0.08), 0 2px 4px rgba(27, 42, 33, 0.06);
   --shadow-lg: 0 10px 15px rgba(27, 42, 33, 0.1), 0 4px 6px rgba(27, 42, 33, 0.08);
