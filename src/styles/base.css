@@ -243,7 +243,6 @@ a,
   /* light-theme lift (DESIGN-AUDIT P2-3): 0.34 alpha vanished on 98%-L ivory */
   --orb-outer: oklch(72% 0.065 140 / 0.5);
   --orb-mid: oklch(60% 0.08 150 / 0.66);
-  --orb-core: var(--c-standout);
   position: relative;
   display: grid;
   place-items: center;
@@ -291,37 +290,16 @@ a,
   width: 40%;
   height: 40%;
   border-radius: 9999px;
+  /* calm-authority M3: a soft luminous botanical-sage disc — no specular
+     highlight, no hard rim, no 3D ball. The mic glyph floats on gradient
+     light that blends into both the ivory and the night canvas. */
   background: radial-gradient(
-    circle at 35% 35%,
-    oklch(97% 0 0 / 0.9) 0%,
-    var(--orb-core) 45%,
-    oklch(24% 0.03 165 / 0.95) 100%
+    circle at 50% 42%,
+    oklch(86% 0.055 150 / 0.95) 0%,
+    oklch(58% 0.075 152 / 0.9) 60%,
+    oklch(38% 0.06 158 / 0.88) 100%
   );
-  box-shadow: 
-    /* Outer ambient shadow */
-    0 20px 60px rgba(20, 34, 26, 0.4),
-    /* Mid-tone glow */
-    0 12px 36px rgba(20, 34, 26, 0.3),
-    /* Inner highlight for 3D effect */
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 20px rgba(255, 255, 255, 0.08),
-    /* Subsurface scattering rim light */
-    inset 0 -8px 24px rgba(110, 180, 160, 0.15);
-}
-
-/* Add glossy overlay to core */
-.orb-core::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255, 255, 255, 0.25) 0%,
-    transparent 60%
-  );
-  pointer-events: none;
-  mix-blend-mode: hard-light;
+  box-shadow: 0 10px 34px rgba(20, 34, 26, 0.18);
 }
 
 /* idle: a slow breathe */
@@ -376,19 +354,16 @@ a,
   border-width: 1px;
   opacity: 0.7;
 }
+/* calm-authority M3: pure scale-and-fade expansion — no rotation, no
+   atom-diagram orbiting */
 @keyframes orb-ring {
   0% {
-    transform: scale(0.85) rotate(0deg);
+    transform: scale(0.85);
     opacity: 0.9;
     border-color: var(--orb-mid);
   }
-  50% {
-    transform: scale(1.15) rotate(180deg);
-    opacity: 0.5;
-    border-color: oklch(80% 0.03 150);
-  }
   100% {
-    transform: scale(1.6) rotate(360deg);
+    transform: scale(1.6);
     opacity: 0;
     border-color: transparent;
   }
@@ -406,23 +381,12 @@ a,
 }
 
 @keyframes thinking-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.94);
-    box-shadow: 
-      0 20px 60px rgba(20, 34, 26, 0.4),
-      0 12px 36px rgba(20, 34, 26, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 0 20px rgba(255, 255, 255, 0.08),
-      inset 0 -8px 24px rgba(110, 180, 160, 0.1);
   }
   50% {
     transform: scale(0.96);
-    box-shadow: 
-      0 24px 70px rgba(20, 34, 26, 0.5),
-      0 16px 40px rgba(20, 34, 26, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2),
-      inset 0 0 30px rgba(255, 255, 255, 0.12),
-      inset 0 -8px 24px rgba(110, 180, 160, 0.18);
   }
 }
 

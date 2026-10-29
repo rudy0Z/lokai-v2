@@ -66,8 +66,10 @@ export default function VoiceCapturePage() {
           </div>
 
           <div className="flex flex-col items-center gap-7">
+            {/* M3: the orb breathes at a balanced size; the single live
+                waveform lives in the transcript card where the words are */}
             <button type="button" onClick={stop} aria-label={tr('tapToStop')} className="rounded-full outline-offset-8">
-              <VoiceOrb state="listening" size="lg" />
+              <VoiceOrb state="listening" size="md" />
             </button>
             <div className="w-full max-w-[300px] bg-card rounded-[22px] p-4">
               <div className="waveform" aria-hidden="true">
