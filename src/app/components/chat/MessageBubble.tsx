@@ -121,8 +121,8 @@ export function MessageBubble({
   if (role === 'system') {
     return (
       <div className={cn('flex justify-center px-2 py-1', className)} data-chat-item={dataId}>
-        <motion.p 
-          className="rounded-full bg-sunken px-3.5 py-1 text-xs text-fg-tertiary"
+        <motion.p
+          className="rounded-full bg-component px-3.5 py-1.5 text-xs text-fg-tertiary"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.2 }}
@@ -134,10 +134,10 @@ export function MessageBubble({
   if (role === 'assistant') {
     return (
       /* ChatGPT parity: the assistant never signs its own turns — the voice
-         IS the identity. Actions reveal on hover (desktop); on touch they
-         stay visible (no hover to reveal them). */
-      <motion.div 
-        className={cn('group/turn flex flex-col gap-2 scroll-mt-20', className)}
+         IS the identity. Calm-authority Phase 2: the turn reads at the
+         --text-reading register (15px / 1.65). Actions reveal on hover. */
+      <motion.div
+        className={cn('group/turn flex flex-col gap-2 scroll-mt-20 text-reading', className)}
         data-chat-item={dataId}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -168,15 +168,16 @@ export function MessageBubble({
     >
       <motion.div
         className={cn(
-          'max-w-[85%] rounded-lg border px-4 py-3 text-sm ltr:rounded-br-lg rtl:rounded-bl-lg shadow-sm',
+          /* calm-authority Phase 2: continuous-curvature pebble, tonal
+             botanical tint, zero border */
+          'max-w-[82%] rounded-[20px] px-4 py-3 text-sm-plus ltr:rounded-br-md rtl:rounded-bl-md',
           stale
-            ? 'border-warning-line bg-warning-subtle text-on-warning-subtle'
-            : 'border-line-default bg-component text-fg-primary',
+            ? 'bg-warning-subtle text-on-warning-subtle'
+            : 'bg-brand-subtle text-on-brand-subtle',
         )}
-        whileHover={!stale ? { 
-          boxShadow: 'var(--shadow-sm)',
-          borderColor: 'var(--c-brand-line-subtle)'
-        } : {}}
+        whileHover={
+          !stale ? { boxShadow: 'var(--shadow-tiny)' } : {}
+        }
         transition={{ duration: 0.2 }}
       >
         {voiceMeta && <VoiceNoteHeader meta={voiceMeta} />}

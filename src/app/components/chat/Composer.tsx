@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
+import { navigate } from '../../lib/router'
 import { cn } from '../../lib/cn'
-import { IconDoc, IconPaperclip, IconSend, IconX } from '../ui/icons'
+import { IconDoc, IconMic, IconPaperclip, IconSend, IconX } from '../ui/icons'
 
 export interface ComposerProps {
   onSend: (text: string, attachments: string[]) => void
@@ -98,8 +99,12 @@ export function Composer({
 
       <motion.div
         className={cn(
-          'rounded-xl bg-sunken transition-all duration-200',
-          offline ? 'opacity-60' : 'focus-within:shadow-md focus-within:border-brand-line-subtle',
+          /* calm-authority Phase 3: a lifted white capsule floating above the
+             shell — focus reads as a ring, not a border change */
+          'rounded-[22px] bg-card shadow-tiny transition-all duration-200',
+          offline
+            ? 'opacity-60'
+            : 'focus-within:shadow-md focus-within:ring-1 focus-within:ring-brand-line-subtle',
         )}
         whileHover={{ boxShadow: offline ? 'none' : 'var(--shadow-sm)' }}
         whileTap={{ scale: 0.998 }}
@@ -127,6 +132,18 @@ export function Composer({
         )}
 
         <div className="flex items-end gap-2 px-3 py-2">
+          <motion.button
+            type="button"
+            aria-label={tr('speakCta')}
+            disabled={disabled || offline}
+            onClick={() => navigate('/voice')}
+            whileTap={{ scale: 0.9 }}
+            className="pressable mb-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg-tertiary transition-colors hover:bg-hover-veil hover:text-fg-primary disabled:opacity-40"
+            style={{ minWidth: 'var(--touch-target)' }}
+          >
+            <IconMic className="size-5" />
+          </motion.button>
+
           <motion.button
             type="button"
             aria-label={tr('composerAttach')}
