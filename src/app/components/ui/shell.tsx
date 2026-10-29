@@ -61,43 +61,9 @@ export function LanguageSelect({ className }: { className?: string }) {
 }
 
 /**
- * Desktop reviewer tour — a quiet floating card in the margin OUTSIDE the
- * device frame (lg+): the six moments that matter, ~60 seconds.
+ * Desktop reviewer tour — moved into the Sandbox inspector (calm-authority
+ * Phase 0): the consumer chat canvas carries zero floating meta-UI.
  */
-function ReviewerTour({ onUrdu }: { onUrdu: () => void }) {
-  const stops: { n: string; label: string; go: () => void }[] = [
-    { n: '01', label: 'Voice intake → review', go: () => navigate('/voice') },
-    { n: '02', label: 'Golden refund journey', go: () => navigate('/?s=refund-golden') },
-    { n: '03', label: 'Marathi notice reader', go: () => navigate('/notice') },
-    { n: '04', label: 'Safety hard-stop', go: () => navigate('/?s=stop-eviction') },
-    { n: '05', label: 'Urdu RTL', go: onUrdu },
-    { n: '06', label: 'Type specimen', go: () => navigate('/specimen') },
-  ]
-  return (
-    <aside
-      dir="ltr"
-      className="pointer-events-none fixed start-8 top-1/2 z-30 hidden -translate-y-1/2 lg:block"
-    >
-      <div className="pointer-events-auto flex w-64 flex-col gap-1.5 rounded-3xl border border-line-subtle bg-shell/85 p-4 shadow-xl backdrop-blur-xl">
-        <p className="font-serif text-sm font-semibold text-fg-primary">Reviewing the prototype?</p>
-        <p className="mb-1.5 text-2xs leading-relaxed text-fg-secondary">
-          Six moments, about a minute. The phone is live — everything runs on mock data.
-        </p>
-        {stops.map((s) => (
-          <button
-            key={s.n}
-            type="button"
-            onClick={s.go}
-            className="pressable flex min-h-11 items-center gap-2.5 rounded-xl px-2 text-start text-2xs font-medium text-fg-secondary transition-colors hover:bg-hover-veil"
-          >
-            <span className="text-2xs font-semibold tabular-nums text-brand-fg">{s.n}</span>
-            {s.label}
-          </button>
-        ))}
-      </div>
-    </aside>
-  )
-}
 
 export interface AppShellProps {
   /** deprecated - bottom tab bar removed for modern AI app pattern */
@@ -119,12 +85,11 @@ export interface AppShellProps {
  * Uses hamburger menu for secondary features, contextual actions inline.
  */
 export function AppShell({ topBarExtra, title, children, footer }: AppShellProps) {
-  const { tr, setLang } = useApp()
+  const { tr } = useApp()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  
+
   return (
     <div className="flex h-dvh justify-center bg-page sm:items-center sm:py-6">
-      <ReviewerTour onUrdu={() => { setLang('ur'); navigate('/') }} />
       <div
         data-app-frame
         className={
@@ -174,11 +139,13 @@ export function AppShell({ topBarExtra, title, children, footer }: AppShellProps
         <main className="flex min-h-0 flex-1 flex-col">{children}</main>
 
         {footer && (
-          <div className="relative z-20 px-4 pb-[calc(4.9rem+env(safe-area-inset-bottom))]">{footer}</div>
+          /* Phase 0: the composer sits snug above the home indicator — the
+             4.9rem reserve died with the TabBar */
+          <div className="relative z-20 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">{footer}</div>
         )}
-        
+
         {/* BOTTOM SAFE AREA for iOS home indicator */}
-        {!footer && <div aria-hidden="true" className="h-[4.9rem] shrink-0" />}
+        {!footer && <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />}
         
         <SandboxDrawer />
         <CaseSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

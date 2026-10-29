@@ -259,8 +259,43 @@ export function SandboxDrawer() {
 
               {tab === 'inspector' && (
                 <div className="flex flex-col gap-1.5">
+                  {/* reviewer tour (calm-authority Phase 0): the six moments,
+                      re-homed from the old floating desktop card so the
+                      consumer canvas carries zero meta-UI */}
+                  <p className="px-1 pt-1 text-2xs font-semibold text-fg-tertiary" lang="en">
+                    Reviewer tour · six moments
+                  </p>
                   {[
-                    { label: 'Type specimen', go: () => navigate('/specimen') },
+                    { label: '01 · Voice intake → review', go: () => navigate('/voice') },
+                    { label: '02 · Golden refund journey', go: () => navigate('/?s=refund-golden') },
+                    { label: '03 · Marathi notice reader', go: () => navigate('/notice') },
+                    { label: '04 · Safety hard-stop', go: () => navigate('/?s=stop-eviction') },
+                    {
+                      label: '05 · Urdu RTL',
+                      go: () => {
+                        setLang('ur')
+                        navigate('/')
+                      },
+                    },
+                    { label: '06 · Type specimen', go: () => navigate('/specimen') },
+                  ].map((l) => (
+                    <button
+                      key={l.label}
+                      type="button"
+                      onClick={() => {
+                        setOpen(false)
+                        l.go()
+                      }}
+                      className="min-h-10 rounded-[10px] bg-card px-3 text-start text-sm text-fg-primary transition-colors hover:bg-component-hover"
+                      lang="en"
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                  <p className="px-1 pt-2 text-2xs font-semibold text-fg-tertiary" lang="en">
+                    System
+                  </p>
+                  {[
                     { label: 'Component gallery', go: () => navigate('/gallery') },
                     { label: 'Notice interpreter (Marathi scan)', go: () => navigate('/notice') },
                     { label: 'Scenario launcher (classic)', go: () => navigate('/dev') },
@@ -268,7 +303,10 @@ export function SandboxDrawer() {
                     <button
                       key={l.label}
                       type="button"
-                      onClick={l.go}
+                      onClick={() => {
+                        setOpen(false)
+                        l.go()
+                      }}
                       className="min-h-10 rounded-[10px] bg-card px-3 text-start text-sm text-fg-primary transition-colors hover:bg-component-hover"
                       lang="en"
                     >
