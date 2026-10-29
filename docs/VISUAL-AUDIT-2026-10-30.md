@@ -107,3 +107,20 @@ What the screenshots show (`qa/visual/16-17`, both themes — VoiceCapturePage r
 | Presence / signature moment | **3** | The orb is the weakest element in the product |
 | Empty state | **7.5** | Calm but less conversational than #31 |
 | **Overall** | **7.5 → ~9 ceiling** | Orb fix + trust-shows-work closes most of the remaining gap |
+
+---
+
+## Appendix — Milestones 1–6 executed (2026-10-30, same day) + Gemini-audit merge
+
+The owner's 6-milestone polish prompt (merging this audit with the parallel Gemini audit `kombai-comparative-visual-audit.md`) executed with gates green per milestone. Commit chain: `5af2bbd` (M1+M2) → `3cde242` (M3) → `3988886` (M4) → `2e17695` (M5) → `9547af8`+`ca96bc0` (M6 + thread-case wiring).
+
+- **M1** — follow-up chips render the localized intent label (`meta` badges: "Bills in hand", "Seller refused", "It worked"…) and push the full script as the user's own message on tap. The empty-launcher box is gone: a seeded home renders **three single-line starter pills under the greeting** (the full script still arrives as the user bubble — the demo keeps its messy-prompt authenticity, the canvas keeps its calm).
+- **M2** — the plan CTA docks **inside** FindingCard/CautionCard (`mt-3.5 border-t pt-3.5` + full-width primary button, sparkle icon), shown while `!ladderShown`. The orphaned external chip is removed; guardrail-1 semantics intact (chips only after the ladder mounts). Wiring covers thread + focus-pane instances.
+- **M3** — orb re-spec shipped: specular highlight, hard rim, inset 3D shadows and the hard-light gloss layer deleted; the core is a **soft luminous sage radial disc** with a single ambient shadow; listening rings are pure scale-and-fade (no rotation/atom orbiting); /voice uses the md orb with a single waveform in the transcript. Verified in `qa/visual/23` — the black ball is gone from both themes.
+- **M4** — resolution claims are celebrated: new `FOLLOW_UPS.resolved` ×5 languages, a `RE_RESOLVED` regex checked before the promise/escalate branches, and the scenario `resolved` route now streams the celebration + mounts the closeout alone. Verified live: "That is wonderful news! … the process did its job" replaces the cold policy line (`qa/visual/22`).
+- **M5** — trust well gains the **"Cited source 1 of 1" pill**; gate cells carry a visible pencil affordance; the confirm button is full-width with the "show my standing" label ×5; the **DLSA handoff narrative** system line precedes every HandoverCard (`runProtective` + `reOther`).
+- **M6** — the top-left nav is a labeled **`📁 Matters · 5` tonal pill** (icon + label + count badge) — no mystery hamburger, no bottom bar; the composer keeps the bottom stage.
+
+**Credit where due:** M1's chip-essay bug and M4's cold resolution were the Gemini audit's catches (mine missed both — I had screenshotted the cold reply without flagging it); the orb, trust-shows-work, multilingual honesty UI and handoff narrative were this audit's. The merged queue is now fully executed.
+
+**Post-fix live checks:** `ctaDocked:true` after wiring, `celebration:true, closeoutAlone:true, chipsGone:true`, launcher pills on seeded home, orb flat-luminous in both themes. Gates green throughout. Remaining open items from the audit's P2/P3 list: translation whisper ("tap for English original"), scanner % labels, ↳ plain-text rows, dark-home presence-dots variant.
