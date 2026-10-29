@@ -196,3 +196,26 @@ Response to the 7-part "Principal AI Product Designer Overhaul" directive (audit
 - "Grey skeleton bars" in ExhibitPaper → already replaced with real micro-content earlier today (`qa/visual/05` shows it); the directive audited the pre-noon tree.
 - Bottom TabBar removal → already shipped by the parallel session in `b4266de`; this session verified and completed the sidebar hub.
 - Part 7's "confirm zero `[VERIFY]` / zero `ur`" → intentionally **not** achieved: both remain by constitution. The gates pass WITH them, which is the correct end state.
+
+---
+
+## Appendix 2 — "Calm Authority" master rebuild (2026-10-29 night, 8 phases)
+
+The owner's master spec ("Calm Authority Visual & Conversational Rebuild") executed phase-by-phase with `npm run gates` + one commit per phase (`62d5faa` → `7aab168`), then a live golden-path walkthrough. Four owner questions went unanswered; the plan's recommended defaults shipped and are flagged below.
+
+**Law deltas (all deliberate, all documented):** the design system's "elevation is border-first" rule is superseded by the spec's tonal materiality (surfaces separate by luminance + `shadow-tiny`; borders whisper-quiet) — AGENTS.md's design section should be amended to match. The trust laws are untouched: `simulatedTag` still renders in ReasoningPill's expanded panel, `[VERIFY]` still lives in legal-content.ts **and** in the matters.ts standing line (Phase 8.1's "inject S.2(10) + delete [VERIFY]" was executed in the lawful form — "strong statutory leverage [VERIFY]" — because inventing a section citation outside the legal store breaks Law 1; flipping to the literal spec text is a one-line change if the owner insists). Urdu stays visible everywhere (the gate requires it in languages.ts; it is the RTL showcase).
+
+**What shipped per phase:**
+- **0** — composer sits snug (`0.75rem` + safe-area); the 4.9rem phantom reserve died with the TabBar; ReviewerTour re-homed into the sandbox Inspector.
+- **1** — tonal tokens (shell 96.8/15.5, card 99.6/21.5, sunken 94.2/13, whisper lines), `shadow-tiny` float, radii 2xl-5xl → 14/18/22/26, `--text-reading` (15px/1.65) added; Card/Disclosure/Chip/ReasoningPill borderless-tonal.
+- **2** — user pebble: 20px continuous curvature, `bg-brand-subtle` tint, zero border; assistant prose at the reading register; system pill tonal.
+- **3** — composer = lifted white capsule (focus ring), **mic button** added (→ /voice).
+- **4** — one thought per beat: empathy → 600 ms → gate; `confirmFacts` mounts **only** the finding (or only the caution); the ladder never auto-mounts — a single "Show my 3-step action plan & WhatsApp draft →" chip invites it while a finding/caution stands alone (guardrail 1; the 'caution' variant maps to the ladder's 'free' face); outcome chips render inline in the thread **only after the ladder mounts**; footer rail exists only on the empty launcher.
+- **5a** — FindingCard: SectionRef + Listen on top, serif headline, reading prose, trust well (source, ConfidenceIndicator, VerificationBadge, ReasoningPill) with Law-4 Edit/Regenerate/Discard tucked quiet inside.
+- **5b** — fact gate: compact 2×2 tonal grid (tap-to-edit, A4b long-value cells span full width), **1-tap Proof chips** (new `proof` fact: GST invoice / No invoice — behavior-neutral, downgrade stays with the When chips) + 1-tap When chips; collapsed state = one quiet line.
+- **5c** — ladder steps as individual tonal cards.
+- **6** — reading-register prose everywhere (ChatPage/CaseWorkspace turns), `text-xs` labels, hero breathing (`gap-8 px-12 pb-16 pt-20`), honest exhibit pills ("PDF · mock"), "Prepared sample history" lines deleted, CaseWorkspace continue-bar tonal (guardrail 4).
+- **7** — weightless header, language select in a tonal pill, sandbox full native names + "EN · EN" quirk fixed, replay outcome enums → human labels.
+- **8** — matters.ts standing reworded (lawful); golden path walked live: home → pebble → empathy → 2×2 gate → confirm → **finding alone + CTA** → ladder + inline chips → resolved → closeout alone. Evidence `qa/visual/10–15`.
+
+**Verified invariants:** gates PASS after every phase (WCAG pairs all green under the new luminances); the live check confirmed `planCtaVisible:true, ladderMountedAlready:false, closeoutAutoMounted:false` → after CTA `ladderNow:true` + inline chips → after resolved `closeoutAlone:true, chipsGone:true`.
