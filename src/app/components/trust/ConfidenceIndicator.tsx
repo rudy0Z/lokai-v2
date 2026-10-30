@@ -23,7 +23,7 @@ export function ConfidenceIndicator({ level, className }: ConfidenceIndicatorPro
         'flex items-start gap-2.5 rounded-xl border px-3 py-2.5',
         level === 'clear' && 'border-positive-line bg-positive-subtle',
         level === 'likely' && 'border-warning-line bg-warning-subtle',
-        level === 'unsure' && 'border-danger-line bg-danger-subtle',
+        level === 'unsure' && 'border-line-default bg-sunken',
         className,
       )}
       role="status"
@@ -34,7 +34,7 @@ export function ConfidenceIndicator({ level, className }: ConfidenceIndicatorPro
           'mt-1.5 size-2 shrink-0 rounded-full',
           level === 'clear' && 'bg-positive-solid',
           level === 'likely' && 'bg-warning-solid',
-          level === 'unsure' && 'bg-danger-solid',
+          level === 'unsure' && 'bg-fg-tertiary',
         )}
       />
       <div className="min-w-0">
@@ -43,7 +43,7 @@ export function ConfidenceIndicator({ level, className }: ConfidenceIndicatorPro
             'text-sm font-semibold',
             level === 'clear' && 'text-on-positive-subtle',
             level === 'likely' && 'text-on-warning-subtle',
-            level === 'unsure' && 'text-on-danger-subtle',
+            level === 'unsure' && 'text-fg-primary',
           )}
         >
           {label}
@@ -53,7 +53,7 @@ export function ConfidenceIndicator({ level, className }: ConfidenceIndicatorPro
             'text-xs',
             level === 'clear' && 'text-on-positive-subtle/85',
             level === 'likely' && 'text-on-warning-subtle/85',
-            level === 'unsure' && 'text-on-danger-subtle/85',
+            level === 'unsure' && 'text-fg-secondary',
           )}
         >
           {desc}

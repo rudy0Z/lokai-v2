@@ -38,19 +38,37 @@ export const SCOPE_RULES: ScopeRule[] = [
     patterns: [/\bfir\b/i, /\bpolice\b/i, /\barrest(?:ed)?\b/i, /धमकी/, /पुलिस/, /پولیس/],
   },
   {
-    id: 'eviction-tenancy',
+    id: 'eviction-possession',
     tier: 'hard-stop',
-    label: 'Eviction or tenancy dispute',
+    label: 'Eviction or physical possession risk',
     whyI18n: {
-      en: 'Housing disputes move fast and mistakes can cost you your home. A person should look at it.',
-      hi: 'आवास विवाद तेज़ी से आगे बढ़ते हैं और ग़लती आपका घर छिना सकती है। इसे कोई व्यक्ति ही देखे।',
-      mr: 'निवास वाद वेगाने पुढे जातात आणि चुकीने तुमचे घर निघून जाऊ शकते. ही एखादी व्यक्तीच पाहिल.',
-      ta: 'வீட்டுத் தகராறுகள் விரைவாக நகரும்; தவறு உங்கள் வீட்டையே பறிக்கலாம். இதை ஒரு மனிதரே பார்க்க வேண்டும்.',
-      ur: 'رہائشی تنازعات تیزی سے آگے بڑھتے ہیں اور غلطی آپ کا گھر چھین سکتی ہے۔ اسے کوئی انسان ہی دیکھے۔',
+      en: 'Housing disputes involving physical eviction, lockouts, or possession threats move fast and mistakes can cost you your home. A person should look at it.',
+      hi: 'शारीरिक बेदखली, तालाबंदी या कब्ज़ा विवाद तेज़ी से आगे बढ़ते हैं और ग़लती आपका घर छिना सकती है। इसे कोई व्यक्ति ही देखे।',
+      mr: 'शारीरिक बेदखली, टाळेबंदी किंवा ताबा वाद वेगाने पुढे जातात आणि चुकीने तुमचे घर निघून जाऊ शकते. ही एखादी व्यक्तीच पाहिल.',
+      ta: 'உடற்பூர்வ வெளியேற்றம், பூட்டுதல் அல்லது உடமை மिरட்டல்கள் விரைவாக நகரும்; தவறு உங்கள் வீட்டையே பறிக்கலாம். இதை ஒரு மனிதரே பார்க்க வேண்டும்.',
+      ur: 'جبری بے دخلی، تالا بندی یا قبضے کے تنازعات تیزی سے آگے بڑھتے ہیں اور غلطی آپ کا گھر چھین سکتی ہے۔ اسے کوئی انسان ہی دیکھے۔',
     },
     patterns: [
-      /evict/i, /tenan(?:t|cy)/i, /landlord/i, /vacate/i,
-      /बेदखल/, /खाली कर/, /मकान मालिक/, /اجارہ داری/, /خالی کرو/,
+      /\b(evict|eviction|lock\s*out|throw\s*(?:me|us|him|her)\s*out|cut\s*(?:the\s*)?(?:water|electricity)|nikal|kabza)\b/i,
+      /बेदखल/, /जबरन\s*खाली/, /कब्ज़ा/, /ताला\s*लगा/, /اجارہ داری/, /خالی\s*کرو/, /زبردستی/,
+    ],
+  },
+  {
+    id: 'deposit-retention',
+    tier: 'caution',
+    label: 'Tenancy security deposit retention',
+    whyI18n: {
+      en: 'Security deposit withholding after vacating is governed by tenancy agreements and State Rent Acts. While consumer commissions typically decline jurisdiction, pre-litigation written notice and DLSA mediation remain available.',
+      hi: 'मकान खाली करने के बाद सिक्योरिटी डिपॉज़िट रोकना राज्य किराया कानून के तहत आता है। हालांकि उपभोक्ता आयोग इसे नहीं सुनते, प्री-मुकदमा लिखित मांग और DLSA मध्यस्थता उपलब्ध है।',
+      mr: 'घर रिकामे केल्यानंतर सुरक्षा ठेव अडवणे हा राज्य भाडे कायद्यांतर्गत वाद आहे. पूर्व-खटला लेखी नोटीस आणि DLSA मध्यस्थता उपलब्ध आहे.',
+      ta: 'வீடு காலி செய்த பின் காப்புத்தொகை பிடித்தம் மாநில வாடகை சட்டத்தின் கீழ் வரும். முன்-வழக்கு நோட்டீஸ் மற்றும் DLSA மத்தியஸ்தம் கிடைக்கும்.',
+      ur: 'مکان خالی کرنے کے بعد سیکیورٹی ڈپازٹ روکنا ریاستی کرایہ داری ایکٹ کے تحت آتا ہے۔ پیشگی تحریری مطالبہ اور DLSA ثالثی دستیاب ہے۔',
+    },
+    patterns: [
+      /security\s*deposit/i,
+      /deposit\s*(?:refund|return|not\s*returned|withheld|deducted)/i,
+      /rent(?:al)?\s*deposit/i,
+      /सिक्योरिटी\s*डिपॉज़िट/, /डिपॉज़िट\s*वापस/, /ڈپازٹ\s*واپسی/,
     ],
   },
   {
@@ -156,7 +174,18 @@ export function classifyMatter(text: string, lang: LangCode = 'en'): ScopeDecisi
   const pick = (r: ScopeRule) => r.whyI18n[lang] ?? r.whyI18n.en ?? ''
   const hit = SCOPE_RULES.find((r) => r.patterns.some((p) => p.test(text)))
   if (hit) {
-    return { tier: hit.tier, ruleId: hit.id, label: hit.label, why: pick(hit), certainty: 'matched' }
+    const domain =
+      hit.id === 'deposit-retention'
+        ? ({ id: 'deposit' as const, branch: 'standard' as const })
+        : undefined
+    return {
+      tier: hit.tier,
+      ruleId: hit.id,
+      label: hit.label,
+      why: pick(hit),
+      certainty: 'matched',
+      ...(domain ? { domain } : {}),
+    }
   }
   if (CONSUMER_SIGNALS.test(text)) {
     return { tier: 'proceed', label: 'Consumer matter', why: '', certainty: 'matched' }

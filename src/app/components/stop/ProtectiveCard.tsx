@@ -2,6 +2,7 @@ import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
 import { copyText } from '../../lib/format'
 import { REASSURANCE } from '../../data/refund-journey'
+import { legalById } from '../../data/legal-content'
 import type { ScopeDecision } from '../../data/scope-rules'
 import { Button } from '../ui/Button'
 import { IconPhone, IconShield } from '../ui/icons'
@@ -22,6 +23,7 @@ export function ProtectiveCard({
   onReRoute: () => void
 }) {
   const { tr, lang } = useApp()
+  const emergencyNum = legalById('emergency-112')?.sectionRef.replace(/\[.*\]/, '').trim() || '112'
   return (
     <div className="rounded-2xl bg-standout p-4 text-fg-on-inverted" role="status">
       <div className="flex items-center gap-2">
@@ -47,11 +49,11 @@ export function ProtectiveCard({
           leadingIcon={<IconPhone className="size-3.5" />}
           title={tr('simulatedTag')}
           onClick={async () => {
-            const ok = await copyText('112')
+            const ok = await copyText(emergencyNum)
             if (ok) toast.success(`${tr('protectPolice')} — ${tr('copied')}`)
           }}
         >
-          {tr('protectPolice')}
+          {emergencyNum} · {tr('protectPolice')}
         </Button>
       </div>
 

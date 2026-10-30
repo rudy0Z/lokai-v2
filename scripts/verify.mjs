@@ -45,6 +45,7 @@ const FORBIDDEN = [
   [/new\s+MediaRecorder/, 'media recording'],
   [/type=["']file["']/, 'file input'],
   [/VITE_[A-Z_]*API_KEY/, 'API key env'],
+  [/Transfer of Property Act,\s*1888/i, 'erroneous statute year 1888 (TPA is Act IV of 1882)'],
 ]
 for (const p of tsxFiles) {
   const text = readFileSync(p, 'utf8')

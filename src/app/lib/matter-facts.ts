@@ -1,6 +1,7 @@
 import { formatINR } from './format'
 import type { LangCode } from '../data/languages'
 import type { FindingCardData } from '../components/cards/FindingCard'
+import { resolveConfidence } from '../data/legal-content'
 import {
   ISSUE_LABELS,
   ASK_LABELS,
@@ -133,7 +134,7 @@ export function buildFinding(facts: FactRecord, lang: LangCode): FindingCardData
   return {
     ...b,
     legalId: 'cpa-defect-goods',
-    confidence: 'clear',
+    confidence: resolveConfidence('clear', 'cpa-defect-goods'),
   }
 }
 

@@ -45,6 +45,16 @@ export interface UiStrings {
   step1Title: Pack
   step2Title: Pack
   step3Title: Pack
+  step4Title: Pack
+  step4Sub: Pack
+  step4PortalDesc: Pack
+  step4CopyComplaint: Pack
+  step2ConciliationNote: Pack
+  noticeReviewDisclaimer: Pack
+  noticeRecipientHint: Pack
+  usageLabel: Pack
+  usagePersonal: Pack
+  usageBusiness: Pack
   copy: Pack
   copied: Pack
   edit: Pack
@@ -303,6 +313,58 @@ export const UI: UiStrings = {
   step1Title: { en: 'Message the seller first', hi: 'पहले विक्रेता को संदेश भेजें', mr: 'आधी विक्रेत्याला संदेश पाठवा', ta: 'முதலில் விற்பவருக்கு செய்தி அனுப்புங்கள்', ur: 'پہلے دکاندار کو پیغام بھیجیں' },
   step2Title: { en: 'Call the national consumer helpline', hi: 'राष्ट्रीय उपभोक्ता हेल्पलाइन पर कॉल करें', mr: 'राष्ट्रीय ग्राहक हेल्पलाइनवर कॉल करा', ta: 'தேசிய நுகர்வோர் உதவி எண்ணை அழையுங்கள்', ur: 'قومی کسٹمر ہیلپ لائن پر کال کریں' },
   step3Title: { en: 'Send a formal demand notice', hi: 'औपचारिक माँग-पत्र भेजें', mr: 'औपचारिक मागणी-पत्र पाठवा', ta: 'முறையான கோரிக்கை அறிவிப்பை அனுப்புங்கள்', ur: 'رسمی مطالبہ نوٹس بھیجیں' },
+  step4Title: { en: 'File on e-Jagriti (District Commission)', hi: 'ई-जागृति पर शिकायत दर्ज करें (जिला आयोग)', mr: 'ई-जागृतीवर तक्रार दाखल करा (जिल्हा आयोग)', ta: 'இ-ஜாக்ரிதியில் புகார் பதிவு செய்க (மாவட்ட ஆணையம்)', ur: 'ای-جاگرتی پر شکایت درج کریں (ضلعی کمیشن)' },
+  step4Sub: { en: 'Official consumer e-filing portal under CPA 2019 S. 35 · Copy-only outline', hi: 'उपभोक्ता संरक्षण कानून धारा 35 के तहत आधिकारिक ई-फाइलिंग पोर्टल', mr: 'ग्राहक संरक्षण कायदा कलम 35 अंतर्गत अधिकृत ई-फायलिंग पोर्टल', ta: 'நுகர்வோர் பாதுகாப்பு சட்டம் பிரிவு 35 கீழ் அதிகாரப்பூர்வ இணைய தளம்', ur: 'صارف تحفظ ایکٹ کی دفعہ 35 کے تحت سرکاری ای فائلنگ پورٹل' },
+  step4PortalDesc: {
+    en: 'Under Section 35 of the Consumer Protection Act, 2019, you can file a formal complaint online on e-Jagriti (edaakhil.nic.in). Under Section 34(2), jurisdiction lies where you reside or personally work for gain. Pecuniary jurisdiction for District Commissions is up to ₹50 Lakhs (nil filing fee for claims up to ₹5 Lakhs).',
+    hi: 'उपभोक्ता संरक्षण अधिनियम, 2019 की धारा 35 के तहत आप ई-जागृति (edaakhil.nic.in) पर ऑनलाइन शिकायत दर्ज कर सकते हैं। धारा 34(2) के तहत आप अपने निवास स्थान के जिला आयोग में जा सकते हैं। ₹5 लाख तक कोई कोर्ट फीस नहीं है (आयोग का अधिकार क्षेत्र ₹50 लाख तक)।',
+    mr: 'ग्राहक संरक्षण कायदा, 2019 च्या कलम 35 अंतर्गत आपण ई-जागृतीवर (edaakhil.nic.in) ऑनलाईन तक्रार दाखल करू शकता. कलम 34(2) नुसार आपण आपल्या रहिवासी जिल्ह्यातील आयोगात जाऊ शकता. ₹5 लाखांपर्यंत कोर्ट फी शून्य आहे.',
+    ta: 'நுகர்வோர் பாதுகாப்பு சட்டம், 2019 பிரிவு 35 கீழ் இ-ஜாக்ரிதியில் (edaakhil.nic.in) ஆன்லைனில் புகார் அளிக்கலாம். பிரிவு 34(2) படி நீங்கள் வசிக்கும் இடத்தில் உள்ள மாவட்ட ஆணையத்தில் தாக்கல் செய்யலாம். ₹5 லட்சம் வரை கட்டணம் இல்லை.',
+    ur: 'صارف تحفظ ایکٹ 2019 کی دفعہ 35 کے تحت آپ ای-جاگرتی (edaakhil.nic.in) پر آن لائن شکایت درج کر سکتے ہیں۔ دفعہ 34(2) کے تحت آپ اپنی رہائش گاہ کے ضلع میں فائل کر سکتے ہیں۔ ₹5 لاکھ تک کوئی کورٹ فیس نہیں۔',
+  },
+  step4CopyComplaint: { en: 'Copy complaint outline', hi: 'शिकायत का प्रारूप कॉपी करें', mr: 'तक्रारीचा मसुदा कॉपी करा', ta: 'புகார் வரைவை நகலெடு', ur: 'شکایت کا خاکہ کاپی کریں' },
+  step2ConciliationNote: {
+    en: 'NCH 1915 is a voluntary pre-litigation conciliation service. Logging a grievance docket creates a dated reference that serves as contemporaneous documentary evidence if you subsequently file on e-Jagriti.',
+    hi: 'NCH 1915 एक निःशुल्क पूर्व-मुकदमा सुलह सेवा है। यहाँ डॉकेट नंबर दर्ज कराने से एक समय-मुहरबंद प्रमाण मिलता है, जो बाद में ई-जागृति पर काम आता है।',
+    mr: 'NCH 1915 ही ऐच्छिक पूर्व-खटला मध्यस्थता सेवा आहे. डॉकेट क्रमांक नोंदवल्यास भविष्यात ई-जागृतीवर तक्रार करताना पुरावा म्हणून उपयोगी पडतो.',
+    ta: 'NCH 1915 என்பது நீதிமன்றத்திற்கு முந்தைய சமரச உதவி. இதில் டாக்கெட் பதிவு செய்வது பின்னாளில் இ-ஜாக்ரிதியில் தாக்கல் செய்யும்போது ஆதாரமாக உதவும்.',
+    ur: 'NCH 1915 ایک پیشگی مصالحتی خدمت ہے۔ ڈاکٹ نمبر درج کروانا بعد میں ای-جاگرتی پر ثبوت کے طور پر کام آتا ہے۔',
+  },
+  noticeReviewDisclaimer: {
+    en: 'This is your own written demand letter, not an advocate’s statutory notice. You are communicating directly as a citizen under the Consumer Protection Act, 2019.',
+    hi: 'यह आपका अपना लिखित माँग-पत्र है, किसी वकील का लीगल नोटिस नहीं। आप सीधे उपभोक्ता संरक्षण अधिनियम के तहत बात कर रहे हैं।',
+    mr: 'हे तुमचे स्वतःचे लेखी मागणीपत्र आहे, वकिलाची नोटीस नाही. ग्राहक संरक्षण कायद्यांतर्गत तुम्ही थेट संवाद साधत आहात.',
+    ta: 'இது உங்கள் சொந்த எழுத்துப்பூர்வ கோரிக்கை கடிதம், வழக்கறிஞரின் சட்ட அறிவிப்பு அல்ல. நீங்கள் நேரடியாக தொடர்பு கொள்கிறீர்கள்.',
+    ur: 'یہ آپ کا اپنا تحریری مطالبہ خط ہے، کسی وکیل کا نوٹس نہیں۔ آپ بطور شہری بات کر رہے ہیں۔',
+  },
+  noticeRecipientHint: {
+    en: 'Tip: For corporate or online sellers, state the full registered legal entity name and GST address from your invoice, not just the trading brand name.',
+    hi: 'सुझाव: कंपनी या ऑनलाइन विक्रेता के लिए इनवॉइस से रजिस्टर्ड कंपनी का पूरा नाम और GST पता लिखें, केवल ब्रांड नाम नहीं।',
+    mr: 'टीप: इनव्हॉइसवरून अधिकृत कंपनीचे नाव आणि GST पत्ता लिहा, केवळ ब्रँडचे नाव नाही.',
+    ta: 'குறிப்பு: இன்வாய்ஸில் உள்ள பதிவுசெய்யப்பட்ட நிறுவன பெயர் மற்றும் GST முகவரியை குறிப்பிடவும்.',
+    ur: 'مشورہ: انوائس پر درج رجسٹرڈ کمپنی کا پورا نام اور GST پتہ لکھیں، صرف برانڈ کا نام نہیں۔',
+  },
+  usageLabel: {
+    en: 'Purchase purpose (CPA 2019 S. 2(7))',
+    hi: 'खरीद का उद्देश्य (उपभोक्ता कानून धारा 2(7))',
+    mr: 'खरेदीचा हेतू (ग्राहक कायदा कलम 2(7))',
+    ta: 'கொள்முதல் நோக்கம் (CPA பிரிவு 2(7))',
+    ur: 'خریداری کا مقصد (CPA دفعہ 2(7))',
+  },
+  usagePersonal: {
+    en: 'Personal / Home use',
+    hi: 'व्यक्तिगत / घरेलू उपयोग',
+    mr: 'वैयक्तिक / घरगुती वापर',
+    ta: 'தனிப்பட்ட / வீட்டு பயன்பாடு',
+    ur: 'ذاتی / گھریلو استعمال',
+  },
+  usageBusiness: {
+    en: 'Business / Commercial / Resale',
+    hi: 'व्यापार / व्यावसायिक / पुनर्विक्रय',
+    mr: 'व्यवसाय / व्यावसायिक / पुनर्विक्री',
+    ta: 'வணிகம் / வணிகரீதியானது / மறுவிற்பனை',
+    ur: 'کاروبار / تجارتی / دوبارہ فروخت',
+  },
   copy: { en: 'Copy', hi: 'कॉपी', mr: 'कॉपी', ta: 'நகலெடு', ur: 'کاپی' },
   copied: { en: 'Copied', hi: 'कॉपी हो गया', mr: 'कॉपी झाले', ta: 'நகலெடுக்கப்பட்டது', ur: 'کاپی ہو گیا' },
   edit: { en: 'Edit', hi: 'संपादित करें', mr: 'संपादन करा', ta: 'திருத்து', ur: 'ترمیم' },

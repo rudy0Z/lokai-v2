@@ -5,6 +5,7 @@ import { useApp } from '../lib/app-context'
 import { navigate, useHashRoute } from '../lib/router'
 import { runBeats, SimulatedFailure, type BeatClass } from '../lib/engine'
 import { classifyMatter, reRouteAsCaution, SCOPE_RULES, type ScopeDecision } from '../data/scope-rules'
+import { resolveConfidence } from '../data/legal-content'
 import { REASSURANCE, SCENARIO_SEEDS } from '../data/refund-journey'
 import { FOLLOW_UPS, INFORMAL_CAUTION } from '../data/localized-content'
 import { scenarioById, type TesterOption } from '../data/interactive-scenarios'
@@ -76,7 +77,8 @@ interface ChatItem {
   stream?: boolean
   /** the scope decision attached to protective/handover/caution items */
   decision?: ScopeDecision
-  initialExpandedStep?: 1 | 2 | 3
+  initialExpandedStep?: 1 | 2 | 3 | 4
+  stale?: boolean
   counterData?: {
     title: string
     statutoryBasis: string
@@ -263,6 +265,76 @@ export default function ChatPage() {
 
     if (activeCase || stageRef.current !== 'intake') {
       stageRef.current = 'engaged'
+
+      // Check if user requests re-run/update after facts changed
+      const isUpdateIntent = /\b(re-?run|re-?calculate|update\s*(?:facts|standing)?|दोबारा\s*जाँच|पुन्हा\s*तपासा|புதுப்பி)\b/i.test(text)
+      if (isUpdateIntent && items.some((i) => i.stale)) {
+        setItems((prev) => prev.map((item) => ({ ...item, stale: false })))
+        run('progress', () => {
+          setFindingData(buildFinding(matterFacts, lang))
+          push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
+        })
+        return
+      }
+
+      // Bidirectional state mutability (HID Layer / P0 bug fix):
+      // Check incoming text for fact corrections
+      const extracted = extractFacts(text)
+      const hasFactCorrection =
+        (extracted.amount && extracted.amount !== matterFacts.amount) ||
+        (extracted.seller && extracted.seller !== matterFacts.seller) ||
+        (extracted.item && extracted.item !== matterFacts.item) ||
+        (extracted.issue && extracted.issue !== matterFacts.issue) ||
+        (extracted.ask && extracted.ask !== matterFacts.ask)
+
+      if (hasFactCorrection) {
+        const updatedFacts: FactRecord = {
+          ...matterFacts,
+          ...(extracted.amount ? { amount: extracted.amount } : {}),
+          ...(extracted.seller ? { seller: extracted.seller } : {}),
+          ...(extracted.item ? { item: extracted.item } : {}),
+          ...(extracted.issue ? { issue: extracted.issue } : {}),
+          ...(extracted.ask ? { ask: extracted.ask } : {}),
+        }
+        setMatterFacts(updatedFacts)
+        setFactItems(factRows(updatedFacts, lang))
+
+        // Mark downstream cards as stale in thread
+        setItems((prev) =>
+          prev.map((item) =>
+            item.kind === 'finding' || item.kind === 'ladder'
+              ? { ...item, stale: true }
+              : item,
+          ),
+        )
+
+        const changeDesc = extracted.amount
+          ? `amount updated to ${extracted.amount}`
+          : extracted.seller
+            ? `seller updated to ${extracted.seller}`
+            : extracted.item
+              ? `product updated to ${extracted.item}`
+              : 'details updated'
+
+        run('progress', () => {
+          push({
+            kind: 'assistant',
+            stream: true,
+            text:
+              lang === 'hi'
+                ? `मैंने नया विवरण दर्ज कर लिया है (${changeDesc})। क्या आप चाहते हैं कि मैं आपके कानूनी अधिकार और प्रारूप दोबारा तैयार करूँ?`
+                : lang === 'mr'
+                  ? `मी नवीन माहिती नोंदवली आहे (${changeDesc}). आपण कायदेशीर बाबी आणि मसुदे पुन्हा तयार करू इच्छिता?`
+                  : lang === 'ta'
+                    ? `புதிய தகவலைப் பதிவு செய்துள்ளேன் (${changeDesc}). சட்ட நிலை மற்றும் வரைவுகளை மீண்டும் புதுப்பிக்க வேண்டுமா?`
+                    : lang === 'ur'
+                      ? `میں نے نئی تفصیلات درج کر لی ہیں (${changeDesc})۔ کیا آپ قانونی پوزیشن اور مسودے دوبارہ تیار کرنا چاہتے ہیں؟`
+                      : `I’ve recorded the updated details (${changeDesc}). Would you like me to re-calculate your legal standing and drafts with these updated facts?`,
+          })
+        })
+        return
+      }
+
       followUp('engaged')
       return
     }
@@ -299,6 +371,18 @@ export default function ChatPage() {
       return
     }
     if (decision.tier === 'caution') {
+      if (decision.domain) {
+        setDomain(decision.domain)
+        const pack = domainPack(decision.domain.id, decision.domain.branch, lang)
+        stageRef.current = 'awaitingFacts'
+        run('explain', () => {
+          setFactItems(pack.facts)
+          setFactSigned(false)
+          push({ kind: 'assistant', stream: true, text: pack.empathy })
+          window.setTimeout(() => push({ kind: 'factcheck' }), 600)
+        })
+        return
+      }
       startCautionFlow(decision)
       return
     }
@@ -313,6 +397,20 @@ export default function ChatPage() {
    * the honest time-barred caution.
    */
   const confirmFacts = (values: Record<string, string>) => {
+    // S. 2(7) CPA Exclusion: Business / commercial purpose triggers B2B Hard-Stop
+    if (values.usage === 'business') {
+      const b2bRule = SCOPE_RULES.find((r) => r.id === 'commercial-b2b')!
+      const decision: ScopeDecision = {
+        tier: 'hard-stop',
+        ruleId: b2bRule.id,
+        label: b2bRule.label,
+        why: b2bRule.whyI18n[lang] ?? b2bRule.whyI18n.en ?? '',
+        certainty: 'matched',
+      }
+      runProtective(decision)
+      return
+    }
+
     setFactSigned(true)
     stageRef.current = 'engaged'
 
@@ -330,7 +428,7 @@ export default function ChatPage() {
           domain,
         }
         run('caution', () => {
-          push({ kind: 'caution', decision })
+          push({ kind: 'caution', decision }, { kind: 'ladder', variant: 'free' })
         })
         return
       }
@@ -345,7 +443,7 @@ export default function ChatPage() {
           lawSays: f.lawSays,
           means: f.means,
           legalId: f.legalId,
-          confidence: 'clear',
+          confidence: resolveConfidence('clear', f.legalId),
           reasoningSteps: f.reasoning,
         })
         /* Calm-authority Phase 4, beat 2: the finding mounts ALONE — the
@@ -635,6 +733,13 @@ export default function ChatPage() {
           )
         })
         return
+      case 'updateFacts':
+        setItems((prev) => prev.map((item) => ({ ...item, stale: false })))
+        run('progress', () => {
+          setFindingData(buildFinding(matterFacts, lang))
+          push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
+        })
+        return
       case 'pushback':
         stageRef.current = 'engaged'
         run('progress', () => {
@@ -678,6 +783,25 @@ export default function ChatPage() {
           ? /* the closure ritual joins the rail — one follow-up menu, not two
                (overhaul Part 2: the CloseOutCard stays out while this is up) */
             [
+              ...(items.some((i) => i.stale)
+                ? [
+                    {
+                      text:
+                        '↻ ' +
+                        (lang === 'hi'
+                          ? 'अपडेटेड तथ्यों से दोबारा जाँचें'
+                          : lang === 'mr'
+                            ? 'नवीन तथ्यांवरून पुन्हा तपासा'
+                            : lang === 'ta'
+                              ? 'புதுப்பிக்கப்பட்ட உண்மைகளுடன் மீண்டும் சரிபார்க்கவும்'
+                              : lang === 'ur'
+                                ? 'تازہ ترین حقائق کے ساتھ دوبارہ جانچیں'
+                                : 'Re-run standing with updated facts'),
+                      meta: 'metaEvidence',
+                      route: 'updateFacts' as const,
+                    },
+                  ]
+                : []),
               ...(postFindingOptions ?? []),
               { text: tr('railSaveLater'), meta: 'metaSave', route: 'save' as const },
             ]
@@ -806,6 +930,7 @@ export default function ChatPage() {
         <MessageBubble role="assistant">
           <FindingCard
             data={findingData}
+            stale={focusItem.stale}
             onUpdate={setFindingData}
             onShowLadder={() => showLadder('full')}
             ladderShown={ladderMounted}
@@ -1143,6 +1268,7 @@ export default function ChatPage() {
                     <MessageBubble key={item.id} role="assistant" dataId={item.id}>
                       <FindingCard
                         data={findingData}
+                        stale={item.stale}
                         onUpdate={setFindingData}
                         onShowLadder={() => showLadder('full')}
                         ladderShown={ladderMounted}

@@ -206,6 +206,25 @@ export function FactCheckCard({
         </div>
       )}
 
+      {/* Intended purpose chips (CPA S. 2(7) B2B boundary check) */}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-xs text-fg-tertiary">{tr('usageLabel')}</span>
+        <div className="flex flex-wrap gap-1.5">
+          <Chip
+            selected={(values.usage ?? 'personal') === 'personal'}
+            onClick={() => setValues((v) => ({ ...v, usage: 'personal' }))}
+          >
+            {tr('usagePersonal')}
+          </Chip>
+          <Chip
+            selected={values.usage === 'business'}
+            onClick={() => setValues((v) => ({ ...v, usage: 'business' }))}
+          >
+            {tr('usageBusiness')}
+          </Chip>
+        </div>
+      </div>
+
       <Button
         variant="primary"
         size="md"

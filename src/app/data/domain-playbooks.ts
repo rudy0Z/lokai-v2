@@ -98,8 +98,8 @@ const refundStandard: BranchPacks = {
       ],
     },
     drafts: [
-      'Hello HomeKart Grievance Team,\n\nOrder [order ID] — Mixwell 750W mixer grinder (₹8,999) was delivered defective: the jar arrived cracked and the motor failed on first use.\n\nA "return window closed" refusal does not hold — goods that arrive damaged count as a defect under the Consumer Protection Act, 2019, and the E-Commerce Rules, 2020 require your grievance officer to address this.\n\nPlease process a pickup and a full refund of ₹8,999 within 48 hours of this message, failing which I will register a docket on the National Consumer Helpline (1915) and the consumer portal.\n\nThank you,\n[Your name]',
-      'Hello HomeKart team,\n\nMy Mixwell mixer grinder (₹8,999) arrived damaged — photos and the GST invoice are ready.\n\nUnder the Consumer Protection Act, 2019 a defective-on-arrival product is a defect; store policy cannot override that.\n\nI ask for a pickup and a full refund within 48 hours, in writing.\n\nRegards,\n[Your name]',
+      'Hello HomeKart Grievance Team,\n\nOrder [order ID] — Mixwell 750W mixer grinder (₹8,999) was delivered defective: the jar arrived cracked and the motor failed on first use.\n\nA "return window closed" refusal does not hold — goods that arrive damaged count as a defect under Section 2(10) of the Consumer Protection Act, 2019. Under Rule 4(4)–(5) of the Consumer Protection (E-Commerce) Rules, 2020, your grievance officer must acknowledge complaints within 48 hours and resolve them within one month.\n\nPlease provide a written acknowledgement and grievance ticket number within 48 hours, and schedule a pickup with a full refund of ₹8,999 within the statutory redressal period. I am separately logging a National Consumer Helpline (1915) docket in parallel so the matter is on record.\n\nThank you,\n[Your name]',
+      'Hello HomeKart team,\n\nMy Mixwell mixer grinder (₹8,999) arrived damaged — photos and the GST invoice are ready.\n\nUnder Section 2(10) of the Consumer Protection Act, 2019 a product defective on arrival is a statutory defect; store policy cannot override statutory remedies.\n\nI request your 48-hour grievance acknowledgement and a pickup with a full refund under the E-Commerce Rules, 2020.\n\nRegards,\n[Your name]',
     ],
     prep: [
       'Order ID and the GST invoice PDF',
@@ -138,8 +138,8 @@ const refundStandard: BranchPacks = {
       ],
     },
     drafts: [
-      'नमस्ते HomeKart ग्रीवांस टीम,\n\nऑर्डर [ऑर्डर नं.] — मिक्सवेल 750W मिक्सर ग्राइंडर (₹8,999) खराब हालत में डिलीवर हुआ: जार टूटा आया और मोटर पहली बार चलाने पर ही बंद।\n\n"रिटर्न विंडो बंद" का इनकार टिकता नहीं — उपभोक्ता संरक्षण कानून, 2019 के तहत खराब-हालत में आया सामान खराबी है, और ई-कॉमर्स नियम, 2020 अपने ग्रीवांस ऑफ़िसर से इसे निपटाने की माँग करते हैं।\n\nकृपया इस संदेश के 48 घंटों में पिकअप और ₹8,999 का पूरा रिफंड करें, वरना मैं राष्ट्रीय उपभोक्ता हेल्पलाइन (1915) और उपभोक्ता पोर्टल पर डॉकेट दर्ज करूँगी।\n\nधन्यवाद,\n[आपका नाम]',
-      'नमस्ते HomeKart टीम,\n\nमेरा मिक्सवेल मिक्सर ग्राइंडर (₹8,999) खराब हालत में आया — फ़ोटो और GST बिल तैयार हैं।\n\nउपभोक्ता संरक्षण कानून, 2019 के तहत डिलीवरी पर खराब उत्पाद खराबी है; दुकान की पॉलिसी इसे नहीं मिटा सकती।\n\nमैं 48 घंटों में पिकअप और पूरे रिफंद की लिखित माँग करती हूँ।\n\nसादर,\n[आपका नाम]',
+      'नमस्ते HomeKart ग्रीवांस टीम,\n\nऑर्डर [ऑर्डर नं.] — मिक्सवेल 750W मिक्सर ग्राइंडर (₹8,999) खराब हालत में डिलीवर हुआ: जार टूटा आया और मोटर पहली बार चलाने पर ही बंद।\n\n"रिटर्न विंडो बंद" का इनकार टिकता नहीं — उपभोक्ता संरक्षण कानून, 2019 की धारा 2(10) के तहत डिलीवरी पर टूटा सामान खराबी है। ई-कॉमर्स नियम, 2020 के नियम 4(4)–(5) के तहत आपके ग्रीवांस ऑफ़िसर को 48 घंटों में पावती और एक महीने में समाधान देना अनिवार्य है।\n\nकृपया 48 घंटों में लिखित पावती व टिकट नंबर दें और निर्धारित अवधि में पिकअप व ₹8,999 का पूरा रिफंड करें। मैंने समानांतर रूप से राष्ट्रीय उपभोक्ता हेल्पलाइन (1915) पर भी शिकायत दर्ज की है।\n\nधन्यवाद,\n[आपका नाम]',
+      'नमस्ते HomeKart टीम,\n\nमेरा मिक्सवेल मिक्सर ग्राइंडर (₹8,999) खराब हालत में आया — फ़ोटो और GST बिल तैयार हैं।\n\nउपभोक्ता संरक्षण कानून, 2019 के तहत डिलीवरी पर खराब उत्पाद कानूनी रूप से खराबी है; स्टोर पॉलिसी इसे नहीं मिटा सकती।\n\nई-कॉमर्स नियम, 2020 के तहत 48 घंटे में पावती और पिकअप व पूरे रिफंड की माँग है।\n\nसादर,\n[आपका नाम]',
     ],
     prep: [
       'ऑर्डर ID और GST बिल PDF',
@@ -150,7 +150,7 @@ const refundStandard: BranchPacks = {
     stepTitles: ['पहले ग्रीवांस संदेश भेजें', 'राष्ट्रीय उपभोक्ता हेल्पलाइन पर बढ़ें', 'औपचारिक माँग-पत्र भेजें'],
     channel: { token: '1915', legalId: 'national-consumer-helpline' },
     escalate:
-      '"कंपनी पॉलिसी" जवाब रास्ते का अंत नहीं है — उनके इनकार को लिखित में लें और एक रन्ग ऊपर चढ़ें: तैयार सूची के साथ मुफ़्त 1915 हेल्पलाइन पर डॉकेट दर्ज करें और हर स्क्रीनशॉट संभालें। आपके मसौदे ऊपर तैयार हैं।',
+      '"कंपनी पॉलिसी" जवाब रास्ते का अंत नहीं है — उनके इनकार को लिखित में लें और एक रंग ऊपर चढ़ें: तैयार सूची के साथ मुफ़्त 1915 हेल्पलाइन पर डॉकेट दर्ज करें और हर स्क्रीनशॉट संभालें। आपके मसौदे ऊपर तैयार हैं।',
     noticeSubject: 'रिफंड की माँग — खराब मिक्सर ग्राइंडर, ऑर्डर [ऑर्डर नं.]',
     noticeBody:
       'मैंने HomeKart से मिक्सवेल 750W मिक्सर ग्राइंडर (₹8,999) खरीदा था, डिलीवरी [डिलीवरी तारीख़] को हुई। उत्पाद खराब हालत में आया — सामान की खराबी। मेरी रिफंड/बदली की माँग "रिटर्न विंडो" कहकर मना कर दी गई। मैं इस पत्र के 15 दिनों के भीतर ₹8,999 के पूरे रिफंड की माँग करती हूँ, वरना मैं उपभोक्ता विवाद मार्गों से उपाय चाहूँगी। — [आपका नाम]',
@@ -185,8 +185,8 @@ const refundInformal: BranchPacks = {
       ],
     },
     drafts: [
-      'Hello,\n\nOn [date] you received ₹4,500 by UPI (UTR [UTR]) for an order you never shipped and have now blocked all contact.\n\nI have flagged this transaction as a fraudulent payment in my UPI app and filed a cyber-financial report. If the full amount is returned within 48 hours, I will withdraw the complaint.\n\n[Your name]',
-      'This is regarding the ₹4,500 UPI payment (UTR [UTR]) of [date] for the order you did not fulfil. The transaction has been reported through the UPI app and the cybercrime channel. Refund in full to reverse the report.\n\n[Your name]',
+      'Hello,\n\nPlease return the amount of ₹4,500 transferred via UPI (Ref: [UTR]) for the order placed with your page, as the goods were never shipped and all communication has been blocked.\n\nUnder Section 72 of the Indian Contract Act, 1872, money paid for a consideration that failed must be refunded. If a refund or verified tracking details are not provided within 48 hours, I will escalate a formal dispute with my bank and report the transaction on the National Cyber Crime Portal (1930).\n\n[Your name]',
+      'This is regarding the ₹4,500 UPI payment (UTR [UTR]) of [date] for the unfulfilled order. Under Section 72 of the Indian Contract Act, 1872, money paid without delivery is legally recoverable. Please reverse the payment to avoid bank and cyber-portal escalation.\n\n[Your name]',
     ],
     prep: [
       'The UPI UTR / transaction ID',
@@ -229,8 +229,8 @@ const refundInformal: BranchPacks = {
       ],
     },
     drafts: [
-      'नमस्ते,\n\nतारीख़ [तारीख़] को आपको UPI से ₹4,500 (UTR [UTR]) मिले थे, जिसका ऑर्डर कभी भेजा नहीं गया और अब आपने संपर्क बंद कर दिया।\n\nमैंने यह लेनदेन अपनी UPI ऐप में धोखाधड़ी के रूप में फ़्लैग किया है और साइबर-वित्तीय रिपोर्ट दर्ज की है। 48 घंटों में पूरा भुगतान लौटा देंगे तो शिकायत वापस ले लूँगी।\n\n[आपका नाम]',
-      'यह [तारीख़] के ₹4,500 के UPI भुगतान (UTR [UTR]) के संबंध में है, जिसका सामान नहीं भेजा गया। लेनदेन UPI ऐप और साइबर क्राइम चैनल से रिपोर्ट किया जा चुका है। रिपोर्ट वापस लेने के लिए पूरा भुगतान करें।\n\n[आपका नाम]',
+      'नमस्ते,\n\nतारीख़ [तारीख़] को आपको UPI से ₹4,500 (UTR [UTR]) भेजे गए थे, जिसका सामान कभी नहीं भेजा गया और अब आपने संपर्क बंद कर दिया है।\n\nभारतीय अनुबंध अधिनियम, 1872 की धारा 72 के तहत जिस लेनदेन का सामान न मिले, उसकी राशि कानूनी रूप से वापस की जानी चाहिए। यदि 48 घंटों में रिफंड या वैध ट्रैकिंग नहीं मिलती, तो मैं बैंक में गलत लेनदेन विवाद उठाऊँगा और 1930 साइबर अपराध पोर्टल पर रिपोर्ट दर्ज करूँगा।\n\n[आपका नाम]',
+      'यह [तारीख़] के ₹4,500 के UPI भुगतान (UTR [UTR]) के संबंध में है, जिसका सामान नहीं मिला। भारतीय अनुबंध अधिनियम की धारा 72 के अनुसार यह राशि कानूनी रूप से वसूली योग्य है। बैंक व साइबर रिपोर्ट की कार्यवाही से बचने के लिए कृपया तुरंत रिफंड करें।\n\n[आपका नाम]',
     ],
     prep: [
       'UPI UTR / लेनदेन ID',
@@ -263,9 +263,9 @@ const depositStandard: BranchPacks = {
     finding: {
       title: 'Arbitrary deductions from a deposit are recoverable — wear and tear is the owner\u2019s cost',
       lawSays:
-        'A tenant must return premises as received, allowing for reasonable wear and tear under the Transfer of Property Act, 1888 [VERIFY — state rent acts may override]. Withholding a deposit without itemised third-party bills after a peaceful handover can amount to wrongful retention of money.',
+        'A tenant must return premises as received, allowing for reasonable wear and tear under the Transfer of Property Act, 1882 [VERIFY — state rent acts may override]. Withholding a deposit without itemised third-party bills after a peaceful handover can amount to wrongful retention of money.',
       means:
-        'An itemised-bill demand on WhatsApp is the normal first step: every deduction needs a real invoice, else the balance is refundable. Move-out photos and rent-transfer statements are your evidence file.',
+        'Residential tenancy deposit disputes fall under civil law, State Rent Control Acts, and DLSA conciliation — not the Consumer Commission. An itemised-bill demand on WhatsApp is the normal first step: every deduction needs a real invoice, else the balance is refundable. Move-out photos and rent-transfer statements are your evidence file.',
       legalId: 'tpa-wear-tear',
       reasoning: [
         'Keys were handed over peacefully after the notice period.',
@@ -274,7 +274,7 @@ const depositStandard: BranchPacks = {
       ],
     },
     drafts: [
-      'Namaste,\n\nI handed over the flat keys on [date], in clean condition, after serving the full notice period. Deducting ₹35,000 from my ₹50,000 deposit for routine painting and cleaning is not permitted — normal wear and tear is the owner\u2019s responsibility under the Transfer of Property Act, 1888.\n\nEvery deduction needs an itemised third-party bill. Kindly transfer the remaining ₹35,000 by [date], so we can close this amicably without a formal demand notice.\n\n[Your name]',
+      'Namaste,\n\nI handed over the flat keys on [date], in clean condition, after serving the full notice period. Deducting ₹35,000 from my ₹50,000 deposit for routine painting and cleaning is not permitted — normal wear and tear is the owner\u2019s responsibility under the Transfer of Property Act, 1882.\n\nEvery deduction needs an itemised third-party bill. Kindly transfer the remaining ₹35,000 by [date], so we can close this amicably without a formal demand notice.\n\n[Your name]',
       'Namaste,\n\nThe flat was vacated on [date] after full notice; keys were handed over peacefully. The ₹35,000 deduction from the ₹50,000 deposit has no itemised bills — routine painting after a long stay is wear and tear, which the law places on the owner.\n\nPlease transfer the balance of ₹35,000 by [date].\n\n[Your name]',
     ],
     prep: [
@@ -303,9 +303,9 @@ const depositStandard: BranchPacks = {
     finding: {
       title: 'डिपॉज़िट से मनमानी कटौती वसूली जा सकती है — रख-रखाव मालिक का खर्च है',
       lawSays:
-        'किराएदार को प्रॉपर्टी वैसी ही लौटानी होती है जैसी मिली थी — सामान्य रख-रखाव की छूट के साथ (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1888) [VERIFY — राज्य के किराया कानून अलग हो सकते हैं]। शांतिपूर्व हैंडओवर के बाद बिना बिलों के डिपॉज़िट रोकना धन का अनुचित प्रतिधारण हो सकता है।',
+        'किराएदार को प्रॉपर्टी वैसी ही लौटानी होती है जैसी मिली थी — सामान्य रख-रखाव की छूट के साथ (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1882) [VERIFY — राज्य के किराया कानून अलग हो सकते हैं]। शांतिपूर्व हैंडओवर के बाद बिना बिलों के डिपॉज़िट रोकना धन का अनुचित प्रतिधारण हो सकता है।',
       means:
-        'पहला सामान्य कदम: WhatsApp पर आइटम-वार बिल की माँग — हर कटौती का असली बिल चाहिए, वरना पूरा बैलेंस लौटाना होगा। मूव-आउट फ़ोटो और किराया-स्टेटमेंट आपके सबूत हैं।',
+        'आवासीय किरायेदारी में डिपॉज़िट विवाद सिविल कानून, राज्य किराया नियंत्रण कानून और DLSA सुलह के दायरे में आते हैं — उपभोक्ता आयोग के नहीं। पहला सामान्य कदम: WhatsApp पर आइटम-वार बिल की माँग — हर कटौती का असली बिल चाहिए, वरना पूरा बैलेंस लौटाना होगा। मूव-आउट फ़ोटो और किराया-स्टेटमेंट आपके सबूत हैं।',
       legalId: 'tpa-wear-tear',
       reasoning: [
         'नोटिस पूरा कर चाबियाँ शांतिपूर्वक सौंपी गईं।',
@@ -314,7 +314,7 @@ const depositStandard: BranchPacks = {
       ],
     },
     drafts: [
-      'नमस्ते,\n\nमैंने [तारीख़] को पूरा नोटिस निभाकर फ्लैट की चाबियाँ साफ़ हालत में लौटा दीं। मेरी ₹50,000 की डिपॉज़िट में से ₹35,000 सामान्य पेंटिंग-क्लीनिंग कहकर रोखना उचित नहीं — सामान्य रख-रखाव मालिक की ज़िम्मेदारी है (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1888)।\n\nहर कटौती का बिल चाहिए। कृपया शेष ₹35,000 [तारीख़] तक भेज दें, ताकि बिना कानूनी नोटिस के मामला अमनचैन से सुलझे।\n\n[आपका नाम]',
+      'नमस्ते,\n\nमैंने [तारीख़] को पूरा नोटिस निभाकर फ्लैट की चाबियाँ साफ़ हालत में लौटा दीं। मेरी ₹50,000 की डिपॉज़िट में से ₹35,000 सामान्य पेंटिंग-क्लीनिंग कहकर रोखना उचित नहीं — सामान्य रख-रखाव मालिक की ज़िम्मेदारी है (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1882)।\n\nहर कटौती का बिल चाहिए। कृपया शेष ₹35,000 [तारीख़] तक भेज दें, ताकि बिना कानूनी नोटिस के मामला अमनचैन से सुलझे।\n\n[आपका नाम]',
       'नमस्ते,\n\nफ्लैट [तारीख़] को पूरे नोटिस के बाद खाली किया; चाबियाँ शांतिपूर्वक सौंपीं। ₹50,000 में से ₹35,000 की कटौती के कोई बिल नहीं — लंबे ठहराव के बाद पेंटिंग सामान्य रख-रखाव है, जो कानूनन मालिक पर है।\n\nकृपया शेष ₹35,000 [तारीख़] तक भेजें।\n\n[आपका नाम]',
     ],
     prep: [
@@ -352,7 +352,7 @@ const depositInformal: BranchPacks = {
     },
     caution: {
       title: 'No written agreement does not mean no tenancy',
-      body: 'Monthly rent transfers and the deposit receipt can establish a month-to-month tenancy under the Transfer of Property Act, 1888 even without a signed agreement [VERIFY]. Two cautions: do not hand over keys until the refund is transferred or a written handover receipt is signed — and have a human helper check your dates and state-specific rules first.',
+      body: 'Monthly rent transfers and the deposit receipt can establish a month-to-month tenancy under the Transfer of Property Act, 1882 even without a signed agreement [VERIFY]. Two cautions: do not hand over keys until the refund is transferred or a written handover receipt is signed — and have a human helper check your dates and state-specific rules first.',
       steps: [
         'Read your message and the proof you do have',
         'Checked the trail: repeated transfers, no signed agreement',
@@ -396,7 +396,7 @@ const depositInformal: BranchPacks = {
     },
     caution: {
       title: 'लिखित एग्रीमेंट न होना = किरायेदारी नहीं, ऐसा नहीं है',
-      body: 'हर महीने के किराया ट्रांसफ़र और डिपॉज़िट की रसीद बिना साइन एग्रीमेंट के भी महीने-दर-महीने किरायेदारी सिद्ध कर सकते हैं (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1888) [VERIFY]। दो सावधानियाँ: रिफंड आने तक या लिखित हैंडओवर रसीद पर साइन होने तक चाबियाँ मत दें — और आपकी तारीख़ें व राज्य के नियम पहले कोई मानव सहायक जाँचे।',
+      body: 'हर महीने के किराया ट्रांसफ़र और डिपॉज़िट की रसीद बिना साइन एग्रीमेंट के भी महीने-दर-महीने किरायेदारी सिद्ध कर सकते हैं (ट्रांसफ़र ऑफ़ प्रॉपर्टी ऐक्ट, 1882) [VERIFY]। दो सावधानियाँ: रिफंड आने तक या लिखित हैंडओवर रसीद पर साइन होने तक चाबियाँ मत दें — और आपकी तारीख़ें व राज्य के नियम पहले कोई मानव सहायक जाँचे।',
       steps: [
         'आपका संदेश और उपलब्ध सबूत पढ़े',
         'पहल जाँची: बार-बार ट्रांसफ़र, साइन एग्रीमेंट नहीं',
@@ -544,10 +544,10 @@ const salaryStandard: BranchPacks = {
       'Bank statement showing the missing credit',
       'Employee ID and reporting dates',
     ],
-    stepTitles: ['Send the final escalation email first', 'File the free labour-portal claim', 'Send a formal demand notice'],
-    channel: { token: 'SAMADHAN', legalId: 'payment-wages-ff' },
+    stepTitles: ['Send the final escalation email first', 'File the free labour conciliation claim', 'Send a formal demand notice'],
+    channel: { token: 'Conciliation', legalId: 'payment-wages-ff' },
     escalate:
-      'If HR keeps deferring to an internal sign-off, put the dates in writing and climb: the free labour-portal claim does not wait for a manager\u2019s signature — the escalation email in your documents already carries the dates and the demand.',
+      'If HR keeps deferring to an internal sign-off, put the dates in writing and climb: the free labour commissioner conciliation claim does not wait for a manager\u2019s signature — the escalation email in your documents already carries the dates and the demand.',
     noticeSubject: 'Demand for release of ₹68,000 F&F dues and relieving letter',
     noticeBody:
       'I served as [designation] (Emp ID [ID]) and completed my notice period on [date]; all company assets were returned and clearance was issued. My final settlement of ₹68,000 and the relieving letter have been withheld for 45 days. Earned wages cannot be withheld after a completed notice. I demand release of the full settlement and the relieving letter within 15 days of this notice, failing which proceedings under the applicable labour law will follow. — [Your name]',
@@ -584,10 +584,10 @@ const salaryStandard: BranchPacks = {
       'ग़ायब क्रेडिट दिखाता बैंक स्टेटमेंट',
       'कर्मचारी ID और कार्यकाल की तारीख़ें',
     ],
-    stepTitles: ['पहले अंतिम एस्केलेशन ईमेल भेजें', 'मुफ़्त लेबर-पोर्टल क्लेम दर्ज करें', 'औपचारिक माँग-पत्र भेजें'],
-    channel: { token: 'SAMADHAN', legalId: 'payment-wages-ff' },
+    stepTitles: ['पहले अंतिम एस्केलेशन ईमेल भेजें', 'मुफ़्त लेबर सुलह क्लेम दर्ज करें', 'औपचारिक माँग-पत्र भेजें'],
+    channel: { token: 'Conciliation', legalId: 'payment-wages-ff' },
     escalate:
-      'HR आंतरिक साइन के पीछे टाले तो तारीख़ें लिखित में दें और चढ़ें: मुफ़्त लेबर-पोर्टल क्लेम किसी मैनेजर के साइन का इंतज़ार नहीं करता — आपके दस्तावेज़ों में एस्केलेशन ईमेल तारीख़ों और माँग सहित तैयार है।',
+      'HR आंतरिक साइन के पीछे टाले तो तारीख़ें लिखित में दें और चढ़ें: मुफ़्त लेबर कमिश्नर सुलह क्लेम किसी मैनेजर के साइन का इंतज़ार नहीं करता — आपके दस्तावेज़ों में एस्केलेशन ईमेल तारीख़ों और माँग सहित तैयार है।',
     noticeSubject: '₹68,000 F&F बकाया और रिलीविंग लैटर जारी करने की माँग',
     noticeBody:
       'मैं [पद] (कर्मचारी ID [ID]) के रूप में कार्यरत थी और [तारीख़] को मेरा नोटिस पूरा हुआ; सभी कंपनी एसेट लौटाए और क्लियरेंस मिला। मेरा ₹68,000 का फ़ाइनल सेटलमेंट और रिलीविंग लैटर 45 दिन से रोके हैं। नोटिस पूरा होने के बाद कमाया वेतन नहीं रोका जा सकता। मैं इस नोटिस के 15 दिनों में पूरा सेटलमेंट और रिलीविंग लैटर जारी करने की माँग करती हूँ, वरना लागू श्रम कानून के तहत कार्यवाही होगी। — [आपका नाम]',

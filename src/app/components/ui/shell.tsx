@@ -147,11 +147,22 @@ export function AppShell({ topBarExtra, title, children, footer }: AppShellProps
         {footer && (
           /* Phase 0: the composer sits snug above the home indicator — the
              4.9rem reserve died with the TabBar */
-          <div className="relative z-20 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">{footer}</div>
+          <div className="relative z-20 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            {footer}
+            <p className="mt-1 text-center text-[10px] tracking-tight text-fg-disabled">
+              {tr('protoTag')}
+            </p>
+          </div>
         )}
 
         {/* BOTTOM SAFE AREA for iOS home indicator */}
-        {!footer && <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />}
+        {!footer && (
+          <div className="shrink-0 px-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+            <p className="text-center text-[10px] tracking-tight text-fg-disabled">
+              {tr('protoTag')}
+            </p>
+          </div>
+        )}
         
         <SandboxDrawer />
         <CaseSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

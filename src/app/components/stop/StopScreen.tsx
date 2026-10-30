@@ -101,18 +101,22 @@ function DlsaPanel({ inverted }: { inverted: boolean }) {
               {stateName}
             </Badge>
           </div>
-          <dl className="mt-2.5 flex flex-col gap-1 font-mono text-2xs" lang="en">
+          <dl className="mt-2.5 flex flex-col gap-1.5 font-mono text-2xs" lang="en">
             <div className="flex gap-2">
-              <dt className="opacity-70">phone:</dt>
-              <dd>[VERIFY — to be added]</dd>
+              <dt className="opacity-70">helpline:</dt>
+              <dd className="font-semibold">15100 (NALSA 24×7 Legal Aid · Toll-Free [VERIFY])</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="opacity-70">address:</dt>
-              <dd>[VERIFY — to be added]</dd>
+              <dt className="opacity-70">location:</dt>
+              <dd>ADR Centre / Front Office, District Court Complex, {district} [VERIFY]</dd>
             </div>
             <div className="flex gap-2">
               <dt className="opacity-70">hours:</dt>
-              <dd>[VERIFY — to be added]</dd>
+              <dd>Mon–Sat 10:00 AM – 5:00 PM (except court holidays) [VERIFY]</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="opacity-70">eligibility:</dt>
+              <dd>Free legal aid under S. 12 Legal Services Authorities Act, 1987 [VERIFY]</dd>
             </div>
           </dl>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">

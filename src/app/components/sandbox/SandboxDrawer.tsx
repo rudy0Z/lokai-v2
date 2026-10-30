@@ -23,11 +23,11 @@ const TIER_1_LANGS: LangCode[] = ['en', 'hi', 'mr', 'ta', 'ur']
 const TIER_2_LANGS: LangCode[] = ['bn', 'gu', 'kn', 'ml', 'or', 'pa', 'te']
 
 const SCENARIO_META: Record<string, { domain: string; law: string; tag: string }> = {
-  scn1: { domain: 'E-Commerce Refund', law: 'CPA 2019 · E-Commerce Rules', tag: '₹8,999' },
-  scn2: { domain: 'Landlord Deposit', law: 'Sec 108(m) Transfer of Property Act', tag: '₹35,000' },
-  scn3: { domain: 'Municipal Tax Notice', law: '15-Day Objection Window · S. 149', tag: '₹18,450' },
-  scn4: { domain: 'Wrong UPI & Salary', law: 'Sec 72 Contract Act / Labour Portal', tag: '₹12k / ₹68k' },
-  scn5: { domain: 'Domestic Safety Stop', law: 'Immediate Stop · 181 / 112 / DLSA', tag: 'Safety Stop' },
+  scn1: { domain: 'E-Commerce Refund', law: 'CPA 2019 · E-Commerce Rules [VERIFY]', tag: '₹8,999' },
+  scn2: { domain: 'Landlord Deposit', law: 'Transfer of Property Act, 1882 [VERIFY]', tag: '₹35,000' },
+  scn3: { domain: 'Municipal Tax Notice', law: 'MMC Act, 1888 [VERIFY]', tag: '₹18,450' },
+  scn4: { domain: 'Wrong UPI & Salary', law: 'Contract Act 1872 / Labour conciliation [VERIFY]', tag: '₹12k / ₹68k' },
+  scn5: { domain: 'Domestic Safety Stop', law: 'Immediate Stop · Emergency 112 / DLSA', tag: 'Safety Stop' },
 }
 
 export const SANDBOX_OPEN_EVENT = 'lokai:sandbox-open'

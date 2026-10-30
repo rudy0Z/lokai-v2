@@ -98,18 +98,26 @@ export function DemandNoticeReview({
           </Button>
         </div>
         <Banner tone="warning">{tr('noticeReviewBanner')}</Banner>
+        <Banner tone="info">{tr('noticeReviewDisclaimer')}</Banner>
 
         <div className="paper flex flex-col gap-4 rounded-[18px] p-5" lang="en">
           {notice.fields.map((f) => (
             <Field key={f.key} label={f.label}>
               {(id) => (
-                <Textarea
-                  id={id}
-                  rows={2}
-                  value={values[f.key] ?? ''}
-                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                  className="resize-none rounded-none border-x-0 border-t-0 border-warning-line/40 bg-transparent px-0 font-serif"
-                />
+                <div>
+                  <Textarea
+                    id={id}
+                    rows={2}
+                    value={values[f.key] ?? ''}
+                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                    className="resize-none rounded-none border-x-0 border-t-0 border-warning-line/40 bg-transparent px-0 font-serif"
+                  />
+                  {f.key === 'to' && (
+                    <p className="mt-1 text-2xs text-fg-tertiary">
+                      {tr('noticeRecipientHint')}
+                    </p>
+                  )}
+                </div>
               )}
             </Field>
           ))}

@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { useApp } from '../../lib/app-context'
 import { cn } from '../../lib/cn'
 import { legalById } from '../../data/legal-content'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
-import { Textarea } from '../ui/Field'
 import { ConfidenceIndicator, type ConfidenceLevel } from '../trust/ConfidenceIndicator'
 import { IconDoc, IconSparkle } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
@@ -13,7 +10,6 @@ import { SectionRef } from '../trust/SectionRef'
 import { ReasoningPill } from '../trust/ReasoningPill'
 import { LegalText } from '../trust/LegalText'
 import { SpeakPill } from '../trust/SpeakPill'
-import { CardActions } from './CardActions'
 
 export interface FindingCardData {
   title: string
@@ -38,45 +34,22 @@ export interface FindingCardProps {
 }
 
 /**
- * The generative finding card: serif heading (the "law register" is a READING
- * surface, allowed), three zones, verified-or-not citation, confidence in
- * plain words, reasoning pill, and full user control.
+ * The finding card: editorial serif heading, plain-language statutory reasoning,
+ * verified citation, and quiet provenance well. A citizen cannot edit an Act of
+ * Parliament — user agency (edit/regenerate/discard) lives on the generative
+ * drafts in ActionLadder and DemandNoticeReview.
  */
-export function FindingCard({ data, stale, onUpdate, onDiscard, onShowLadder, ladderShown }: FindingCardProps) {
+export function FindingCard({ data, stale, onShowLadder, ladderShown }: FindingCardProps) {
   const { tr, lang } = useApp()
   const legal = legalById(data.legalId)
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(data)
-  const [variantIdx, setVariantIdx] = useState(0)
+
   /** A4b: uppercase + tracking are Latin-only niceties */
   const labelClass = cn(
     'text-xs font-semibold text-fg-tertiary',
     lang === 'en' && 'uppercase tracking-wide',
   )
 
-  const variants = data.variants ?? []
-  const regenerate = () => {
-    if (variants.length === 0) {
-      toast('No alternate draft prepared for this card')
-      return
-    }
-    const next = (variantIdx + 1) % (variants.length + 1)
-    setVariantIdx(next)
-    const v = next === 0 ? data : variants[next - 1]!
-    const merged = { ...draft, ...v }
-    setDraft(merged)
-    onUpdate?.(merged)
-  }
-
-  const save = () => {
-    setEditing(false)
-    onUpdate?.(draft)
-    toast.success(tr('saveChanges'))
-  }
-
   return (
-    /* Calm-authority Phase 5a: editorial headline first, trust details tucked
-       in the bottom well. Inline assessment block (left hairline), not a box. */
     <div
       className={cn(
         'flex flex-col gap-3 border-s-2 border-line-default py-0.5 ps-4',
@@ -89,49 +62,37 @@ export function FindingCard({ data, stale, onUpdate, onDiscard, onShowLadder, la
           {stale && <Badge tone="warning" variant="subtle">{tr('stale')}</Badge>}
           {legal && <SectionRef sectionRef={legal.sectionRef} />}
         </div>
-        {!editing && (
-          <SpeakPill text={`${draft.title}. ${draft.whatHappened} ${draft.lawSays} ${draft.means}`} />
-        )}
+        <SpeakPill text={`${data.title}. ${data.whatHappened} ${data.lawSays} ${data.means}`} />
       </div>
 
-      {editing ? (
-        <div className="flex flex-col gap-2">
-          <Textarea value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} rows={2} aria-label="title" />
-          <Textarea value={draft.whatHappened} onChange={(e) => setDraft({ ...draft, whatHappened: e.target.value })} aria-label="what happened" />
-          <Textarea value={draft.means} onChange={(e) => setDraft({ ...draft, means: e.target.value })} aria-label="what this means" />
+      <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
+        {data.title}
+      </h3>
+      {/* NO lang="en" here: buildFinding localizes the body — an English
+          scope would strip :lang() font stacks and Nastaliq leading from
+          the card's main reading surface (DESIGN-AUDIT P1-2) */}
+      <dl className="flex flex-col gap-3">
+        <div>
+          <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
+            {tr('findingWhatHappened')}
+          </dt>
+          <dd className="mt-1 text-sm-plus text-fg-primary">{data.whatHappened}</dd>
         </div>
-      ) : (
-        <>
-          <h3 className="font-serif text-lg font-semibold leading-snug text-fg-primary">
-            {draft.title}
-          </h3>
-          {/* NO lang="en" here: buildFinding localizes the body — an English
-              scope would strip :lang() font stacks and Nastaliq leading from
-              the card's main reading surface (DESIGN-AUDIT P1-2) */}
-          <dl className="flex flex-col gap-3">
-            <div>
-              <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
-                {tr('findingWhatHappened')}
-              </dt>
-              <dd className="mt-1 text-sm-plus text-fg-primary">{draft.whatHappened}</dd>
-            </div>
-            <div>
-              <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
-                {tr('findingLawSays')}
-              </dt>
-              <dd className="mt-1 text-sm-plus text-fg-primary">
-                <LegalText text={draft.lawSays} />
-              </dd>
-            </div>
-            <div>
-              <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
-                {tr('findingMeans')}
-              </dt>
-              <dd className="mt-1 text-sm-plus text-fg-primary">{draft.means}</dd>
-            </div>
-          </dl>
-        </>
-      )}
+        <div>
+          <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
+            {tr('findingLawSays')}
+          </dt>
+          <dd className="mt-1 text-sm-plus text-fg-primary">
+            <LegalText text={data.lawSays} />
+          </dd>
+        </div>
+        <div>
+          <dt className={labelClass} lang={lang === 'en' ? undefined : lang}>
+            {tr('findingMeans')}
+          </dt>
+          <dd className="mt-1 text-sm-plus text-fg-primary">{data.means}</dd>
+        </div>
+      </dl>
 
       {/* the trust well — confidence, verification and reasoning tucked UNDER
           the answer (calm authority: headline & plain law first) */}
@@ -147,19 +108,10 @@ export function FindingCard({ data, stale, onUpdate, onDiscard, onShowLadder, la
           </span>
         )}
         <div className="flex flex-wrap items-center gap-2">
-          <ConfidenceIndicator level={draft.confidence} />
+          <ConfidenceIndicator level={data.confidence} />
           {legal && <VerificationBadge verified={legal.verified} />}
-          <ReasoningPill steps={draft.reasoningSteps} />
+          <ReasoningPill steps={data.reasoningSteps} />
         </div>
-        {/* Law 4 (A2 rule 7): edit / regenerate / discard stay on every
-            generative card — tucked here as quiet text, not a chrome row */}
-        <CardActions
-          editing={editing}
-          onEdit={() => (editing ? save() : setEditing(true))}
-          onRegenerate={regenerate}
-          onDiscard={onDiscard}
-          className="-ms-1"
-        />
       </div>
 
       {/* M2: the action plan docks INSIDE the artifact — the finding is an

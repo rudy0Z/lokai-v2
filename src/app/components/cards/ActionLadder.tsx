@@ -11,7 +11,7 @@ import { Badge } from '../ui/Badge'
 import { Banner } from '../ui/Banner'
 import { Button } from '../ui/Button'
 import { Disclosure } from '../ui/Disclosure'
-import { IconCheck, IconPhone } from '../ui/icons'
+import { IconCheck, IconCopy, IconPhone } from '../ui/icons'
 import { VerificationBadge } from '../trust/VerificationBadge'
 import { IconPencil, IconRefresh } from '../ui/icons'
 
@@ -28,7 +28,7 @@ export interface ActionLadderProps {
   stepTitles?: [string, string, string]
   channel?: DomainChannel
   className?: string
-  initialExpandedStep?: 1 | 2 | 3
+  initialExpandedStep?: 1 | 2 | 3 | 4
 }
 
 function StepNumber({ n, tone = 'brand' }: { n: number; tone?: 'brand' | 'positive' | 'warning' }) {
@@ -164,7 +164,101 @@ function ChannelStep({ prep, channel }: { prep?: string[]; channel?: DomainChann
             </li>
           ))}
         </ul>
+        <p className="mt-2.5 text-2xs leading-relaxed text-fg-tertiary">
+          {tr('step2ConciliationNote')}
+        </p>
       </div>
+    </div>
+  )
+}
+
+/** Step 4: e-Jagriti consumer commission e-filing outline — copy-only structured format */
+function EJagritiStep({ facts }: { facts?: FactRecord }) {
+  const { tr } = useApp()
+  const legal = legalById('cpa-e-jagriti')
+  const [copied, setCopied] = useState(false)
+
+  const item = facts?.item || 'Product'
+  const seller = facts?.seller || 'Opposite Party / Seller'
+  const amount = facts?.amount || 'claimed amount'
+  const issue = facts?.issueRaw || facts?.issue || 'Defective goods delivered'
+
+  const complaintDraft = `BEFORE THE DISTRICT CONSUMER DISPUTES REDRESSAL COMMISSION
+(Filed under Section 35 of the Consumer Protection Act, 2019)
+
+IN THE MATTER OF:
+Complainant: [Your Full Name, Address, Contact]
+Versus
+Opposite Party: ${seller} [Registered Office Address & GSTIN]
+
+1. BRIEF STATEMENT OF FACTS:
+a. The Complainant purchased ${item} from the Opposite Party for a consideration of ${amount}.
+b. Upon receipt, the product was found to be defective/non-conforming (${issue}).
+c. The Complainant raised a timely grievance with the Opposite Party, who failed/refused to provide replacement or refund.
+d. A pre-litigation written demand was served on the Opposite Party, but no remedy was provided.
+
+2. JURISDICTION:
+a. Territorial: The Complainant resides/works within the jurisdiction of this Hon'ble Commission (Section 34(2)).
+b. Pecuniary: The total claim value is ${amount}, which is well within the pecuniary limit of up to ₹50,00,000 (Section 34(1)). Court fee: Nil (claims up to ₹5 Lakhs).
+
+3. PRAYER / RELIEF SOUGHT:
+a. Direct the Opposite Party to refund the sum of ${amount} along with interest @ 9% p.a.
+b. Direct the Opposite Party to pay reasonable compensation for mental agony and harassment.
+c. Award litigation costs of ₹5,000.
+
+LIST OF EXHIBITS:
+- Exhibit C-1: Copy of Tax Invoice / Purchase Bill
+- Exhibit C-2: Photographs / Video proof of defect
+- Exhibit C-3: Copy of pre-litigation correspondence / WhatsApp transcript
+- Exhibit C-4: Postal receipt & Tracking / Delivery confirmation`
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-line-default bg-sunken p-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-mono text-xs font-semibold text-fg-primary" lang="en">
+            edaakhil.nic.in
+          </span>
+          <Badge tone="positive" variant="subtle">Official Portal</Badge>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-fg-secondary">
+          {tr('step4PortalDesc')}
+        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-2xs text-fg-tertiary">{legal?.source} · {legal?.sectionRef}</span>
+          <VerificationBadge verified={legal?.verified ?? false} />
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-line-default bg-card p-3">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-fg-tertiary">
+          Structured Complaint Outline (Copy-only)
+        </p>
+        <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-lg bg-sunken p-2.5 font-mono text-2xs leading-relaxed text-fg-primary">
+          {complaintDraft}
+        </pre>
+      </div>
+
+      {copied && (
+        <p className="rounded-xl bg-positive-subtle px-3 py-2 text-2xs text-on-positive-subtle">
+          {tr('ladderCopied')}
+        </p>
+      )}
+
+      <Button
+        variant="primary"
+        size="sm"
+        leadingIcon={<IconCopy className="size-3.5" />}
+        onClick={async () => {
+          const ok = await copyText(complaintDraft)
+          if (ok) {
+            toast.success(tr('copied'))
+            setCopied(true)
+          } else toast.error(tr('errorTitle'))
+        }}
+      >
+        {tr('step4CopyComplaint')}
+      </Button>
     </div>
   )
 }
@@ -218,6 +312,16 @@ export function ActionLadder({
                 {tr('openNotice')}
               </Button>
             </div>
+          </Disclosure>,
+          <Disclosure
+            key="s4"
+            bare
+            leading={<StepNumber n={4} tone="brand" />}
+            title={tr('step4Title')}
+            subtitle={tr('step4Sub')}
+            defaultOpen={initialExpandedStep === 4}
+          >
+            <EJagritiStep facts={facts} />
           </Disclosure>,
         ]
       : []),
