@@ -361,7 +361,7 @@ export const NOTICE_NEXT_STEPS_L: Pack<string[]> = {
 
 /* ---------- post-ladder follow-up answers (turn-aware, Law #3 safe) ---------- */
 
-export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: string; stopped: string; resolved: string }> = {
+export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: string; stopped: string; resolved: string; pushback: string }> = {
   en: {
     outcome:
       'I cannot promise an outcome — no one honestly can. What I can stand behind is the process: the steps above are ordered so the cheapest, safest one comes first. If the seller does not reply in writing by the deadline in your draft, Step 2 (the free 1915 helpline) is the next move. You can also correct any fact above at any time.',
@@ -371,10 +371,10 @@ export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: stri
       'We are still on the same matter — the ladder above is the current plan. To change a fact, edit it in the fact card above and confirm again; for a different matter, start a new conversation.',
     stopped:
       'I have paused this matter for a human helper — your handover packet is above, and the full safety guide has the free legal-aid lookup. If this is actually a consumer purchase, tap “Tell me more” and I will continue carefully.',
-    /* calm-authority M4: a resolution is celebrated — as PROCESS, never as a
-       promised-outcome promise (Law #3 register) */
+    pushback:
+      'That is a standard deflection tactic. When a product arrives defective on delivery, you are not required to accept a partial voucher or visit a service center yourself. Here is the statutory counter-reply:',
     resolved:
-      'That is wonderful news! Standing firm with a calm, statutory paper trail worked — the process did its job. Record it as Resolved in your Case Folder below; the log stays on this device.',
+      "That is the best possible outcome. Putting the exact statutory duty in writing gave their grievance desk a clear reason to settle early. I've marked this matter as Resolved in your folder.",
   },
   hi: {
     outcome:
@@ -383,10 +383,12 @@ export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: stri
       'अगर वे आपके संदेश को नज़रअंदाज़ करें, तो फिर से शुरू न करें — सीढ़ी ऊपर चढ़ें: तैयार सूची के साथ मुफ़्त 1915 हेल्पलाइन पर कॉल करें और हर स्क्रीनशॉट संभाल कर रखें। आपके तथ्य और ड्राफ़्ट ऊपर तैयार हैं।',
     general:
       'हम उसी मामले पर हैं — ऊपर की सीढ़ी ही मौजूदा योजना है। कोई तथ्य बदलना हो तो ऊपर तथ्य-कार्ड में सुधारें और दोबारा पक्का करें; दूसरे मामले के लिए नई बातचीत शुरू करें।',
-    resolved:
-      'यह बहुत अच्छी खबर है! शांत और कानूनी लिखित रिकॉर्ड रखने से आपका काम हो गया — प्रक्रिया ने काम किया। नीचे अपने केस फ़ोल्डर में इसे "सुलझा हुआ" दर्ज करें; रिकॉर्ड इसी डिवाइस पर रहता है।',
     stopped:
       'मैंने यह मामला किसी मानव सहायक के लिए रोक दिया है — आपका हैंडओवर पैकेट ऊपर है और पूरी सुरक्षा गाइड में मुफ़्त कानूनी सहायता की खोज है। अगर यह वास्तव में उपभोक्ता खरीद है, तो “और बताइए” दबाएँ — मैं सावधानी से आगे बढ़ूँगा।',
+    pushback:
+      'यह एक आम टालमटोल की रणनीति है। जब डिलीवरी पर सामान खराब निकलता है, तो आपको आंशिक वाउचर स्वीकार करने या खुद सर्विस सेंटर जाने की कोई बाध्यता नहीं है। यह रहा आपका वैधानिक जवाबी संदेश:',
+    resolved:
+      'यह सबसे बेहतरीन परिणाम है। लिखित में सटीक वैधानिक दायित्व दर्ज करने से उनके शिकायत निवारण विभाग को तुरंत मामला सुलझाने का स्पष्ट आधार मिला। मैंने इसे आपके फ़ोल्डर में "सुलझा हुआ" (Resolved) दर्ज कर दिया है।',
   },
   mr: {
     outcome:
@@ -395,10 +397,12 @@ export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: stri
       'त्यांनी तुमचा संदेश दुर्लक्षित केल्यास पुन्हा सुरुवात करू नका — जणू वर चढा: तयार यादीसह मोफत 1915 हेल्पलाइनवर कॉल करा आणि प्रत्येक स्क्रीनशॉट जपून ठेवा. तुमच्या वस्तुस्थिती व मसुदे वर तयार आहेत.',
     general:
       'आपण त्याच बाबीवर आहोत — वरची जणूच मोठी योजना आहे. वस्तुस्थिती बदलायची असल्यास वरील तथ्य-कार्डात दुरुस्त करा व पुन्हा निश्चित करा; दुसऱ्या बाबीसाठी नवी संभाषण सुरू करा.',
-    resolved:
-      'अभिनंदन! शांत आणि कायदेशीर लेखी पुराव्याने काम पूर्ण झाले — प्रक्रियेने काम केले. खाली आपल्या केस फोल्डरमध्ये "निकाली" नोंदवा; नोंद याच डिव्हाइसवर राहते.',
     stopped:
       'मी ही बाब मानवी मदतनीसासाठी थांबवली आहे — तुमचे हँडओव्हर पॅकेट वर आहे आणि संपूर्ण सुरक्षा मार्गदर्शकात मोफत कायदेशीर मदतीचा शोध आहे. ही खरी ग्राहक खरेदी असल्यास “आणखी सांगा” दाबा — मी काळजी घेऊन पुढे जाईन.',
+    pushback:
+      'ही टाळाटाळीची नेहमीची पद्धत आहे. वस्तू डिलीवरीवरच खराब आली असल्यास, आपल्याला आंशिक व्हाउचर स्वीकारण्याची किंवा स्वतः सर्व्हिस सेंटरला जाण्याची कोणतीही आवश्यकता नाही. हा आपला वैधानिक प्रतिवाद संदेश:',
+    resolved:
+      'हा सर्वोत्तम संभाव्य निकाल आहे. अचूक वैधानिक दायित्व लेखी स्वरूपात नोंदवल्याने त्यांच्या तक्रार निवारण विभागाला लवकर समझोता करण्याचा स्पष्ट आधार मिळाला. मी ही बाब आपल्या फोल्डरमध्ये "निकाली" (Resolved) म्हणून नोंदवली आहे.',
   },
   ta: {
     outcome:
@@ -407,10 +411,12 @@ export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: stri
       'உங்கள் செய்தியை புறக்கணித்தால் திரும்பத் தொடங்காதீர்கள் — படிக்கட்டில் மேலே ஏருங்கள்: தயார் பட்டியலுடன் இலவச 1915 உதவி எண்ணை அழையுங்கள், ஒவ்வொரு ஸ்கிரீன்ஷாட்டையும் பாதுகாத்து வையுங்கள். உங்கள் உண்மைகளும் வரைவுகளும் மேலே தயாராக உள்ளன.',
     general:
       'நாம் இன்னும் அதே வழக்கில் தான் இருக்கிறோம் — மேலே உள்ள படிக்கட்டே தற்போதைய திட்டம். ஒரு உண்மையை மாற்ற வேண்டுமானால் மேலே உண்மை அட்டையில் திருத்தி மீண்டும் உறுதிப்படுத்துங்கள்; வேறு வழக்குக்கு புதிய உரையாடலைத் தொடங்குங்கள்.',
-    resolved:
-      'மிக மகிழ்ச்சியான செய்தி! அமைதியான, சட்டப்பூர்வமான ஆவணப்படுத்திய பாதை வெற்றி பெற்றது — செயல்முறை வேலை செய்தது. கீழே உங்கள் கேஸ் ஃபோல்டரில் "தீர்ந்தது" எனப் பதிவு செய்யுங்கள்; பதிவு இந்தச் சாதனத்திலேயே இருக்கும்.',
     stopped:
       'இந்த வழக்கை ஒரு மனித உதவியாளருக்காக நிறுத்திவிட்டேன் — உங்கள் கையளிப்புத் தொகுப்பு மேலே உள்ளது, முழு பாதுகாப்பு வழிகாட்டியில் இலவச சட்ட உதவி தேடல் உள்ளது. இது உண்மையில் நுகர்வோர் வாங்கல் என்றால் “இன்னும் சொல்லுங்கள்” அழுத்துங்கள் — கவனமாகத் தொடர்வேன்.',
+    pushback:
+      'இது வழக்கமான திசைதிருப்பும் உத்தி. டெலிவரியின் போதே பொருள் பழுதாகி வந்தால், நீங்கள் பகுதி வவுச்சரை ஏற்கவோ அல்லது நீங்களே சேவை மையத்திற்குச் செல்லவோ தேவையில்லை. இதோ உங்கள் சட்டபூர்வ பதில்:',
+    resolved:
+      'இதுவே சிறந்த சாத்தியமான முடிவு. சரியான சட்டப்பூர்வ கடமையை எழுத்துப்பூர்வமாக வைத்தது அவர்களின் குறைதீர்க்கும் பிரிவுக்கு உடனே முடிவெடுக்க தெளிவான காரணத்தை அளித்தது. இதை உங்கள் கோப்பில் "தீர்ந்தது" (Resolved) எனப் பதிவு செய்துள்ளேன்.',
   },
   ur: {
     outcome:
@@ -419,10 +425,12 @@ export const FOLLOW_UPS: Pack<{ outcome: string; escalate: string; general: stri
       'اگر وہ آپ کا پیغام نظرانداز کریں تو دوبارہ شروع نہ کریں — سیڑھی اوپر چڑھیں: تیار فہرست کے ساتھ مفت 1915 ہیلپ لائن پر کال کریں اور ہر اسکرین شاٹ محفوظ رکھیں۔ آپ کے حقائق اور مسودے اوپر موجود ہیں۔',
     general:
       'ہم اسی معاملے پر ہیں — اوپر کی سیڑھی ہی موجودہ منصوبہ ہے۔ کوئی حقیقت بدلنی ہو تو اوپر حقیقت کارڈ میں درست کریں اور دوبارہ تصدیق کریں؛ دوسرے معاملے کے لیے نئی گفتگو شروع کریں۔',
-    resolved:
-      'بہت خوشخبری! پرسکون اور قانونی تحریری ریکارڈ پر کھڑے رہنے سے کام ہو گیا — عمل نے کام کیا۔ نیچے اپنے کیس فولڈر میں اسے "حل شدہ" درج کریں؛ ریکارڈ اسی ڈیوائس پر رہتا ہے۔',
     stopped:
       'میں نے یہ معاملہ کسی انسانی مددگار کے لیے روک دیا ہے — آپ کا ہینڈ اوور پیکٹ اوپر ہے اور مکمل حفاظتی گائیڈ میں مفت قانونی امداد کی تلاش ہے۔ اگر یہ واقعی صارف خریداری ہے تو “اور بتائیں” دبائیں — میں احتیاط سے آگے بڑھوں گا۔',
+    pushback:
+      'یہ ایک عام ٹال مٹول کی حکمت عملی ہے۔ جب ڈیلیوری پر چیز خراب نکلے تو آپ کو جزوی واؤچر قبول کرنے یا خود سروس سینٹر جانے کی کوئی ضرورت نہیں۔ یہ رہا آپ کا قانونی جوابی پیغام:',
+    resolved:
+      'یہ سب سے بہترین نتیجہ ہے۔ تحریر میں درست قانونی ذمہ داری درج کرنے سے ان کے شکایات ڈیسک کو فوری تصفیہ کی واضح وجہ ملی۔ میں نے اسے آپ کے فولڈر میں "حل شدہ" (Resolved) درج کر دیا ہے۔',
   },
 }
 

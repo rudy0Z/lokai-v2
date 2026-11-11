@@ -77,7 +77,7 @@ export function domainPack(
 const refundStandard: BranchPacks = {
   en: {
     empathy:
-      'A "return window is closed" answer when the product itself arrived broken is where many people get stuck — a store policy cannot take away what the law gives you. Let us lock the basic facts first, so your next message is the exact right one.',
+      'A 48-hour store rule cannot override your statutory right when a product arrives defective. Before I map out your standing, check if I caught these four facts accurately—tap any box to edit.',
     facts: [
       { key: 'item', label: 'Item', value: 'Mixwell 750W mixer grinder' },
       { key: 'amount', label: 'Amount paid', value: '₹8,999 (UPI · GST invoice)' },
@@ -117,7 +117,7 @@ const refundStandard: BranchPacks = {
   },
   hi: {
     empathy:
-      'जब सामान खुद टूटा हुआ आया हो, तब "रिटर्न विंडो बंद है" कहकर मना करना वहीं अटकने की जगह है — दुकान की पॉलिसी कानून द्वारा दिए अधिकारों को नहीं काट सकती। आइए पहले बुनियादी तथ्य पक्के करें, ताकि आपका अगला संदेश बिल्कुल सही हो।',
+      'सामान खराब निकलने पर 48 घंटे का स्टोर नियम आपके कानूनी अधिकार को खत्म नहीं कर सकता। आपका कानूनी पक्ष तय करने से पहले, देख लें कि मैंने ये चार तथ्य सही दर्ज किए हैं — बदलने के लिए किसी भी बॉक्स पर टैप करें।',
     facts: [
       { key: 'item', label: 'वस्तु', value: 'मिक्सवेल 750W मिक्सर ग्राइंडर' },
       { key: 'amount', label: 'राशि', value: '₹8,999 (UPI · GST बिल)' },

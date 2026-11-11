@@ -8,7 +8,7 @@ import { classifyMatter, reRouteAsCaution, SCOPE_RULES, type ScopeDecision } fro
 import { resolveConfidence } from '../data/legal-content'
 import { REASSURANCE, SCENARIO_SEEDS } from '../data/refund-journey'
 import { FOLLOW_UPS, INFORMAL_CAUTION } from '../data/localized-content'
-import { scenarioById, type TesterOption } from '../data/interactive-scenarios'
+import { scenarioById, STARTER_OPTIONS, type TesterOption } from '../data/interactive-scenarios'
 import { domainPack, type DomainId, type DomainBranch } from '../data/domain-playbooks'
 import {
   extractFacts,
@@ -113,7 +113,9 @@ export default function ChatPage() {
   const seedId = params.get('s')
   const spans = useSpans()
   const activeCase = activeCaseId ? matterById(activeCaseId) : undefined
-  const scenario = scenarioById(seedId?.startsWith('scn') ? seedId : undefined)
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | undefined>()
+  const activeScenarioId = selectedScenarioId ?? (seedId?.startsWith('scn') ? seedId : undefined)
+  const scenario = scenarioById(activeScenarioId)
 
   const [items, setItems] = useState<ChatItem[]>([])
   const [busy, setBusy] = useState(false)
@@ -187,7 +189,7 @@ export default function ChatPage() {
         push({
           kind: 'assistant',
           stream: true,
-          text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en,
+          text: tr('reassurance'),
         })
         window.setTimeout(() => push({ kind: 'factcheck' }), 600)
       },
@@ -224,23 +226,57 @@ export default function ChatPage() {
   const followUp = (currentStage: ThreadStage) => {
     const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
     const text = lastUserRef.current
-    const domainPackLive = domain ? domainPack(domain.id, domain.branch, lang) : null
     if (RE_RESOLVED.test(text)) {
-      /* M4: a resolution is celebrated as process-win, then the closeout
-         mounts alone — never the "still on the same matter" line */
       stageRef.current = 'awaitingFacts'
       run('progress', () => {
-        push({ kind: 'assistant', stream: true, text: pack.resolved }, { kind: 'closeout' })
+        push(
+          {
+            kind: 'assistant',
+            stream: true,
+            text: pack.resolved,
+          },
+          { kind: 'closeout' },
+        )
       })
       return
     }
+
+    const isPushback =
+      /voucher|coupon|service center|service-center|48 hours?|48hr|policy|reject|refus|can'?t refund|वाउचर|सर्विस सेंटर|पॉलिसी/i.test(text) ||
+      RE_ESCALATE.test(text)
+    if (isPushback) {
+      stageRef.current = 'engaged'
+      run('progress', () => {
+        push(
+          {
+            kind: 'assistant',
+            stream: true,
+            text: pack.pushback,
+          },
+          {
+            kind: 'counter',
+            counterData: {
+              title: 'Statutory Counter-Reply (WhatsApp / Email)',
+              statutoryBasis:
+                domain?.id === 'deposit'
+                  ? 'Transfer of Property Act, 1882 · S. 108(m) [VERIFY]'
+                  : 'Consumer Protection Act, 2019 · S. 84 [VERIFY]',
+              replyText:
+                domain?.id === 'deposit'
+                  ? 'Under Section 108(m) of the Transfer of Property Act, 1882 and Section 70 of Indian Contract Act, normal wear-and-tear and painting are the landlord’s statutory obligation. Withholding ₹35,000 without actual GST damage bills is legally unsustainable. Please refund the ₹35,000 within 7 days, failing which legal proceedings will follow.'
+                  : `Under Section 84 of the Consumer Protection Act, 2019, goods that arrive defective out of the box (Dead on Arrival) entitle the consumer to a full refund or replacement. Store policy or return windows cannot waive statutory liability. Please arrange pickup and initiate the full ${matterFacts.amount || '₹8,999'} refund within 48 hours, failing which I will escalate to the National Consumer Helpline (1915) and e-Jagriti.`,
+            },
+          },
+        )
+      })
+      return
+    }
+
     const msg = RE_PROMISE.test(text)
       ? pack.outcome
-      : RE_ESCALATE.test(text)
-        ? (domainPackLive?.escalate ?? pack.escalate)
-        : currentStage === 'stopped'
-          ? pack.stopped
-          : pack.general
+      : currentStage === 'stopped'
+        ? pack.stopped
+        : pack.general
     run('progress', () => {
       push({ kind: 'assistant', stream: true, text: msg })
     })
@@ -501,7 +537,7 @@ export default function ChatPage() {
       setMatterFacts(facts)
       setFactItems(factRows(facts, lang))
       push(
-        { kind: 'assistant', stream: true, text: REASSURANCE.hassle[lang] ?? REASSURANCE.hassle.en },
+        { kind: 'assistant', stream: true, text: tr('reassurance') },
         { kind: 'factcheck' },
       )
     })
@@ -686,6 +722,9 @@ export default function ChatPage() {
   }
 
   const handleScenarioOption = (o: TesterOption) => {
+    if (o.scenarioId) {
+      setSelectedScenarioId(o.scenarioId)
+    }
     push({ kind: 'user', text: o.text })
     lastUserRef.current = o.text
     if (o.domain) {
@@ -740,23 +779,49 @@ export default function ChatPage() {
           push({ kind: 'finding' }, { kind: 'ladder', variant: 'full' })
         })
         return
-      case 'pushback':
+      case 'pushback': {
+        const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
         stageRef.current = 'engaged'
         run('progress', () => {
-          push({ kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).escalate })
+          push(
+            {
+              kind: 'assistant',
+              stream: true,
+              text: pack.pushback,
+            },
+            {
+              kind: 'counter',
+              counterData: {
+                title: 'Statutory Counter-Reply (WhatsApp / Email)',
+                statutoryBasis:
+                  domain?.id === 'deposit'
+                    ? 'Transfer of Property Act, 1882 · S. 108(m) [VERIFY]'
+                    : 'Consumer Protection Act, 2019 · S. 84 [VERIFY]',
+                replyText:
+                  domain?.id === 'deposit'
+                    ? 'Under Section 108(m) of the Transfer of Property Act, 1882 and Section 70 of Indian Contract Act, normal wear-and-tear and painting are the landlord’s statutory obligation. Withholding ₹35,000 without actual GST damage bills is legally unsustainable. Please refund the ₹35,000 within 7 days, failing which legal proceedings will follow.'
+                    : `Under Section 84 of the Consumer Protection Act, 2019, goods that arrive defective out of the box (Dead on Arrival) entitle the consumer to a full refund or replacement. Store policy or return windows cannot waive statutory liability. Please arrange pickup and initiate the full ${matterFacts.amount || '₹8,999'} refund within 48 hours, failing which I will escalate to the National Consumer Helpline (1915) and e-Jagriti.`,
+              },
+            },
+          )
         })
         return
-      case 'resolved':
-        /* M4: celebrate the process-win, then the closeout stands alone —
-           the rail drops (stage with no options) */
+      }
+      case 'resolved': {
+        const pack = FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!
         stageRef.current = 'awaitingFacts'
         run('progress', () => {
           push(
-            { kind: 'assistant', stream: true, text: (FOLLOW_UPS[lang] ?? FOLLOW_UPS.en!).resolved },
+            {
+              kind: 'assistant',
+              stream: true,
+              text: pack.resolved,
+            },
             { kind: 'closeout' },
           )
         })
         return
+      }
       case 'save':
         /* Part 2 overhaul: the closure ritual folds into the rail while the
            post-finding options are up — one menu, not two */
@@ -797,13 +862,39 @@ export default function ChatPage() {
                               : lang === 'ur'
                                 ? 'تازہ ترین حقائق کے ساتھ دوبارہ جانچیں'
                                 : 'Re-run standing with updated facts'),
+                      label:
+                        '↻ ' +
+                        (lang === 'hi'
+                          ? 'दोबारा जाँचें'
+                          : lang === 'mr'
+                            ? 'पुन्हा तपासा'
+                            : lang === 'ta'
+                              ? 'மீண்டும் சரிபார்க்கவும்'
+                              : lang === 'ur'
+                                ? 'دوبارہ جانچیں'
+                                : 'Re-run standing'),
                       meta: 'metaEvidence',
                       route: 'updateFacts' as const,
                     },
                   ]
                 : []),
               ...(postFindingOptions ?? []),
-              { text: tr('railSaveLater'), meta: 'metaSave', route: 'save' as const },
+              {
+                text: tr('railSaveLater'),
+                label:
+                  '💾 ' +
+                  (lang === 'hi'
+                    ? 'केस सेव करें'
+                    : lang === 'mr'
+                      ? 'केस सेव्ह करा'
+                      : lang === 'ta'
+                        ? 'கேஸை சேமிக்கவும்'
+                        : lang === 'ur'
+                          ? 'کیس محفوظ کریں'
+                          : 'Save case'),
+                meta: 'metaSave',
+                route: 'save' as const,
+              },
             ]
           : undefined /* awaitingFacts / stopped: no rail — nothing honest to offer yet */
 
@@ -832,6 +923,7 @@ export default function ChatPage() {
     setMatterFacts(EMPTY_FACTS)
     setFindingData(buildFinding(EMPTY_FACTS, 'en'))
     setFactItems([])
+    setSelectedScenarioId(undefined)
   }
 
   /* the finding card re-speaks the signed facts in the current language */
@@ -1167,19 +1259,22 @@ export default function ChatPage() {
                   {/* M1: on a seeded scenario the three starter options render
                       as single-line intent pills; the full script still pushes
                       as the user's own message on tap */}
-                  {scenario && testerOptions
-                    ? testerOptions.map((o, i) => (
+                  {scenario && testerOptions ? (
+                    testerOptions.map((o, i) => (
+                      <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
+                        {o.label ?? tr(o.meta as never)}
+                      </Chip>
+                    ))
+                  ) : (
+                    <>
+                      {STARTER_OPTIONS.map((o, i) => (
                         <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
-                          {tr(o.meta as never)}
+                          {o.label ?? o.text}
                         </Chip>
-                      ))
-                    : (
-                        <>
-                          <Chip onClick={() => handleSend(SCENARIO_SEEDS[0]!.userMessage, [])}>{tr('chipDefective')}</Chip>
-                          <Chip onClick={() => handleSend(SCENARIO_SEEDS[3]!.userMessage, [])}>{tr('chipThreat')}</Chip>
-                          <Chip onClick={() => navigate('/notice')}>{tr('addNotice')}</Chip>
-                        </>
-                      )}
+                      ))}
+                      <Chip onClick={() => navigate('/notice')}>{tr('addNotice')}</Chip>
+                    </>
+                  )}
                 </motion.div>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -1391,7 +1486,7 @@ export default function ChatPage() {
               <div className="flex flex-wrap gap-2 px-1 pb-1 pt-1">
                 {inlineChips.map((o, i) => (
                   <Chip key={i} onClick={() => handleScenarioOption(o)} className="max-w-full text-start">
-                    {tr(o.meta as never)}
+                    {o.label ?? tr(o.meta as never)}
                   </Chip>
                 ))}
               </div>
